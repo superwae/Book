@@ -1,0 +1,97 @@
+# Built application files
+*.apk
+*.app
+*.exe
+*.ipa
+*.dll
+
+# Compiled source #
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Packages #
+# It's better to exclude the NuGet packages directory
+**/[Pp]ackages/*
+# except build/, which is used as an MSBuild target.
+!**/[Pp]ackages/build/
+
+# ASP.NET Scaffolding #
+ScaffoldingReadMe.txt
+
+# MSTest test Results #
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUNIT #
+*.VisualState.xml
+TestResult.xml
+
+# Build results #
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Roslyn cache directories #
+*.ide/
+
+# ReSharper #
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# TeamCity #
+_TeamCity*
+
+# User-specific files #
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio) #
+*.userprefs
+
+# Mono Auto Generated Files #
+mono_crash.*
+
+# Windows image file caches #
+Thumbs.db
+ehthumbs.db
+
+# Folder config file #
+Desktop.ini
+
+# Recycle Bin used on file shares #
+$RECYCLE.BIN/
+
+# VS Code #
+.vscode/
+*.code-workspace
+
+# Windows Installer files #
+*.cab
+*.msi
+*.msm
+*.msp
+
+# Windows shortcuts #
+*.lnk
+
+# JetBrains Rider #
+.idea/
+*.sln.iml
+
+# Visual Studio Code #
+.vscode/
