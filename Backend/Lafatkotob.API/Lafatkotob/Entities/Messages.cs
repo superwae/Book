@@ -7,7 +7,7 @@
         int senderUserID { get; set; }
         int receiveUserID { get; set; }
         string messageText { get; set; }
-        DataTime dateSent { get; set; }
+        DateTime dateSent { get; set; }
         int isReceived { get; set; }
         int isRead { get; set; }
         int isDeletedBySender { get; set; }
