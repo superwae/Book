@@ -14,6 +14,7 @@ namespace Lafatkotob.Entities
         [ForeignKey(nameof(Event))]
         public int EventId { get; set; }
 
-        public virtual AppUser AppUser { get; set; } 
-        public virtual Event Event { get; set; } 
+        public virtual AppUser AppUser { get; set; }
+        public virtual Event Event { get; set; }
+    }
 }
