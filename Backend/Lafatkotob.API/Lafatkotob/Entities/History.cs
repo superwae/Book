@@ -1,18 +1,28 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Lafatkotob.Entities
 {
     public class History
     {
-        int id { get; set; }
+        [Key]
+        public int Id { get; set; }
 
-        [ForeignKey("User")]
-        int userID { get; set; }
-        [ForeignKey("Books")]
-        int bookID { get; set; }
-        string date { get; set; }
-        string type { get; set; }
-        string state { get; set; }
-        int partnerUserID { get; set; }
+        [ForeignKey("AppUser")]
+        public string UserId { get; set; } 
+
+        [ForeignKey("Book")]
+        public int BookId { get; set; }
+
+        public DateTime Date { get; set; }
+        public string Type { get; set; }
+        public string State { get; set; }
+
+        [ForeignKey("PartnerAppUser")]
+        public string PartnerUserId { get; set; }
+        public virtual AppUser AppUser { get; set; }
+        public virtual AppUser PartnerAppUser { get; set; }
+        public virtual Book Book { get; set; }
     }
 }

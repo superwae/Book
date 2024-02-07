@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Lafatkotob.Entities
 {
-    public class UserEvent
+    public class NotificationUser
     {
         [Key]
         public int Id { get; set; }
@@ -11,9 +11,10 @@ namespace Lafatkotob.Entities
         [ForeignKey(nameof(AppUser))]
         public string UserId { get; set; }
 
-        [ForeignKey(nameof(Event))]
-        public int EventId { get; set; }
+        [ForeignKey(nameof(Notification))]
+        public int NotificationId { get; set; }
 
-        public virtual AppUser AppUser { get; set; } 
-        public virtual Event Event { get; set; } 
+        public virtual AppUser AppUser { get; set; }
+        public virtual Notification Notification { get; set; }
+    }
 }
