@@ -23,7 +23,7 @@ namespace Lafatkotob.Configuration
             // Configuring the relationship with AppUser
 
             builder.HasOne(bpc => bpc.AppUser)
-                   .WithMany(au => au.BookPostComments)
+                   .WithMany(u => u.BookPostComments)
                    .HasForeignKey(bpc => bpc.UserId)
                    .OnDelete(DeleteBehavior.Cascade); 
         }

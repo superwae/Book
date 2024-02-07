@@ -21,7 +21,7 @@ namespace Lafatkotob.Configuration
 
             // Configuring the relationship with AppUser
             builder.HasOne(bpl => bpl.AppUser)
-                   .WithMany(au => au.BookPostLikes)
+                   .WithMany(u => u.BookPostLikes)
                    .HasForeignKey(bpl => bpl.UserId)
                    .OnDelete(DeleteBehavior.Cascade); 
         }

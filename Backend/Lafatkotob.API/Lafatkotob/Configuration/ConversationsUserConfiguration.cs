@@ -15,13 +15,13 @@ namespace Lafatkotob.Configuration
 
             // Relationship with AppUser
             builder.HasOne(cu => cu.AppUser)
-                   .WithMany(au => au.ConversationsUsers)
+                   .WithMany(u => u.ConversationsUsers)
                    .HasForeignKey(cu => cu.UserId)
                    .OnDelete(DeleteBehavior.Cascade); 
 
             // Relationship with Conversation
             builder.HasOne(cu => cu.Conversation)
-                   .WithMany(c => c.ConversationsUsers)
+                   .WithMany(u => u.ConversationsUsers)
                    .HasForeignKey(cu => cu.ConversationId)
                    .OnDelete(DeleteBehavior.Cascade); 
         }

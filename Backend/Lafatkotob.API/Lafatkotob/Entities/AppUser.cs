@@ -13,12 +13,13 @@ namespace Lafatkotob.Entities
         public string ProfilePicture { get; set; }
         public string About { get; set; }
         public DateTime DTHDate { get; set; }
-
+        public int? HistoryId { get; set; }
         public int Age => DateTime.Today.Year - DTHDate.Year - (DateTime.Today.DayOfYear < DTHDate.DayOfYear ? 1 : 0);
 
         public AppUser()
         {
             Books = new HashSet<Book>();
+            PartnerBooks = new HashSet<Book>(); 
             UserPreferences = new HashSet<UserPreference>();
             BookPostLikes = new HashSet<BookPostLike>();
             BookPostComments = new HashSet<BookPostComment>();
@@ -32,6 +33,7 @@ namespace Lafatkotob.Entities
             MessagesSent = new HashSet<Message>();
             MessagesReceived = new HashSet<Message>();
             NotificationsUsers = new HashSet<NotificationUser>();
+            Events = new HashSet<Event>();
             Wishlists = null; 
         }
 
@@ -50,6 +52,9 @@ namespace Lafatkotob.Entities
         public virtual ICollection<Message> MessagesSent { get; set; }
         public virtual ICollection<Message> MessagesReceived { get; set; }
         public virtual ICollection<NotificationUser> NotificationsUsers { get; set; }
+        public virtual ICollection<Book> PartnerBooks { get; set; }
+        public virtual ICollection<Event> Events { get; set; }
+
         public virtual Wishlist Wishlists { get; set; }
     }
 }

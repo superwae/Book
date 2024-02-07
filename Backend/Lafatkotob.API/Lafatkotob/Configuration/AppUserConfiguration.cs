@@ -57,12 +57,12 @@ namespace Lafatkotob.Configuration
             builder.HasMany(u => u.UserLikes)
                    .WithOne(l => l.LikingAppUser)
                    .HasForeignKey(l => l.LikingUserId)
-                   .OnDelete(DeleteBehavior.Restrict); // Prevent CASCADE delete
+                   .OnDelete(DeleteBehavior.Restrict); 
 
             builder.HasMany(u => u.UserLiked)
                    .WithOne(l => l.LikedAppUser)
                    .HasForeignKey(l => l.LikedUserId)
-                   .OnDelete(DeleteBehavior.Restrict); // Prevent CASCADE delete
+                   .OnDelete(DeleteBehavior.Restrict); 
 
             // UserReviews
             builder.HasMany(u => u.UserReviews)
