@@ -19,6 +19,6 @@ namespace Lafatkotob.Entities
         public DateTime DateCommented { get; set; }
 
         public virtual Book Book { get; set; }
-        public virtual AppUser AppUser { get; set; } // Corrected the property name to be singular
+        public virtual AppUser AppUser { get; set; }
     }
 }

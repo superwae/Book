@@ -11,10 +11,12 @@ namespace Lafatkotob.Entities
         public DateTime LastMessageDate { get; set; }
 
         public virtual ICollection<Message> Messages { get; set; }
+        public virtual ICollection<ConversationsUser> ConversationsUsers { get; set; }
 
         public Conversation()
         {
             Messages = new HashSet<Message>();
+            ConversationsUsers = new HashSet<ConversationsUser>(); 
         }
     }
 }
