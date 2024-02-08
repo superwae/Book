@@ -96,10 +96,15 @@ namespace Lafatkotob.Configuration
             builder.HasMany(u => u.MessagesSent)
                    .WithOne(m => m.SenderUser)
                    .HasForeignKey(m => m.SenderUserId);
-
+            // Messages
             builder.HasMany(u => u.MessagesReceived)
                    .WithOne(m => m.ReceiverUser)
                    .HasForeignKey(m => m.ReceiverUserId);
+            //history
+            builder.HasOne(h => h.History)
+                  .WithOne(u => u.AppUser)
+                  .HasForeignKey<History>(u => u.UserId)
+                  .OnDelete(DeleteBehavior.Restrict);
 
             // NotificationsUsers
             builder.HasMany(u => u.NotificationsUsers)
