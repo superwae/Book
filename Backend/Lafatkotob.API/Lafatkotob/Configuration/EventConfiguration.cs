@@ -20,7 +20,11 @@ namespace Lafatkotob.Configuration
             builder.HasOne(e => e.HostUser)
                    .WithMany(u=>u.Events) 
                    .HasForeignKey(e => e.HostUserId)
-                   .OnDelete(DeleteBehavior.Restrict); 
+                   .OnDelete(DeleteBehavior.Restrict);
+            // the relationship with AppUser as the event participant
+            builder.HasMany(e => e.UserEvents)
+                   .WithOne(u => u.Event)
+                   .OnDelete(DeleteBehavior.Restrict);
 
 
         }

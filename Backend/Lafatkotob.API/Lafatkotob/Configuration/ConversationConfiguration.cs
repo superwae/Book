@@ -18,9 +18,13 @@ namespace Lafatkotob.Configuration
                    .WithOne(m => m.Conversation)
                    .HasForeignKey(m=> m.ConversationId)
                    .OnDelete(DeleteBehavior.Cascade);
+            // whith conversationUser many to one 
+            builder.HasMany(cu => cu.ConversationsUsers)
+                  .WithOne(u => u.Conversation)
+                  .HasForeignKey(cu => cu.ConversationId)
+                  .OnDelete(DeleteBehavior.Cascade);
 
-            
-           
+
         }
     }
 }

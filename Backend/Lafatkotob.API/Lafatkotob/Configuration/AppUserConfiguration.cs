@@ -42,6 +42,11 @@ namespace Lafatkotob.Configuration
             builder.HasMany(u => u.UserPreferences)
                    .WithOne(p => p.AppUser)
                    .HasForeignKey(p => p.UserId);
+            //history 
+            builder.HasOne(h => h.History)
+                  .WithOne(u => u.AppUser)
+                  .HasForeignKey<History>(u => u.UserId)
+                  .OnDelete(DeleteBehavior.Restrict);
 
             // BookPostLikes
             builder.HasMany(u => u.BookPostLikes)
@@ -104,7 +109,7 @@ namespace Lafatkotob.Configuration
 
             // Configuring a one-to-one relationship with Wishlist
             // Assuming Wishlist has a navigation property back to AppUser (if applicable)
-            builder.HasOne(u => u.Wishlists)
+            builder.HasOne(u => u.Wishlist)
                    .WithOne(w => w.AppUser)
                    .HasForeignKey<Wishlist>(w => w.UserId);
         }
