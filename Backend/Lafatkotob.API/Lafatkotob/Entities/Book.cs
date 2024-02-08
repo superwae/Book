@@ -22,6 +22,7 @@ public class Book
     public string Status { get; set; }
 
     // Foreign key to the user who currently has the book or is interested in it
+    [ForeignKey(nameof(PartnerUserId))]
     public string PartnerUserId { get; set; }
 
     // Navigation properties

@@ -21,7 +21,7 @@ namespace Lafatkotob.Configuration
             builder.HasOne(m => m.Conversation)
                    .WithMany(c => c.Messages)
                    .HasForeignKey(m => m.ConversationId)
-                   .OnDelete(DeleteBehavior.Cascade); 
+                   .OnDelete(DeleteBehavior.Restrict); 
 
             // Configuring the relationships with SenderUser and ReceiverUser
             builder.HasOne(m => m.SenderUser)

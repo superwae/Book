@@ -19,8 +19,6 @@ namespace Lafatkotob.Configuration
                    .WithOne(u => u.History)
                    .HasForeignKey<History>(h => h.UserId)
                    .OnDelete(DeleteBehavior.Restrict); 
-
-            
         }
     }
 }

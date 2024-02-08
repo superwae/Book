@@ -18,14 +18,14 @@ namespace Lafatkotob.Configuration
             builder.HasOne(bpc => bpc.Book)
                    .WithMany(b => b.BookPostComments)
                    .HasForeignKey(bpc => bpc.BookId)
-                   .OnDelete(DeleteBehavior.Cascade); 
+                   .OnDelete(DeleteBehavior.Restrict); 
 
             // Configuring the relationship with AppUser
 
             builder.HasOne(bpc => bpc.AppUser)
                    .WithMany(u => u.BookPostComments)
                    .HasForeignKey(bpc => bpc.UserId)
-                   .OnDelete(DeleteBehavior.Cascade); 
+                   .OnDelete(DeleteBehavior.Restrict); 
         }
     }
 }

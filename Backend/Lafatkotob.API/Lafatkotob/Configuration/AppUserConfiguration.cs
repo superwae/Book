@@ -19,6 +19,10 @@ namespace Lafatkotob.Configuration
             builder.Property(u => u.PasswordHash).IsRequired();
             builder.Property(u => u.PhoneNumber).IsRequired(false);
 
+            //unique properties
+            builder.HasIndex(u => u.Email).IsUnique();
+            builder.HasIndex(u => u.UserName).IsUnique();
+
             // Custom properties
             builder.Property(u => u.IsDeleted).IsRequired();
             builder.Property(u => u.Location).IsRequired(false).HasMaxLength(255);
@@ -103,10 +107,14 @@ namespace Lafatkotob.Configuration
                    .HasForeignKey(n => n.UserId);
 
             // Configuring a one-to-one relationship with Wishlist
-            // Assuming Wishlist has a navigation property back to AppUser (if applicable)
-            builder.HasOne(u => u.Wishlists)
+            builder.HasOne(u => u.Wishlist)
                    .WithOne(w => w.AppUser)
                    .HasForeignKey<Wishlist>(w => w.UserId);
+            //configuring the one-to-one relationship with History
+            builder.HasOne(u => u.History)
+                   .WithOne(h => h.AppUser)
+                   .HasForeignKey<History>(h => h.UserId)
+                   .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

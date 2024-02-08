@@ -14,13 +14,13 @@ namespace Lafatkotob.Configuration
             builder.HasOne(up => up.AppUser)
                    .WithMany(u => u.UserPreferences) 
                    .HasForeignKey(up => up.UserId)
-                   .OnDelete(DeleteBehavior.Cascade); 
+                   .OnDelete(DeleteBehavior.Restrict); 
 
             // Configuring the relationship between UserPreference and Genre
             builder.HasOne(up => up.Genre)
                    .WithMany(g => g.UserPreferences) 
                    .HasForeignKey(up => up.GenreId)
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .OnDelete(DeleteBehavior.Restrict);
 
         }
     }

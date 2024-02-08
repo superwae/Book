@@ -15,13 +15,13 @@ namespace Lafatkotob.Configuration
             builder.HasOne(wb => wb.Wishlist)
                    .WithMany(wl => wl.WishedBooks) 
                    .HasForeignKey(wb => wb.WishlistId)
-                   .OnDelete(DeleteBehavior.Cascade); 
+                   .OnDelete(DeleteBehavior.Restrict); 
 
             // Configuring the relationship between WishedBook and BooksInWishlists
             builder.HasOne(wb => wb.BooksInWishlists)
                    .WithMany(biw => biw.WishedBooks) 
                    .HasForeignKey(wb => wb.BooksInWishlistsId)
-                   .OnDelete(DeleteBehavior.Cascade); 
+                   .OnDelete(DeleteBehavior.Restrict); 
 
         }
     }

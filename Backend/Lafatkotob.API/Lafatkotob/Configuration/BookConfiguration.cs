@@ -36,7 +36,7 @@ namespace Lafatkotob.Configuration
             builder.HasOne(b => b.History)
                    .WithMany(h => h.Books)
                    .HasForeignKey(b => b.HistoryId)
-                   .OnDelete(DeleteBehavior.SetNull); 
+                   .OnDelete(DeleteBehavior.Restrict); 
 
             // Many-to-Many: BookGenres (via BookGenre entity)
             builder.HasMany(b => b.BookGenres)
