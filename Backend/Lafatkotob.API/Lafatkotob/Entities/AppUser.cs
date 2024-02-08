@@ -34,7 +34,7 @@ namespace Lafatkotob.Entities
             MessagesReceived = new HashSet<Message>();
             NotificationsUsers = new HashSet<NotificationUser>();
             Events = new HashSet<Event>();
-            Wishlists = null; 
+            Wishlist = null; 
         }
 
         public virtual ICollection<Book> Books { get; set; }
@@ -55,6 +55,6 @@ namespace Lafatkotob.Entities
         public virtual ICollection<Book> PartnerBooks { get; set; }
         public virtual ICollection<Event> Events { get; set; }
 
-        public virtual Wishlist Wishlists { get; set; }
+        public virtual Wishlist Wishlist { get; set; }
     }
 }

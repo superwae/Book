@@ -18,7 +18,7 @@ namespace Lafatkotob.Configuration
 
             // Configuring the relationship with AppUser as the event host
             builder.HasOne(e => e.HostUser)
-                   .WithMany(u=>u.Events) // Assuming no navigation property in AppUser for hosted events; adjust if there is one.
+                   .WithMany(u=>u.Events) 
                    .HasForeignKey(e => e.HostUserId)
                    .OnDelete(DeleteBehavior.Restrict); 
 
