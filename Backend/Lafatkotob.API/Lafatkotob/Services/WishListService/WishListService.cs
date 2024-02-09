@@ -15,7 +15,7 @@ namespace Lafatkotob.Services.WishListService
             _context = context;
         }
 
-        public async Task<WishlistModel> delete(int id)
+        public async Task<WishlistModel> Delete(int id)
         {
             var wishlist = await _context.Wishlists.FindAsync(id);
             if (wishlist == null) return null;
@@ -42,7 +42,7 @@ namespace Lafatkotob.Services.WishListService
             }
         }
 
-        public async Task<WishlistModel> get(int id)
+        public async Task<WishlistModel> GetById(int id)
         {
             var wishlist = await _context.Wishlists.FindAsync(id);
             if (wishlist == null) return null;
@@ -55,7 +55,19 @@ namespace Lafatkotob.Services.WishListService
             };
         }
 
-        public async Task<WishlistModel> post(WishlistModel model)
+        public async Task<List<WishlistModel>> GetAll()
+        {
+            return await _context.Wishlists
+            .Select(wl => new WishlistModel
+            {
+                Id = wl.Id,
+                UserId = wl.UserId,
+                DateAdded = wl.DateAdded,
+            })
+            .ToListAsync();
+        }
+
+        public async Task<WishlistModel> Post(WishlistModel model)
         {
             using (var transaction = await _context.Database.BeginTransactionAsync())
             {
@@ -81,7 +93,7 @@ namespace Lafatkotob.Services.WishListService
             }
         }
 
-        public async Task<WishlistModel> put(WishlistModel model)
+        public async Task<WishlistModel> Update(WishlistModel model)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
 
