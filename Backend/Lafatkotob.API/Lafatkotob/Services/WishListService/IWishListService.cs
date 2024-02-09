@@ -4,10 +4,11 @@ namespace Lafatkotob.Services.WishListService
 {
     public interface IWishListService
     {
-        Task<WishlistModel> post(WishlistModel model);
-        Task<WishlistModel> get(int id);
-        Task<WishlistModel> put(WishlistModel model);
-        Task<WishlistModel> delete(int id);
+        Task<WishlistModel> Post(WishlistModel model);
+        Task<WishlistModel> GetById(int id);
+        Task<List<WishlistModel>> GetAll();
+        Task<WishlistModel> Update(WishlistModel model);
+        Task<WishlistModel> Delete(int id);
 
     }
 }
