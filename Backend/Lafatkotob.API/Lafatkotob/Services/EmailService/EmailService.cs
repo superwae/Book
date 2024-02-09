@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
 
-namespace login.Services.EmailService
+namespace Lafatkotob.Services.EmailService
 {
     public class EmailService : IEmailService
     {

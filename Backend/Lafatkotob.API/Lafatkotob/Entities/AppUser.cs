@@ -54,7 +54,6 @@ namespace Lafatkotob.Entities
         public virtual ICollection<NotificationUser> NotificationsUsers { get; set; }
         public virtual ICollection<Book> PartnerBooks { get; set; }
         public virtual ICollection<Event> Events { get; set; }
-
         public virtual Wishlist Wishlist { get; set; }
     }
 }
