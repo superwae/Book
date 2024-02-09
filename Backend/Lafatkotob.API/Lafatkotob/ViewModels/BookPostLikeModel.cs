@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Lafatkotob.ViewModels
 {
-    public class BookPostLike
+    public class BookPostLikeModel
     {
         public int Id { get; set; }
 

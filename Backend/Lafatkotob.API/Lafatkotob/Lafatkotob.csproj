@@ -34,10 +34,6 @@
     <Folder Include="Controllers\" />
     <Folder Include="MiddleWare\" />
     <Folder Include="Migrations\" />
- Feature/wael-viewmodel
-=======
-    <Folder Include="Services\" />
- main
   </ItemGroup>
 
 </Project>

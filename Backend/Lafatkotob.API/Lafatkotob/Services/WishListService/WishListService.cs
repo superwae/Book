@@ -107,5 +107,22 @@ namespace Lafatkotob.Services.WishListService
                 }
             }
         }
+        public async Task<List<WishlistModel>> get()
+        {
+            var wishlists = await _context.Wishlists.ToListAsync();
+            var wishlistModels = new List<WishlistModel>();
+            foreach (var wishlist in wishlists)
+            {
+                wishlistModels.Add(new WishlistModel
+                {
+                    Id = wishlist.Id,
+                    UserId = wishlist.UserId,
+                    DateAdded = wishlist.DateAdded,
+                });
+
+            }
+            return wishlistModels;
+        }
+
     }
 }
