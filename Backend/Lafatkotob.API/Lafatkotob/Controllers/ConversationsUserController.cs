@@ -1,0 +1,59 @@
+﻿using Lafatkotob.Services.ConversationsUserService;
+using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Lafatkotob.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ConversationsUserController : Controller
+    {
+        private readonly IConversationsUserService _conversationsUserService;
+        public ConversationsUserController(IConversationsUserService conversationsUserService)
+        {
+            _conversationsUserService = conversationsUserService;
+        }
+        [HttpGet("getall")]
+        public async Task<IActionResult> GetAllConversationsUsers()
+        {
+            var conversationsUsers = await _conversationsUserService.GetAll();
+            if(conversationsUsers == null) return BadRequest();
+            return Ok(conversationsUsers);
+        }
+        [HttpGet("getbyid")]
+        public async Task<IActionResult> GetConversationsUserById(int conversationsUserId)
+        {
+            var conversationsUser = await _conversationsUserService.GetById(conversationsUserId);
+            if (conversationsUser == null) return BadRequest();
+            return Ok(conversationsUser);
+        }
+        [HttpPost("post")]
+        public async Task<IActionResult> PostConversationsUser(ConversationsUserModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            await _conversationsUserService.Post(model);
+            return Ok();
+        }
+        [HttpDelete("delete")]
+        public async Task<IActionResult> DeleteConversationsUser(int conversationsUserId)
+        {
+            var conversationsUser = await _conversationsUserService.Delete(conversationsUserId);
+            if (conversationsUser == null) return BadRequest();
+            return Ok(conversationsUser);
+        }
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateConversationsUser(ConversationsUserModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            await _conversationsUserService.Update(model);
+            return Ok();
+        }
+       
+    }
+}
