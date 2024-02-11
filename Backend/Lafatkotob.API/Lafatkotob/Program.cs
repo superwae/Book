@@ -27,6 +27,8 @@ using Lafatkotob.Services.UserPreferenceService;
 using Lafatkotob.Services.NotificationUserService;
 using Lafatkotob.Services.UserBadgeService;
 using Lafatkotob.Services.UserReviewService;
+using Lafatkotob.Entities;
+using Microsoft.AspNetCore.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,8 +60,10 @@ builder.Services.AddScoped<INotificationUserService,NotificationUserService>();
 builder.Services.AddScoped<IUserBadgeService,UserBadgeService>();
 builder.Services.AddScoped<IUserReviewService,UserReviewService>();
 builder.Services.AddScoped<IHistoryService, HistoryService>();
+builder.Services.AddIdentity<AppUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
-    
 builder.Services
     .AddDbContext<ApplicationDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
