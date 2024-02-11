@@ -8,12 +8,13 @@ namespace Lafatkotob.Services.AppUserService
 {
     public interface IUserService
     {
-        Task<RegisterModel> RegisterUser(RegisterModel model,string role);
-        Task UpdateUser(UpdateUserModel model, string userId);
-        Task<IEnumerable<AppUserModel>> GetAllUsers(); 
+        Task<ServiceResponse<AppUser>> RegisterUser(RegisterModel model, string baseUrl);
+        Task<ServiceResponse<bool>> UpdateUser(UpdateUserModel model, string userId);
+        Task<IEnumerable<AppUserModel>> GetAllUsers();
         Task<AppUserModel> GetUserById(string userId);
-        Task<AppUserModel> DeleteUser(string userId);
-
+        Task<ServiceResponse<bool>> DeleteUser(string userId);
+        Task<LoginResultModel> LoginUser(LoginModel model);
+        Task<ServiceResponse<bool>> ConfirmEmail(string userId, string token);
 
     }
 }

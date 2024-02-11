@@ -7,6 +7,8 @@ namespace login.ViewModel
         [Required]
         [StringLength(15)]
         public string Name { get; set; }
+        [Required]
+        string Role { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
@@ -29,5 +31,11 @@ namespace login.ViewModel
         [Required]
         public string City { get; set; }
         public string About { get; set; }
+        
+     
+
+        
+
+
     }
 }

@@ -1,78 +1,130 @@
-﻿using Azure.Core;
-using Lafatkotob.Entities;
-using Lafatkotob.Services.AppUserService;
+﻿using Lafatkotob.Entities;
 using Lafatkotob.Services.EmailService;
+using Lafatkotob.Services.TokenService;
 using Lafatkotob.ViewModel;
 using Lafatkotob.ViewModels;
 using login.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Lafatkotob.Services.AppUserService
 {
     public class UserService : IUserService
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly SignInManager<AppUser> _signInManager;
         private readonly IEmailService _emailService;
-        public UserService(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, IEmailService emailService)
+        private readonly ITokenSerive _tokenService;
+
+        public UserService(UserManager<AppUser> userManager, IEmailService emailService, ITokenSerive tokenService)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _emailService = emailService;
+            _tokenService = tokenService;
         }
 
-        public async Task<AppUserModel> DeleteUser(string userId)
+        public async Task<ServiceResponse<AppUser>> RegisterUser(RegisterModel model, string baseUrl)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return null;
-
+            var user = new AppUser
             {
-
-                var result = await _userManager.DeleteAsync(user);
-
-            }
-            return new AppUserModel
-            {
-                City = user.City,
-                DateJoined = user.DateJoined,
-                LastLogin = user.LastLogin,
-                ProfilePicture = user.ProfilePicture,
-                About = user.About,
-                DTHDate = user.DTHDate,
-                HistoryId = user.HistoryId,
+                City = model.City,
+                DateJoined = DateTime.UtcNow,
+                LastLogin = DateTime.UtcNow,
+                UserName = model.UserName,
+                Email = model.Email,
+                Name = model.Name,
+                ProfilePicture = model.ProfilePictureUrl,
+                About = model.About,
+                DTHDate = model.DTHDate,
             };
 
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
+                return new ServiceResponse<AppUser>
+                {
+                    Success = false,
+                    Message = "User registration failed.",
+                    Errors = result.Errors.Select(e => e.Description).ToList()
+                };
+            }
+
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var confirmationLink = $"{baseUrl}/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
+            var emailBody = $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.";
+
+            await _emailService.SendEmailAsync(user.Email, "Confirm Your Email", emailBody);
+
+            return new ServiceResponse<AppUser>
+            {
+                Success = true,
+                Data = user,
+                Message = "User registered successfully. Please check your email to confirm."
+            };
         }
 
+        public async Task<ServiceResponse<bool>> UpdateUser(UpdateUserModel model, string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new ServiceResponse<bool> { Success = false, Message = "User not found." };
+            }
 
+            // Map the update model to the user entity
+            user.Email = model.Email;
+            user.UserName = model.UserName;
+            user.Name = model.Name;
+            user.City = model.City;
+            user.ProfilePicture = model.ProfilePictureUrl;
+            user.About = model.About;
+     
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Failed to update user.",
+                    Errors = result.Errors.Select(e => e.Description).ToList()
+                };
+            }
+
+            return new ServiceResponse<bool> { Success = true };
+        }
 
         public async Task<IEnumerable<AppUserModel>> GetAllUsers()
         {
-            return await _userManager.Users
-                .Select(up => new AppUserModel
+            var users = await _userManager.Users
+                .Select(user => new AppUserModel
                 {
-                    City = up.City,
-                    DateJoined = up.DateJoined,
-                    LastLogin = up.LastLogin,
-                    ProfilePicture = up.ProfilePicture,
-                    About = up.About,
-                    DTHDate = up.DTHDate,
-                    HistoryId = up.HistoryId,
-                    
+                    City = user.City,
+                    DateJoined = user.DateJoined,
+                    LastLogin = user.LastLogin,
+                    ProfilePicture = user.ProfilePicture,
+                    About = user.About,
+                    DTHDate = user.DTHDate,
+                    HistoryId = user.HistoryId,
                 })
-                    .ToListAsync();
+                .ToListAsync();
+
+            return users;
         }
-
-
 
         public async Task<AppUserModel> GetUserById(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-
-            var up = new AppUserModel
+            if (user == null)
             {
+                return null;
+            }
+
+            return new AppUserModel
+            {
+                Name = user.Name,
                 City = user.City,
                 DateJoined = user.DateJoined,
                 LastLogin = user.LastLogin,
@@ -82,62 +134,68 @@ namespace Lafatkotob.Services.AppUserService
                 HistoryId = user.HistoryId,
 
             };
-            return up;
-
-
-
         }
 
-   
-
-        public async Task<RegisterModel> RegisterUser(RegisterModel model, string role)
-        {
-            var user = new AppUser
-            {
-                City=model.City,
-                DateJoined = DateTime.Now,
-                LastLogin = DateTime.Now,
-                UserName = model.UserName,
-                Email = model.Email,
-                Name = model.Name,
-                ProfilePicture =model.ProfilePictureUrl,
-                About= model.About,
-                DTHDate = model.DTHDate,
-                
-            };
-
-            var result = await _userManager.CreateAsync(user, model.Password);
-            if (result.Succeeded)
-            {
-                // Assign Roles
-                var roleResult = await _userManager.AddToRoleAsync(user, role);
-                // Check roleResult for success
-                return model;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-
-        public async Task UpdateUser(UpdateUserModel model, string userId)
+        public async Task<ServiceResponse<bool>> DeleteUser(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            if (user != null)
+            if (user == null)
             {
-                user.Email = model.Email;
-                user.UserName = model.UserName;
-                user.Name = model.Name;
-                var updateResult = await _userManager.UpdateAsync(user);
-
-                // Handle password change
-                if (!string.IsNullOrEmpty(model.NewPassword))
-                {
-                    var passwordChangeResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-                }
+                return new ServiceResponse<bool> { Success = false, Message = "User not found." };
             }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Failed to delete user.",
+                    Errors = result.Errors.Select(e => e.Description).ToList()
+                };
+            }
+
+            return new ServiceResponse<bool> { Success = true };
         }
 
+        public async Task<LoginResultModel> LoginUser(LoginModel model)
+        {
+            var user = await _userManager.FindByNameAsync(model.UserName);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
+            {
+                return new LoginResultModel { Success = false, ErrorMessage = "Invalid username or password." };
+            }
+
+            var roles = await _userManager.GetRolesAsync(user);
+            var token = _tokenService.GenerateJwtToken(user.UserName, user.Id, roles.ToList());
+
+            return new LoginResultModel
+            {
+                Success = true,
+                Token = token
+            };
+        }
+
+        public async Task<ServiceResponse<bool>> ConfirmEmail(string userId, string token)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new ServiceResponse<bool> { Success = false, Message = "User not found." };
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (!result.Succeeded)
+            {
+                return new ServiceResponse<bool>
+                {
+                    Success = false,
+                    Message = "Email confirmation failed.",
+                    Errors = result.Errors.Select(e => e.Description).ToList()
+                };
+            }
+
+            return new ServiceResponse<bool> { Success = true, Data = true };
+        }
     }
 }
