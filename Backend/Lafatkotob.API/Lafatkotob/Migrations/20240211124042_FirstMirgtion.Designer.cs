@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lafatkotob.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240208102242_FirstMigration")]
-    partial class FirstMigration
+    [Migration("20240211124042_FirstMirgtion")]
+    partial class FirstMirgtion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -863,6 +863,10 @@ namespace Lafatkotob.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
+                    b.Property<string>("City")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
                     b.Property<DateTime>("DTHDate")
                         .HasColumnType("datetime2");
 
@@ -878,9 +882,9 @@ namespace Lafatkotob.Migrations
                     b.Property<DateTime>("LastLogin")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Location")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ProfilePicture")
                         .HasMaxLength(2048)

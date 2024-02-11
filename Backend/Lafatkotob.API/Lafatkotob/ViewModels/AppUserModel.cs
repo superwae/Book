@@ -5,7 +5,8 @@ namespace Lafatkotob.ViewModels
     public class AppUserModel
     {
         public bool IsDeleted { get; set; }
-        public string Location { get; set; }
+        public string Name { get; set; }
+        public string City { get; set; }
         public DateTime DateJoined { get; set; }
         public DateTime LastLogin { get; set; }
         public string ProfilePicture { get; set; }

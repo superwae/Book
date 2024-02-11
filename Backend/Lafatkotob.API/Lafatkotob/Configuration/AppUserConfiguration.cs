@@ -25,7 +25,7 @@ namespace Lafatkotob.Configuration
 
             // Custom properties
             builder.Property(u => u.IsDeleted).IsRequired();
-            builder.Property(u => u.Location).IsRequired(false).HasMaxLength(255);
+            builder.Property(u => u.City).IsRequired(false).HasMaxLength(255);
             builder.Property(u => u.DateJoined).IsRequired();
             builder.Property(u => u.LastLogin).IsRequired();
             builder.Property(u => u.ProfilePicture).IsRequired(false).HasMaxLength(2048);

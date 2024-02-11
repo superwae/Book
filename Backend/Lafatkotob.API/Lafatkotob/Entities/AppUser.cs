@@ -7,7 +7,8 @@ namespace Lafatkotob.Entities
     public class AppUser : IdentityUser 
     {
         public bool IsDeleted { get; set; }
-        public string Location { get; set; }
+        public string Name { get; set; }
+        public string City { get; set; }
         public DateTime DateJoined { get; set; }
         public DateTime LastLogin { get; set; }
         public string ProfilePicture { get; set; }
