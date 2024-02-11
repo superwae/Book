@@ -11,32 +11,42 @@ namespace Lafatkotob.Services.BadgeService
         {
             _context = context;
         }
-        public async Task<BadgeModel> Post(BadgeModel model)
+        
+        public async Task<ServiceResponse<BadgeModel>> Post(BadgeModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
-            {   
-                try
+            var response = new ServiceResponse<BadgeModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var Badge = new Badge
+                    try
                     {
-                        Id = model.Id,
-                        BadgeName = model.BadgeName,
-                        Description = model.Description
-                    };
 
-                    _context.Badges.Add(Badge);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var badge = new Badge
+                        {
+                            Id = model.Id,
+                            BadgeName = model.BadgeName,
+                            Description = model.Description
+                        };
+                        _context.Badges.Add(badge);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = Badge.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model; 
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create badge.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
        
         public async Task<BadgeModel> GetById(int id)
@@ -63,61 +73,97 @@ namespace Lafatkotob.Services.BadgeService
                 })
                 .ToListAsync();
         }
-        public async Task<BadgeModel> Update(BadgeModel model)
+        public async Task<ServiceResponse<BadgeModel>> Update(BadgeModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<BadgeModel>();
 
-            var Badges = await _context.Badges.FindAsync(model.Id);
-            if (Badges == null) return null;
-
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    Badges.Id = model.Id;
-                    Badges.BadgeName = model.BadgeName;
-                    Badges.Description = model.Description;
-
-                    _context.Badges.Update(Badges);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
-        }
-        public async Task<BadgeModel> Delete(int id)
-        {
-            var Badges = await _context.Badges.FindAsync(id);
-            if (Badges == null) return null;
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var badge = await _context.Badges.FindAsync(model.Id);
+            if (badge == null)
             {
-                try
-                {
-                    _context.Badges.Remove(Badges);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                response.Success = false;
+                response.Message = "Badge not found.";
+                return response;
+            }
 
-                    return new BadgeModel
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
                     {
-                        Id = Badges.Id,
-                        BadgeName = Badges.BadgeName,
-                        Description = Badges.Description
-                    };
+                        badge.BadgeName = model.BadgeName;
+                        badge.Description = model.Description;
 
+                        _context.Badges.Update(badge);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update badge: {ex.Message}";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
+
+        public async Task<ServiceResponse<BadgeModel>> Delete(int id)
+        {
+            var response = new ServiceResponse<BadgeModel>();
+
+            var badge = await _context.Badges.FindAsync(id);
+            if (badge == null)
+            {
+                response.Success = false;
+                response.Message = "Badge not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.Badges.Remove(badge);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new BadgeModel 
+                        {
+                            Id = badge.Id,
+                            BadgeName = badge.BadgeName,
+                            Description = badge.Description
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete badge: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
+        }
+
     }
 }
