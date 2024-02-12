@@ -7,7 +7,7 @@ namespace Lafatkotob.Services.BooksInWishlistsService
 {
     public class BooksInWishlistsService : IBooksInWishlistsService
     {
-private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
         public BooksInWishlistsService(ApplicationDbContext context)
         {
             _context = context;
@@ -15,13 +15,15 @@ private readonly ApplicationDbContext _context;
         public async Task<ServiceResponse<BookInWishlistsModel>> Delete(int id)
         {
             var response = new ServiceResponse<BookInWishlistsModel>();
-            var book = await _context.Books.FindAsync(id);
-            if (book == null)
+
+            var BookInWishlists = await _context.BooksInWishlists.FindAsync(id);
+            if (BookInWishlists == null)
             {
                 response.Success = false;
-                response.Message = "Badge not found.";
+                response.Message = "BookInWishlists not found.";
                 return response;
             }
+
             var executionStrategy = _context.Database.CreateExecutionStrategy();
             await executionStrategy.ExecuteAsync(async () =>
             {
@@ -29,30 +31,34 @@ private readonly ApplicationDbContext _context;
                 {
                     try
                     {
-                        _context.Books.Remove(book);
+                        _context.BooksInWishlists.Remove(BookInWishlists);
                         await _context.SaveChangesAsync();
                         await transaction.CommitAsync();
+
                         response.Success = true;
                         response.Data = new BookInWishlistsModel
                         {
-                            Id = book.Id,
-                            Title = book.Title,
-                            Author = book.Author,
-                            ISBN = book.ISBN,
-
+                            Id = BookInWishlists.Id,
+                            Title = BookInWishlists.Title,
+                            Author = BookInWishlists.Author,
+                            ISBN = BookInWishlists.ISBN
                         };
+                       
                     }
                     catch (Exception ex)
                     {
                         await transaction.RollbackAsync();
                         response.Success = false;
-                        response.Message = $"Failed to delete badge: {ex.Message}";
+                        response.Message = $"Failed to delete BookInWishlists: {ex.Message}";
                     }
                 }
             });
+
             return response;
-        }
-        public async Task<List<BookInWishlistsModel>> GetAll()
+        
+
+    }
+    public async Task<List<BookInWishlistsModel>> GetAll()
         {
             return await _context.BooksInWishlists.Select(book => new BookInWishlistsModel
             {
@@ -85,16 +91,15 @@ private readonly ApplicationDbContext _context;
                 {
                     try
                     {
-                        var book = new Book
+                        var BookInWishlists = new BooksInWishlists
                         {
-                            Id = model.Id,
                             Title = model.Title,
                             Author = model.Author,
-                            ISBN = model.ISBN,
-
+                            ISBN = model.ISBN
                         };
+                       
 
-                        _context.Books.Add(book);
+                        _context.BooksInWishlists.Add(BookInWishlists);
                         await _context.SaveChangesAsync();
                         transaction.Commit();
                         response.Success = true;
@@ -104,7 +109,7 @@ private readonly ApplicationDbContext _context;
                     {
                         await transaction.RollbackAsync();
                         response.Success = false;
-                        response.Message = "Failed to create badge.";
+                        response.Message = "Failed to create BookInWishlists.";
                     }
                 }
             });
@@ -113,20 +118,22 @@ private readonly ApplicationDbContext _context;
         public async Task<ServiceResponse<BookInWishlistsModel>> Update(BookInWishlistsModel model)
         {
             var response = new ServiceResponse<BookInWishlistsModel>();
+
             if (model == null)
             {
                 response.Success = false;
-                response.Message = "Book not found.";
+                response.Message = "Model cannot be null.";
                 return response;
             }
 
-            var BookInWischlist = await _context.BooksInWishlists.FindAsync(model.Id);
-            if (BookInWischlist == null)
+            var BookInWishlists = await _context.BooksInWishlists.FindAsync(model.Id);
+            if (BookInWishlists == null)
             {
                 response.Success = false;
-                response.Message = "Book not found.";
+                response.Message = "BookInWishlists not found.";
                 return response;
             }
+
             var executionStrategy = _context.Database.CreateExecutionStrategy();
             await executionStrategy.ExecuteAsync(async () =>
             {
@@ -134,26 +141,28 @@ private readonly ApplicationDbContext _context;
                 {
                     try
                     {
-                        BookInWischlist.Id = model.Id;
-                        BookInWischlist.Title = model.Title;
-                        BookInWischlist.Author = model.Author;
-                        BookInWischlist.ISBN = model.ISBN;
-                        _context.BooksInWishlists.Update(BookInWischlist);
+                        BookInWishlists.Author = model.Author;
+                        BookInWishlists.Title = model.Title;
+                        BookInWishlists.ISBN = model.ISBN;
+
+
+                        _context.BooksInWishlists.Update(BookInWishlists);
                         await _context.SaveChangesAsync();
+
                         await transaction.CommitAsync();
 
                         response.Success = true;
                         response.Data = model;
                     }
-
                     catch (Exception ex)
                     {
                         await transaction.RollbackAsync();
                         response.Success = false;
-                        response.Message = $"Failed to update badge: {ex.Message}";
+                        response.Message = $"Failed to update BookInWishlists: {ex.Message}";
                     }
                 }
             });
+
             return response;
         }
 
