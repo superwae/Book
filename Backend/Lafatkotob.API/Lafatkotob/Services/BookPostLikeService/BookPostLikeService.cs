@@ -1,4 +1,5 @@
-﻿using Lafatkotob.Entities;
+﻿using Azure;
+using Lafatkotob.Entities;
 using Lafatkotob.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,10 +12,15 @@ namespace Lafatkotob.Services.BookPostLikeServices
         {
             _context = context;
         }
-        public async Task<BookPostLikeModel> Post(BookPostLikeModel model)
+        public async Task<ServiceResponse<BookPostLikeModel>> Post(BookPostLikeModel model)
+        
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<BookPostLikeModel>();
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
+                using (var transaction =  _context.Database.BeginTransaction())
+              { 
                 try
                 {
                     var bookPostLike = new BookPostLike
@@ -26,17 +32,23 @@ namespace Lafatkotob.Services.BookPostLikeServices
                     };
                     _context.BookPostLikes.Add(bookPostLike);
                     await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                    return model;
+                     transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                       
                 }
                 catch (Exception)
                 {
-                    await transaction.RollbackAsync();
-                    throw;
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create badge.";
                 }
-            }
+              }
+        });
+
+            return response;
         }
-            public async Task<BookPostLikeModel> GetById(int id)
+    public async Task<BookPostLikeModel> GetById(int id)
             {
                 var bookPostLike = await _context.BookPostLikes.FindAsync(id);
                 if (bookPostLike == null) return null;
@@ -59,12 +71,26 @@ namespace Lafatkotob.Services.BookPostLikeServices
                 }).ToListAsync();
             }
 
-            public async Task<BookPostLikeModel> Update(BookPostLikeModel model)
+        public async Task<ServiceResponse<BookPostLikeModel>> Update(BookPostLikeModel model)
+        {
+            var response = new ServiceResponse<BookPostLikeModel>();
+            if (model == null)
             {
-                if (model == null) throw new ArgumentNullException(nameof(model));
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
+            }
 
-                var BookPostLike = await _context.BookPostLikes.FindAsync(model.Id);
-                if (BookPostLike == null) return null;
+            var BookPostLike = await _context.BookPostLikes.FindAsync(model.Id);
+            if (BookPostLike == null)
+            {
+                response.Success = false;
+                response.Message = "BookPostLike not found.";
+                return response;
+            }
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
                 using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
                     try
@@ -78,49 +104,66 @@ namespace Lafatkotob.Services.BookPostLikeServices
                         await _context.SaveChangesAsync();
                         await transaction.CommitAsync();
 
-                        return model;
+                        response.Success = true;
+                        response.Data = model;
 
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         await transaction.RollbackAsync();
-                        throw;
-                    } 
+                        response.Success = false;
+                        response.Message = $"Failed to update badge: {ex.Message}";
+                    }
                 }
 
-            }
+            });
+            return response;
+        }
 
-            public async Task<BookPostLikeModel> Delete(int id)
+        public async Task<ServiceResponse<BookPostLikeModel>> Delete(int id)
+        {
+            var response = new ServiceResponse<BookPostLikeModel>();
+            var BookPostLike = await _context.BookPostLikes.FindAsync(id);
+            if (BookPostLike == null)
             {
-                var BookPostLike = await _context.BookPostLikes.FindAsync(id);
-                if (BookPostLike == null)
-                {
-                    return null;
-                }
+                response.Success = false;
+                response.Message = "Badge not found.";
+                return response;
+            }
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
                 using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
                     try
                     {
-                        var bookPostLike = await _context.BookPostLikes.FindAsync(id);
-                        _context.BookPostLikes.Remove(bookPostLike);
+
+                        _context.BookPostLikes.Remove(BookPostLike);
                         await _context.SaveChangesAsync();
-                        return new BookPostLikeModel
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new BookPostLikeModel
                         {
-                            Id = bookPostLike.Id,
-                            BookId = bookPostLike.BookId,
-                            UserId = bookPostLike.UserId,
-                            DateLiked = bookPostLike.DateLiked
+                            Id = BookPostLike.Id,
+                            BookId = BookPostLike.BookId,
+                            UserId = BookPostLike.UserId,
+                            DateLiked = BookPostLike.DateLiked
                         };
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         await transaction.RollbackAsync();
-                        throw;
+                        response.Success = false;
+                        response.Message = $"Failed to delete badge: {ex.Message}";
                     }
 
                 }
-            }
+            });
+            return response;
 
-        
+
+
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace Lafatkotob.Services.BadgeService
                         response.Success = true;
                         response.Data = model; 
                     }
-                    catch (Exception ex)
+                    catch (Exception )
                     {
                         transaction.Rollback();
                         response.Success = false;

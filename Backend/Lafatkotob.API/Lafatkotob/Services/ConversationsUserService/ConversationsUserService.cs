@@ -17,31 +17,38 @@ namespace Lafatkotob.Services.ConversationsUserService
             _context = context;
         }
 
-        public async Task<ConversationsUserModel> Post(ConversationsUserModel model)
+        public async Task<ServiceResponse<ConversationsUserModel>> Post(ConversationsUserModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<ConversationsUserModel>();
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var conversationsUser = new ConversationsUser
+                    try
                     {
-                        UserId = model.UserId,
-                        ConversationId = model.ConversationId
-                    };
+                        var conversationsUser = new ConversationsUser
+                        {
+                            UserId = model.UserId,
+                            ConversationId = model.ConversationId
+                        };
 
-                    _context.ConversationsUsers.Add(conversationsUser);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        _context.ConversationsUsers.Add(conversationsUser);
+                        await _context.SaveChangesAsync();
+                        transaction.Commit();
 
-                    model.Id = conversationsUser.Id;
-                    return model;
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception )
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create badge.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+            return response;
         }
 
         public async Task<ConversationsUserModel> GetById(int id)
@@ -72,59 +79,94 @@ namespace Lafatkotob.Services.ConversationsUserService
                 .ToListAsync();
         }
 
-        public async Task<ConversationsUserModel> Update(ConversationsUserModel model)
+        public async Task<ServiceResponse<ConversationsUserModel>> Update(ConversationsUserModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<ConversationsUserModel>();
+
+            if (model == null)
             {
-                try
-                {
-                    var conversationsUser = await _context.ConversationsUsers.FindAsync(model.Id);
-                    if (conversationsUser == null) return null;
-
-                    conversationsUser.UserId = model.UserId;
-                    conversationsUser.ConversationId = model.ConversationId;
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+            var ConversationsUser = await _context.ConversationsUsers.FindAsync(model.Id);
+            if (ConversationsUser == null)
+            {
+                response.Success = false;
+                response.Message = "Badge not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+
+                        ConversationsUser.UserId = model.UserId;
+                        ConversationsUser.ConversationId = model.ConversationId;
+                        _context.ConversationsUsers.Update(ConversationsUser);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update badge: {ex.Message}";
+                    }
+                }
+            });
+            return response;
         }
 
-        public async Task<ConversationsUserModel> Delete(int id)
+        public async Task<ServiceResponse<ConversationsUserModel>> Delete(int id)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<ConversationsUserModel>();
+
+            var conversationsUser = await _context.ConversationsUsers.FindAsync(id);
+            if (conversationsUser == null)
             {
-                try
-                {
-                    var conversationsUser = await _context.ConversationsUsers.FindAsync(id);
-                    if (conversationsUser == null) return null;
-
-                    _context.ConversationsUsers.Remove(conversationsUser);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new ConversationsUserModel
-                    {
-                        Id = conversationsUser.Id,
-                        UserId = conversationsUser.UserId,
-                        ConversationId = conversationsUser.ConversationId
-
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Badge not found.";
+                return response;
             }
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+
+
+                        _context.ConversationsUsers.Remove(conversationsUser);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new ConversationsUserModel
+                        {
+                            Id = conversationsUser.Id,
+                            UserId = conversationsUser.UserId,
+                            ConversationId = conversationsUser.ConversationId
+
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete badge: {ex.Message}";
+                    }
+                }
+            });
+            return response;
         }
     }
 }

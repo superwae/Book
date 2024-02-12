@@ -17,30 +17,39 @@ namespace Lafatkotob.Services.ConversationService
             _context = context;
         }
 
-        public async Task<ConversationModel> Post(ConversationModel model)
+        public async Task<ServiceResponse<ConversationModel>> Post(ConversationModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<ConversationModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var conversation = new Conversation
+                    try
                     {
-                        LastMessageDate = model.LastMessageDate
-                    };
+                        var conversation = new Conversation
+                        {
+                            LastMessageDate = model.LastMessageDate
+                        };
 
-                    _context.Conversations.Add(conversation);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        _context.Conversations.Add(conversation);
+                        await _context.SaveChangesAsync();
+                        transaction.Commit();
 
-                    model.Id = conversation.Id;
-                    return model;
+                        model.Id = conversation.Id;
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception )
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create badge.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+            return response;
         }
 
         public async Task<ConversationModel> GetById(int id)
@@ -67,57 +76,90 @@ namespace Lafatkotob.Services.ConversationService
                 .ToListAsync();
         }
 
-        public async Task<ConversationModel> Update(ConversationModel model)
+        public async Task<ServiceResponse<ConversationModel>> Update(ConversationModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<ConversationModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
-            {
-                try
-                {
-                    var conversation = await _context.Conversations.FindAsync(model.Id);
-                    if (conversation == null) return null;
-
-                    conversation.LastMessageDate = model.LastMessageDate;
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+            if (model == null) {
+                response.Success = false;
+                response.Message = "Model is null";
+                return response;
             }
+            var Conversation = await _context.Conversations.FindAsync(model.Id);
+            if (Conversation == null)
+            {
+                response.Success = false;
+                response.Message = "Badge not found.";
+                return response;
+            }
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                       
+                        Conversation.LastMessageDate = model.LastMessageDate;
+                       
+                        _context.Conversations.Update(Conversation);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update badge: {ex.Message}";
+                    }
+                }
+            });
+            return response;
         }
 
-        public async Task<ConversationModel> Delete(int id)
+        public async Task<ServiceResponse<ConversationModel>> Delete(int id)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<ConversationModel>();
+            var Conversation = await _context.Conversations.FindAsync(id);
+            if (Conversation == null)
             {
-                try
-                {
-                    var conversation = await _context.Conversations.FindAsync(id);
-                    if (conversation == null) return new ConversationModel();
-
-                    _context.Conversations.Remove(conversation);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new ConversationModel
-                    {
-                        Id = conversation.Id,
-                        LastMessageDate = conversation.LastMessageDate
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Badge not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+
+
+                        _context.Conversations.Remove(Conversation);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new ConversationModel
+                        {
+                            Id = Conversation.Id,
+                            LastMessageDate = Conversation.LastMessageDate
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete badge: {ex.Message}";
+                    }
+                }
+            });
+            return response;
         }
     }
 }

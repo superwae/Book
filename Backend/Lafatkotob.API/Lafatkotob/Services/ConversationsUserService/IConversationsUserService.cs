@@ -4,10 +4,10 @@ namespace Lafatkotob.Services.ConversationsUserService
 {
     public interface IConversationsUserService
     {
-        Task<ConversationsUserModel> Post(ConversationsUserModel model);
+        Task<ServiceResponse<ConversationsUserModel>> Post(ConversationsUserModel model);
         Task<ConversationsUserModel> GetById(int id);
         Task<List<ConversationsUserModel>> GetAll();
-        Task<ConversationsUserModel> Update(ConversationsUserModel model);
-        Task<ConversationsUserModel> Delete(int id);
+        Task<ServiceResponse<ConversationsUserModel>>Update(ConversationsUserModel model);
+        Task<ServiceResponse<ConversationsUserModel>>Delete(int id);
     }
 }

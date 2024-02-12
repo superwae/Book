@@ -13,42 +13,50 @@ private readonly ApplicationDbContext _context;
             _context = context;
         }
         //done post
-        public async Task<BooksModel> Post(BooksModel model)
+        public async Task<ServiceResponse<BooksModel>> Post(BooksModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<BooksModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-             var book = new Book
-             {
-                Id = model.Id,
-                Title = model.Title,
-                Author = model.Author,
-                Description = model.Description,
-                CoverImage = model.CoverImage,
-                UserId = model.UserId,
-                HistoryId= model.HistoryId,
-                PublicationDate = model.PublicationDate,
-                ISBN = model.ISBN,
-                PageCount = model.PageCount,
-                Condition = model.Condition,
-                Status = model.Status,
-                PartnerUserId = model.PartnerUserId
-            };
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
-            await transaction.CommitAsync();
-            model.Id = book.Id;
-            return model;
-                }   
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
+                    try
+                    {
+                        var book = new Book
+                        {
+                            Id = model.Id,
+                            Title = model.Title,
+                            Author = model.Author,
+                            Description = model.Description,
+                            CoverImage = model.CoverImage,
+                            UserId = model.UserId,
+                            HistoryId = model.HistoryId,
+                            PublicationDate = model.PublicationDate,
+                            ISBN = model.ISBN,
+                            PageCount = model.PageCount,
+                            Condition = model.Condition,
+                            Status = model.Status,
+                            PartnerUserId = model.PartnerUserId
+                        };
+                        _context.Books.Add(book);
+                        await _context.SaveChangesAsync();
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception )
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create badge.";
+                    }
                 }
-            }
+            });
+            return response;
         }
-        //done getById
+
         public async Task<BooksModel> GetById(int id)
         {
             var Book = await _context.Books.FindAsync(id);
@@ -72,7 +80,7 @@ private readonly ApplicationDbContext _context;
             };
          
         }
-        //done getAll
+       
         public async Task<List<BooksModel>> GetAll()
         {
 
@@ -96,18 +104,30 @@ private readonly ApplicationDbContext _context;
        .ToListAsync();   
         }
 
-        //done update
-        public async Task<BooksModel> Update(BooksModel model)
+       
+        public async Task<ServiceResponse<BooksModel>> Update(BooksModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<BooksModel>();
+            if (model == null) {
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
+            }
 
             var Books = await _context.Books.FindAsync(model.Id);
-            if (Books == null) return null;
-
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (Books == null)
             {
-                try
+                response.Success = false;
+                response.Message = "Book not found.";
+                return response;
+            }
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
+                    try
+                    {
                         Books.Id = model.Id;
                         Books.Title = model.Title;
                         Books.Author = model.Author;
@@ -122,59 +142,71 @@ private readonly ApplicationDbContext _context;
                         Books.Status = model.Status;
                         Books.PartnerUserId = model.PartnerUserId;
 
-                    _context.Books.Update(Books);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        _context.Books.Update(Books);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
 
-                    return model;
-                }
+                        return model;
+                    }
 
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
+                    catch (Exception)
+                    {
+                        await transaction.RollbackAsync();
+                        throw;
+                    }
                 }
-            }
+            });
+            return response;
         }
         //done delete
-        public async Task<BooksModel> Delete(int id)
+        public async Task<ServiceResponse<BooksModel>> Delete(int id)
         {
+            var response = new ServiceResponse<BooksModel>();
             var book = await _context.Books.FindAsync(id);
             if (book == null)
             {
-                return null;
+                response.Success = false;
+                response.Message = "Badge not found.";
+                return response;
             }
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
-                    _context.Books.Remove(book);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                    return new BooksModel
+                    try
                     {
-                        Id = book.Id,
-                        Title = book.Title,
-                        Author = book.Author,
-                        Description = book.Description,
-                        CoverImage = book.CoverImage,
-                        UserId = book.UserId,
-                        HistoryId = book.HistoryId,
-                        PublicationDate = book.PublicationDate,
-                        ISBN = book.ISBN,
-                        PageCount = book.PageCount,
-                        Condition = book.Condition,
-                        Status = book.Status,
-                        PartnerUserId = book.PartnerUserId
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                        _context.Books.Remove(book);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        response.Success = true;
+                        response.Data = new BooksModel
+                        {
+                            Id = book.Id,
+                            Title = book.Title,
+                            Author = book.Author,
+                            Description = book.Description,
+                            CoverImage = book.CoverImage,
+                            UserId = book.UserId,
+                            HistoryId = book.HistoryId,
+                            PublicationDate = book.PublicationDate,
+                            ISBN = book.ISBN,
+                            PageCount = book.PageCount,
+                            Condition = book.Condition,
+                            Status = book.Status,
+                            PartnerUserId = book.PartnerUserId
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete badge: {ex.Message}";
+                    }
 
-            }
+                }
+            });
+            return response;
         }
     }
 }

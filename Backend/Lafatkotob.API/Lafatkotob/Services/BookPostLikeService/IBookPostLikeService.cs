@@ -4,10 +4,10 @@ namespace Lafatkotob.Services.BookPostLikeServices
 {
     public interface IBookPostLikeService
     {
-        Task<BookPostLikeModel> Post(BookPostLikeModel model);
+        Task<ServiceResponse<BookPostLikeModel>> Post(BookPostLikeModel model);
         Task<BookPostLikeModel> GetById(int id);
         Task<List<BookPostLikeModel>> GetAll();
-        Task<BookPostLikeModel> Update(BookPostLikeModel model);
-        Task<BookPostLikeModel> Delete(int id);
+        Task<ServiceResponse<BookPostLikeModel>> Update(BookPostLikeModel model);
+        Task<ServiceResponse<BookPostLikeModel>> Delete(int id);
     }
 }
