@@ -34,8 +34,7 @@ namespace Lafatkotob.Services.HistoryService
                             Id = model.Id,
                             UserId = model.UserId,
                             Date = DateTime.Now,
-                            Type = model.Type,
-                            State = model.State
+
                         };
 
                        
@@ -68,8 +67,7 @@ namespace Lafatkotob.Services.HistoryService
                 Id = history.Id,
                 UserId = history.UserId,
                 Date = history.Date,
-                Type = history.Type,
-                State = history.State
+
             };
         }
 
@@ -81,8 +79,7 @@ namespace Lafatkotob.Services.HistoryService
                     Id = h.Id,
                     UserId = h.UserId,
                     Date = h.Date,
-                    Type = h.Type,
-                    State = h.State
+
                 })
                 .ToListAsync();
         }
@@ -114,8 +111,7 @@ namespace Lafatkotob.Services.HistoryService
                     try
                     {
                         History.Date = model.Date;
-                        History.Type = model.Type;
-                        History.State = model.State;
+
 
 
                         _context.History.Update(History);
@@ -167,8 +163,7 @@ namespace Lafatkotob.Services.HistoryService
                             Id = History.Id,
                             UserId = History.UserId,
                             Date = History.Date,
-                            Type = History.Type,
-                            State = History.State
+
                         };
                        
                     }

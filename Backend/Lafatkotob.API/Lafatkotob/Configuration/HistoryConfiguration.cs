@@ -11,8 +11,7 @@ namespace Lafatkotob.Configuration
             builder.HasKey(h => h.Id);
 
             builder.Property(h => h.Date).IsRequired();
-            builder.Property(h => h.Type).IsRequired().HasMaxLength(50);
-            builder.Property(h => h.State).IsRequired().HasMaxLength(50);
+;
 
             // Configuring the one-to-one relationship with AppUser
             builder.HasOne(h => h.AppUser)

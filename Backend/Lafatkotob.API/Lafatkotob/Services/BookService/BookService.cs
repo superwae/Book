@@ -37,8 +37,10 @@ private readonly ApplicationDbContext _context;
                             ISBN = model.ISBN,
                             PageCount = model.PageCount,
                             Condition = model.Condition,
+                            Type = model.Type,
                             Status = model.Status,
                             PartnerUserId = model.PartnerUserId
+
                         };
                         _context.Books.Add(book);
                         await _context.SaveChangesAsync();
@@ -75,6 +77,7 @@ private readonly ApplicationDbContext _context;
                 ISBN = Book.ISBN,
                 PageCount = Book.PageCount,
                 Condition = Book.Condition,
+                Type = Book.Type,
                 Status = Book.Status,
                 PartnerUserId = Book.PartnerUserId
             };
@@ -99,6 +102,7 @@ private readonly ApplicationDbContext _context;
         PageCount = up.PageCount,
         Condition = up.Condition,
         Status = up.Status,
+        Type = up.Type,
         PartnerUserId = up.PartnerUserId
        })
        .ToListAsync();   
@@ -140,6 +144,7 @@ private readonly ApplicationDbContext _context;
                         Books.PageCount = model.PageCount;
                         Books.Condition = model.Condition;
                         Books.Status = model.Status;
+                        Books.Type = model.Type;
                         Books.PartnerUserId = model.PartnerUserId;
 
                         _context.Books.Update(Books);
@@ -194,6 +199,7 @@ private readonly ApplicationDbContext _context;
                             PageCount = book.PageCount,
                             Condition = book.Condition,
                             Status = book.Status,
+                            Type = book.Type,
                             PartnerUserId = book.PartnerUserId
                         };
                     }

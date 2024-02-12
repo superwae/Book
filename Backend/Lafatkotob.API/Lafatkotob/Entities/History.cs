@@ -14,8 +14,7 @@ namespace Lafatkotob.Entities
 
 
         public DateTime Date { get; set; }
-        public string Type { get; set; }
-        public string State { get; set; }
+
 
         public virtual AppUser AppUser { get; set; }
         public virtual ICollection<Book> Books { get; set; }

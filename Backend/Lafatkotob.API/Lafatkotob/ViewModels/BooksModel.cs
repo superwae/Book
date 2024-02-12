@@ -17,6 +17,7 @@ namespace Lafatkotob.ViewModels
         public int? PageCount { get; set; }
         public string Condition { get; set; }
         public string Status { get; set; }
+        public string Type { get; set; }
         public string PartnerUserId { get; set; }
     }
 }
