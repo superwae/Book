@@ -1,4 +1,5 @@
-﻿using Lafatkotob.Entities;
+﻿using Azure;
+using Lafatkotob.Entities;
 using Lafatkotob.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
@@ -13,32 +14,42 @@ namespace Lafatkotob.Services.BookGenreService
         {
             _context = context;
         }
-        public async Task<BookGenreModel> Post(BookGenreModel model)
+        public async Task<ServiceResponse<BookGenreModel>> Post(BookGenreModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<BookGenreModel>();
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var BookGenre = new BookGenre
+                    try
                     {
-                        Id = model.Id,
-                        BookId= model.BookId,
-                        GenreId = model.GenreId
-                    };
+                        var BookGenre = new BookGenre
+                        {
 
-                    _context.BookGenres.Add(BookGenre);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                            BookId = model.BookId,
+                            GenreId = model.GenreId
+                        };
 
-                    model.Id = BookGenre.Id;
-                    return model;
+                        _context.BookGenres.Add(BookGenre);
+                        await _context.SaveChangesAsync();
+
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+
+
+                    }
+                    catch (Exception )
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create badge.";
+                        throw;
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+            return response;
         }
         public async Task<BookGenreModel> GetById(int id)
         {
@@ -64,56 +75,88 @@ namespace Lafatkotob.Services.BookGenreService
                 })
                 .ToListAsync();
         }
-        public async Task<BookGenreModel> Update(BookGenreModel model)
+        public async Task<ServiceResponse<BookGenreModel>> Update(BookGenreModel model)
         {
-            if(model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<BookGenreModel>();
+            if (model == null)
+            {
+                response.Success = false;
+                response.Message = "Model is null";
+                return response;
+            }
             var BookGenre = await _context.BookGenres.FindAsync(model.Id);
-            if (BookGenre == null) return null;
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (BookGenre == null)
             {
-                try
-                { 
-                    BookGenre.Id = model.Id;
-                    BookGenre.BookId = model.BookId;
-                    BookGenre.GenreId = model.GenreId;
-                    _context.BookGenres.Update(BookGenre);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "BookGenre not found";
+                return response;
             }
-        }
-        public async Task<BookGenreModel> Delete(int id)
-        {
-            var BookGenre = await _context.BookGenres.FindAsync(id);
-            if (BookGenre == null) return null;
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
-                    _context.BookGenres.Remove(BookGenre);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-                    return new BookGenreModel
+                    try
                     {
-                        Id = BookGenre.Id,
-                        BookId = BookGenre.BookId,
-                        GenreId = BookGenre.GenreId
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
-        }
+                        BookGenre.Id = model.Id;
+                        BookGenre.BookId = model.BookId;
+                        BookGenre.GenreId = model.GenreId;
+                        _context.BookGenres.Update(BookGenre);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
 
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update badge: {ex.Message}";
+                    }
+                }
+            });
+            return response;
+        }
+        public async Task<ServiceResponse<BookGenreModel>> Delete(int id)
+        {
+            var response = new ServiceResponse<BookGenreModel>();
+            var BookGenre = await _context.BookGenres.FindAsync(id);
+            if (BookGenre == null)
+            {
+                response.Success = false;
+                response.Message = "BookGenre not found";
+                return response;
+
+            }
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.BookGenres.Remove(BookGenre);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        response.Success = true;
+                        response.Data = new BookGenreModel
+                        {
+                            Id = BookGenre.Id,
+                            BookId = BookGenre.BookId,
+                            GenreId = BookGenre.GenreId
+                        };
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete badge: {ex.Message}";
+                    }
+                }
+            });
+            return response;
+
+        }
     }
 }
