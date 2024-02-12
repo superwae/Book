@@ -38,17 +38,7 @@ namespace Lafatkotob.Controllers
             return Ok(new { Token = loginResult.Token });
         }
 
-        [HttpGet("ConfirmEmail")]
-        public async Task<IActionResult> ConfirmEmail(string userId, string token)
-        {
-            var result = await _userService.ConfirmEmail(userId, token);
-            if (!result.Success)
-            {
-                return BadRequest(result.Message);
-            }
-
-            return Ok("Email confirmed successfully.");
-        }
+       
 
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllUsers()
@@ -65,7 +55,7 @@ namespace Lafatkotob.Controllers
             return Ok(user);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("DeleteUser")]
         public async Task<IActionResult> DeleteUser(string userId)
         {
@@ -78,16 +68,16 @@ namespace Lafatkotob.Controllers
             return Ok("User deleted successfully.");
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("UpdateUser")]
-        public async Task<IActionResult> UpdateUser(UpdateUserModel model)
+       // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> UpdateUser(UpdateUserModel model,string userId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId2 = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var result = await _userService.UpdateUser(model, userId);
             if (!result.Success)
             {

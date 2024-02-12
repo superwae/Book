@@ -66,15 +66,14 @@ namespace Lafatkotob.Services.AppUserService
             };
         }
 
-        public async Task<ServiceResponse<bool>> UpdateUser(UpdateUserModel model, string userId)
+        public async Task<ServiceResponse<UpdateUserModel>> UpdateUser(UpdateUserModel model,string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new ServiceResponse<bool> { Success = false, Message = "User not found." };
+                return new ServiceResponse<UpdateUserModel> { Success = false, Message = "User not found." };
             }
 
-            // Map the update model to the user entity
             user.Email = model.Email;
             user.UserName = model.UserName;
             user.Name = model.Name;
@@ -85,7 +84,7 @@ namespace Lafatkotob.Services.AppUserService
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
-                return new ServiceResponse<bool>
+                return new ServiceResponse<UpdateUserModel>
                 {
                     Success = false,
                     Message = "Failed to update user.",
@@ -93,7 +92,7 @@ namespace Lafatkotob.Services.AppUserService
                 };
             }
 
-            return new ServiceResponse<bool> { Success = true };
+            return new ServiceResponse<UpdateUserModel> { Success = true ,Data=model};
         }
 
         public async Task<IEnumerable<AppUserModel>> GetAllUsers()
@@ -101,6 +100,9 @@ namespace Lafatkotob.Services.AppUserService
             var users = await _userManager.Users
                 .Select(user => new AppUserModel
                 {
+                    Id= user.Id,
+                    Name = user.Name,
+                    Email  = user.Email,
                     City = user.City,
                     DateJoined = user.DateJoined,
                     LastLogin = user.LastLogin,
@@ -124,8 +126,10 @@ namespace Lafatkotob.Services.AppUserService
 
             return new AppUserModel
             {
+                Id = user.Id,
                 Name = user.Name,
                 City = user.City,
+                Email = user.Email,
                 DateJoined = user.DateJoined,
                 LastLogin = user.LastLogin,
                 ProfilePicture = user.ProfilePicture,
@@ -136,26 +140,40 @@ namespace Lafatkotob.Services.AppUserService
             };
         }
 
-        public async Task<ServiceResponse<bool>> DeleteUser(string userId)
+        public async Task<ServiceResponse<UpdateUserModel>> DeleteUser(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new ServiceResponse<bool> { Success = false, Message = "User not found." };
+                return new ServiceResponse<UpdateUserModel> { Success = false, Message = "User not found." };
             }
 
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
-                return new ServiceResponse<bool>
+                return new ServiceResponse<UpdateUserModel>
                 {
                     Success = false,
                     Message = "Failed to delete user.",
                     Errors = result.Errors.Select(e => e.Description).ToList()
                 };
             }
+            UpdateUserModel model = new UpdateUserModel
+            {
+                Name = user.Name,
+                Email = user.Email,
+                UserName = user.UserName,
+                ProfilePictureUrl = user.ProfilePicture,
+                About = user.About,
+                City = user.City,
+                CurrentPassword = null,
+                NewPassword = null,
+                ConfirmNewPassword = null
+            };
+            
+            
 
-            return new ServiceResponse<bool> { Success = true };
+            return new ServiceResponse<UpdateUserModel> { Success = true,Data= model };
         }
 
         public async Task<LoginResultModel> LoginUser(LoginModel model)
@@ -176,26 +194,6 @@ namespace Lafatkotob.Services.AppUserService
             };
         }
 
-        public async Task<ServiceResponse<bool>> ConfirmEmail(string userId, string token)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return new ServiceResponse<bool> { Success = false, Message = "User not found." };
-            }
-
-            var result = await _userManager.ConfirmEmailAsync(user, token);
-            if (!result.Succeeded)
-            {
-                return new ServiceResponse<bool>
-                {
-                    Success = false,
-                    Message = "Email confirmation failed.",
-                    Errors = result.Errors.Select(e => e.Description).ToList()
-                };
-            }
-
-            return new ServiceResponse<bool> { Success = true, Data = true };
-        }
+        
     }
 }
