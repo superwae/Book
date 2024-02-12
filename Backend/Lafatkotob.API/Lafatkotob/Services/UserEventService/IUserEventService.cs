@@ -4,10 +4,10 @@ namespace Lafatkotob.Services.UserEventService
 {
     public interface IUserEventService
     {
-        Task<UserEventModel> Post(UserEventModel model);
+        Task<ServiceResponse<UserEventModel>> Post(UserEventModel model);
         Task<UserEventModel> GetById(int id);
         Task<List<UserEventModel>> GetAll();
-        Task<UserEventModel> Update(UserEventModel model);
-        Task<UserEventModel> Delete(int id);
+        Task<ServiceResponse<UserEventModel>> Update(UserEventModel model);
+        Task<ServiceResponse<UserEventModel>> Delete(int id);
     }
 }

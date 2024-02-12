@@ -17,30 +17,40 @@ namespace Lafatkotob.Services.GenreService
             _context = context;
         }
 
-        public async Task<GenreModel> Post(GenreModel model)
+        public async Task<ServiceResponse<GenreModel>> Post(GenreModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<GenreModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var genre = new Genre
+                    try
                     {
-                        Name = model.Name
-                    };
 
-                    _context.Genres.Add(genre);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var Genre = new Genre
+                        {
+                            Name = model.Name
+                        };
+                        
+                        _context.Genres.Add(Genre);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = genre.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create Genre.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
         public async Task<GenreModel> GetById(int id)
@@ -66,57 +76,95 @@ namespace Lafatkotob.Services.GenreService
                 .ToListAsync();
         }
 
-        public async Task<GenreModel> Update(GenreModel model)
+        public async Task<ServiceResponse<GenreModel>> Update(GenreModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<GenreModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var genre = await _context.Genres.FindAsync(model.Id);
-                    if (genre == null) return null;
-
-                    genre.Name = model.Name;
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+
+            var Genre = await _context.Genres.FindAsync(model.Id);
+            if (Genre == null)
+            {
+                response.Success = false;
+                response.Message = "Genre not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        Genre.Name = model.Name;
+
+                        _context.Genres.Update(Genre);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update Genre: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
-        public async Task<GenreModel> Delete(int id)
+        public async Task<ServiceResponse<GenreModel>> Delete(int id)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<GenreModel>();
+
+            var Genre = await _context.Genres.FindAsync(id);
+            if (Genre == null)
             {
-                try
-                {
-                    var genre = await _context.Genres.FindAsync(id);
-                    if (genre == null) return null;
-
-                    _context.Genres.Remove(genre);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new GenreModel
-                    {
-                        Id = genre.Id,
-                        Name = genre.Name
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Genre not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.Genres.Remove(Genre);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new GenreModel
+                        {
+                            Id = Genre.Id,
+                            Name = Genre.Name
+                        };
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete Genre: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
     }
 }

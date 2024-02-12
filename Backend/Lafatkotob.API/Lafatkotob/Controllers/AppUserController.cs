@@ -38,8 +38,8 @@ namespace Lafatkotob.Controllers
             return Ok(new { Token = loginResult.Token });
         }
 
-       
 
+        
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -68,9 +68,11 @@ namespace Lafatkotob.Controllers
             return Ok("User deleted successfully.");
         }
 
+
        // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut("UpdateUser")]
         public async Task<IActionResult> UpdateUser(UpdateUserModel model,string userId)
+
         {
             if (!ModelState.IsValid)
             {

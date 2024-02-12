@@ -16,33 +16,50 @@ namespace Lafatkotob.Services.UserPreferenceService
             _context = context;
         }
 
-        public async Task<UserPreferenceModel> Delete(int id)
+        public async Task<ServiceResponse<UserPreferenceModel>> Delete(int id)
         {
-            var userPreference = await _context.UserPreferences.FindAsync(id);
-            if (userPreference == null) return null;
+            var response = new ServiceResponse<UserPreferenceModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var UserPreference = await _context.UserPreferences.FindAsync(id);
+            if (UserPreference == null)
             {
-                try
-                {
-                    _context.UserPreferences.Remove(userPreference);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new UserPreferenceModel
-                    {
-                        Id = userPreference.Id,
-                        UserId = userPreference.UserId,
-                        GenreId = userPreference.GenreId,
-                        PreferredAuthor = userPreference.PreferredAuthor
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "UserPreference not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.UserPreferences.Remove(UserPreference);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new UserPreferenceModel
+                        {
+                            Id = UserPreference.Id,
+                            UserId = UserPreference.UserId,
+                            GenreId = UserPreference.GenreId,
+                            PreferredAuthor = UserPreference.PreferredAuthor
+                        };
+                        
+                       
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete UserPreference: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
         public async Task<UserPreferenceModel> GetById(int id)
@@ -72,61 +89,93 @@ namespace Lafatkotob.Services.UserPreferenceService
                 .ToListAsync();
         }
 
-        public async Task<UserPreferenceModel> Post(UserPreferenceModel model)
+        public async Task<ServiceResponse<UserPreferenceModel>> Post(UserPreferenceModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<UserPreferenceModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var userPreference = new UserPreference
+                    try
                     {
-                        UserId = model.UserId,
-                        GenreId = model.GenreId,
-                        PreferredAuthor = model.PreferredAuthor
-                    };
 
-                    _context.UserPreferences.Add(userPreference);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var UserPreference = new UserPreference
+                        {
+                            UserId = model.UserId,
+                            GenreId = model.GenreId,
+                            PreferredAuthor = model.PreferredAuthor
+                        };
+                        
+                        _context.UserPreferences.Add(UserPreference);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = userPreference.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create UserPreference.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
-        public async Task<UserPreferenceModel> Update(UserPreferenceModel model)
+        public async Task<ServiceResponse<UserPreferenceModel>> Update(UserPreferenceModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<UserPreferenceModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var userPreference = await _context.UserPreferences.FindAsync(model.Id);
-                    if (userPreference == null) return null;
-
-                    userPreference.UserId = model.UserId;
-                    userPreference.GenreId = model.GenreId;
-                    userPreference.PreferredAuthor = model.PreferredAuthor;
-
-                    _context.Update(userPreference);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+
+            var UserPreference = await _context.UserPreferences.FindAsync(model.Id);
+            if (UserPreference == null)
+            {
+                response.Success = false;
+                response.Message = "UserPreference not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        UserPreference.UserId = model.UserId;
+                        UserPreference.GenreId = model.GenreId;
+                        UserPreference.PreferredAuthor = model.PreferredAuthor;
+
+
+                        _context.UserPreferences.Update(UserPreference);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update UserPreference: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
     }
 }

@@ -16,35 +16,51 @@ namespace Lafatkotob.Services.UserReviewService
             _context = context;
         }
 
-        public async Task<UserReviewModel> Delete(int id)
+        public async Task<ServiceResponse<UserReviewModel>> Delete(int id)
         {
-            var userReview = await _context.UserReviews.FindAsync(id);
-            if (userReview == null) return null;
+            var response = new ServiceResponse<UserReviewModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var UserReview = await _context.UserReviews.FindAsync(id);
+            if (UserReview == null)
             {
-                try
-                {
-                    _context.UserReviews.Remove(userReview);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new UserReviewModel
-                    {
-                        Id = userReview.Id,
-                        ReviewedUserId = userReview.ReviewedUserId,
-                        ReviewingUserId = userReview.ReviewingUserId,
-                        ReviewText = userReview.ReviewText,
-                        DateReviewed = userReview.DateReviewed,
-                        Rating = userReview.Rating
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "UserReview not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.UserReviews.Remove(UserReview);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new UserReviewModel
+                        {
+                            Id = UserReview.Id,
+                            ReviewedUserId = UserReview.ReviewedUserId,
+                            ReviewingUserId = UserReview.ReviewingUserId,
+                            ReviewText = UserReview.ReviewText,
+                            DateReviewed = UserReview.DateReviewed,
+                            Rating = UserReview.Rating
+                        };
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete UserReview: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
         public async Task<UserReviewModel> GetById(int id)
@@ -78,65 +94,93 @@ namespace Lafatkotob.Services.UserReviewService
                 .ToListAsync();
         }
 
-        public async Task<UserReviewModel> Post(UserReviewModel model)
+        public async Task<ServiceResponse<UserReviewModel>> Post(UserReviewModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<UserReviewModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var userReview = new UserReview
+                    try
                     {
-                        ReviewedUserId = model.ReviewedUserId,
-                        ReviewingUserId = model.ReviewingUserId,
-                        ReviewText = model.ReviewText,
-                        DateReviewed = DateTime.Now,
-                        Rating = model.Rating
-                    };
 
-                    _context.UserReviews.Add(userReview);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var UserReview = new UserReview
+                        {
+                            ReviewedUserId = model.ReviewedUserId,
+                            ReviewingUserId = model.ReviewingUserId,
+                            ReviewText = model.ReviewText,
+                            DateReviewed = DateTime.Now,
+                            Rating = model.Rating
+                        };  
+                        _context.UserReviews.Add(UserReview);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = userReview.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create UserReview.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
-        public async Task<UserReviewModel> Update(UserReviewModel model)
+        public async Task<ServiceResponse<UserReviewModel>> Update(UserReviewModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<UserReviewModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var userReview = await _context.UserReviews.FindAsync(model.Id);
-                    if (userReview == null) return null;
-
-                    userReview.ReviewedUserId = model.ReviewedUserId;
-                    userReview.ReviewingUserId = model.ReviewingUserId;
-                    userReview.ReviewText = model.ReviewText;
-                    userReview.DateReviewed = DateTime.Now;
-                    userReview.Rating = model.Rating;
-
-                    _context.Update(userReview);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+
+            var UserReview = await _context.UserReviews.FindAsync(model.Id);
+            if (UserReview == null)
+            {
+                response.Success = false;
+                response.Message = "UserReview not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        UserReview.ReviewText = model.ReviewText;
+                        UserReview.Rating = model.Rating;
+
+
+                        _context.UserReviews.Update(UserReview);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update UserReview: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
     }
 }

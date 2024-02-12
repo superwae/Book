@@ -16,35 +16,50 @@ namespace Lafatkotob.Services.UserLikeService
             _context = context;
         }
 
-        public async Task<UserLikeModel> Delete(int id)
+        public async Task<ServiceResponse<UserLikeModel>> Delete(int id)
         {
-            var userLike = await _context.UserLikes.FindAsync(id);
-            if (userLike == null) return null;
+            var response = new ServiceResponse<UserLikeModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var UserLike = await _context.UserLikes.FindAsync(id);
+            if (UserLike == null)
             {
-                try
-                {
-                    _context.UserLikes.Remove(userLike);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new UserLikeModel
-                    {
-                        Id = userLike.Id,
-                        LikedUserId = userLike.LikedUserId,
-                        LikingUserId = userLike.LikingUserId,
-                        DateLiked = userLike.DateLiked
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "UserLike not found.";
+                return response;
             }
-        }
 
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.UserLikes.Remove(UserLike);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new UserLikeModel
+                        {
+                            Id = UserLike.Id,
+                            LikedUserId = UserLike.LikedUserId,
+                            LikingUserId = UserLike.LikingUserId,
+                            DateLiked = UserLike.DateLiked
+                        };
+                       
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete UserLike: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
+        }
         public async Task<UserLikeModel> GetById(int id)
         {
             var userLike = await _context.UserLikes.FindAsync(id);
@@ -72,61 +87,92 @@ namespace Lafatkotob.Services.UserLikeService
                 .ToListAsync();
         }
 
-        public async Task<UserLikeModel> Post(UserLikeModel model)
+        public async Task<ServiceResponse<UserLikeModel>> Post(UserLikeModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<UserLikeModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var userLike = new UserLike
+                    try
                     {
-                        LikedUserId = model.LikedUserId,
-                        LikingUserId = model.LikingUserId,
-                        DateLiked = model.DateLiked
-                    };
 
-                    _context.UserLikes.Add(userLike);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var UserLike = new UserLike
+                        {
+                            LikedUserId = model.LikedUserId,
+                            LikingUserId = model.LikingUserId,
+                            DateLiked = DateTime.Now
+                        };
+                       
+                        _context.UserLikes.Add(UserLike);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = userLike.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create UserLike.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
-        public async Task<UserLikeModel> Update(UserLikeModel model)
+        public async Task<ServiceResponse<UserLikeModel>> Update(UserLikeModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<UserLikeModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var userLike = await _context.UserLikes.FindAsync(model.Id);
-                    if (userLike == null) return null;
-
-                    userLike.LikedUserId = model.LikedUserId;
-                    userLike.LikingUserId = model.LikingUserId;
-                    userLike.DateLiked = model.DateLiked;
-
-                    _context.Update(userLike);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+
+            var UserLike = await _context.UserLikes.FindAsync(model.Id);
+            if (UserLike == null)
+            {
+                response.Success = false;
+                response.Message = "UserLike not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        
+                        UserLike.DateLiked = DateTime.Now;
+
+
+                        _context.UserLikes.Update(UserLike);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update UserLike: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
     }
 }

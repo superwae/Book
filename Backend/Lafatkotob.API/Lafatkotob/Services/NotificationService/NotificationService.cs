@@ -18,32 +18,42 @@ namespace Lafatkotob.Services.NotificationService
             _context = context;
         }
 
-        public async Task<NotificationModel> Post(NotificationModel model)
+        public async Task<ServiceResponse<NotificationModel>> Post(NotificationModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<NotificationModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var notification = new Notification
+                    try
                     {
-                        Message = model.Message,
-                        DateSent = model.DateSent,
-                        IsRead = model.IsRead
-                    };
 
-                    _context.Notifications.Add(notification);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var Notification = new Notification
+                        {
+                            Message = model.Message,
+                            DateSent = DateTime.Now,
+                            IsRead = model.IsRead
+                        };
+                        
+                        _context.Notifications.Add(Notification);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = notification.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create Notification.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
         public async Task<NotificationModel> GetById(int id)
@@ -73,62 +83,100 @@ namespace Lafatkotob.Services.NotificationService
                 .ToListAsync();
         }
 
-        public async Task<NotificationModel> Update(NotificationModel model)
+        public async Task<ServiceResponse<NotificationModel>> Update(NotificationModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<NotificationModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var notification = await _context.Notifications.FindAsync(model.Id);
-                    if (notification == null) return null;
-
-                    notification.Message = model.Message;
-                    notification.DateSent = model.DateSent;
-                    notification.IsRead = model.IsRead;
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+
+            var Notification = await _context.Notifications.FindAsync(model.Id);
+            if (Notification == null)
+            {
+                response.Success = false;
+                response.Message = "Notification not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        Notification.IsRead = model.IsRead;
+                        Notification.Message = model.Message;
+                        Notification.DateSent = model.DateSent;
+                        Notification.IsRead = model.IsRead;
+
+                        _context.Notifications.Update(Notification);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to Notification badge: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
-        public async Task<NotificationModel> Delete(int id)
+        public async Task<ServiceResponse<NotificationModel>> Delete(int id)
         {
-            var notification = await _context.Notifications.FindAsync(id);
-            if (notification == null) return null;
+            var response = new ServiceResponse<NotificationModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var Notification = await _context.Notifications.FindAsync(id);
+            if (Notification == null)
             {
-
-                try
-                {
-                    _context.Notifications.Remove(notification);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new NotificationModel
-                    {
-                        Id = notification.Id,
-                        Message = notification.Message,
-                        DateSent = notification.DateSent,
-                        IsRead = notification.IsRead
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Notification not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.Notifications.Remove(Notification);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new NotificationModel
+                        {
+                            Id = Notification.Id,
+                            Message = Notification.Message,
+                            DateSent = Notification.DateSent,
+                            IsRead = Notification.IsRead
+                        };
+                      
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete Notification: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
     }
 }
