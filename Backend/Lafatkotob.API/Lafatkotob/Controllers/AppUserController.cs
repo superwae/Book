@@ -1,9 +1,12 @@
-﻿using Lafatkotob.Services.AppUserService;
+﻿using Lafatkotob.Entities;
+using Lafatkotob.Services.AppUserService;
+using Lafatkotob.Services.EmailService;
 using Lafatkotob.ViewModel;
 using Lafatkotob.ViewModels;
 using login.ViewModel;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -15,10 +18,14 @@ namespace Lafatkotob.Controllers
     public class AppUserController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly UserManager<AppUser> _userManager;
+        private readonly IEmailService _emailService;
 
-        public AppUserController(IUserService userService)
+        public AppUserController(IUserService userService, IEmailService emailService, UserManager<AppUser>userManager)
         {
             _userService = userService;
+            _emailService = emailService;
+            _userManager = userManager;
         }
 
         [HttpPost("Login")]
@@ -97,15 +104,29 @@ namespace Lafatkotob.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Assume baseUrl is correctly determined here. For example:
+            
             string baseUrl = $"{Request.Scheme}://{Request.Host}";
             var result = await _userService.RegisterUser(model, baseUrl);
             if (!result.Success)
             {
                 return BadRequest(result.Message);
             }
+            
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(result.Data);
+                var confirmationLink = Url.Action("ConfirmEmail", "Account",
+                                        new { userId = result.Data.Id, token = token },
+                                        protocol: Request.Scheme);
 
-            return Ok(result.Data); // Or customize the response as needed
+                string subject = "Confirm Your Account";
+                string body = $@"Hello {result.Data.UserName},<br><br>
+                                Please confirm your account by clicking the link below:<br>
+                                <a href='{confirmationLink}'>Confirm Your Account</a><br><br>
+                                Thank you.";
+
+                await _emailService.SendEmailAsync(result.Data.Email, subject, body);
+
+
+            return Ok(result.Data); 
         }
 
         [HttpGet("validateToken")]

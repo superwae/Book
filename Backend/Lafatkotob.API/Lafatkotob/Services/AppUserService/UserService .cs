@@ -52,11 +52,6 @@ namespace Lafatkotob.Services.AppUserService
                 };
             }
 
-            var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = $"{baseUrl}/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(token)}";
-            var emailBody = $"Please confirm your account by <a href='{confirmationLink}'>clicking here</a>.";
-
-            await _emailService.SendEmailAsync(user.Email, "Confirm Your Email", emailBody);
 
             return new ServiceResponse<AppUser>
             {

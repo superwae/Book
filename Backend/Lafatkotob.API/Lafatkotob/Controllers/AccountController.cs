@@ -18,24 +18,21 @@ public class AccountController : ControllerBase
     {
         if (userId == null || token == null)
         {
-            return BadRequest("User ID or token is missing.");
+            return RedirectToPage("/Error");
         }
-
-        token = System.Net.WebUtility.UrlDecode(token);
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            return NotFound("User not found.");
+            return NotFound($"Unable to load user with ID '{userId}'.");
         }
 
         var result = await _userManager.ConfirmEmailAsync(user, token);
         if (!result.Succeeded)
         {
-            // For debug purposes, consider logging the error details to understand why it fails
-            return BadRequest($"Email confirmation failed. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            return BadRequest("Error confirming your email.");
         }
 
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Index", "Home"); 
     }
 }
