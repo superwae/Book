@@ -4,10 +4,10 @@ namespace Lafatkotob.Services.UserLikeService
 {
     public interface IUserLikeService
     {
-        Task<UserLikeModel> Post(UserLikeModel model);
+        Task<ServiceResponse<UserLikeModel>> Post(UserLikeModel model);
         Task<UserLikeModel> GetById(int id);
         Task<List<UserLikeModel>> GetAll();
-        Task<UserLikeModel> Update(UserLikeModel model);
-        Task<UserLikeModel> Delete(int id);
+        Task<ServiceResponse<UserLikeModel>> Update(UserLikeModel model);
+        Task<ServiceResponse<UserLikeModel>> Delete(int id);
     }
 }

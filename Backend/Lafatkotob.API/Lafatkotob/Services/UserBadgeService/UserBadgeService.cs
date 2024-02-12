@@ -16,33 +16,49 @@ namespace Lafatkotob.Services.UserBadgeService
             _context = context;
         }
 
-        public async Task<UserBadgeModel> Delete(int id)
+        public async Task<ServiceResponse<UserBadgeModel>> Delete(int id)
         {
-            var userBadge = await _context.UserBadges.FindAsync(id);
-            if (userBadge == null) return null;
+            var response = new ServiceResponse<UserBadgeModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var UserBadge = await _context.UserBadges.FindAsync(id);
+            if (UserBadge == null)
             {
-                try
-                {
-                    _context.UserBadges.Remove(userBadge);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new UserBadgeModel
-                    {
-                        Id = userBadge.Id,
-                        UserId = userBadge.UserId,
-                        BadgeId = userBadge.BadgeId,
-                        DateEarned = userBadge.DateEarned
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "UserBadge not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.UserBadges.Remove(UserBadge);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new UserBadgeModel
+                        {
+                            Id = UserBadge.Id,
+                            UserId = UserBadge.UserId,
+                            BadgeId = UserBadge.BadgeId,
+                            DateEarned = UserBadge.DateEarned
+                        };
+                     
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete UserBadge: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
         public async Task<UserBadgeModel> GetById(int id)
@@ -73,61 +89,93 @@ namespace Lafatkotob.Services.UserBadgeService
                 .ToListAsync();
         }
 
-        public async Task<UserBadgeModel> Post(UserBadgeModel model)
+        public async Task<ServiceResponse<UserBadgeModel>> Post(UserBadgeModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<UserBadgeModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var userBadge = new UserBadge
+                    try
                     {
-                        UserId = model.UserId,
-                        BadgeId = model.BadgeId,
-                        DateEarned = DateTime.Now
-                    };
 
-                    _context.UserBadges.Add(userBadge);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var UserBadge = new UserBadge
+                        {
+                            Id = model.Id,
+                            UserId = model.UserId,
+                            BadgeId = model.BadgeId,
+                            DateEarned = DateTime.Now
+                        };
+                       
+                        _context.UserBadges.Add(UserBadge);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = userBadge.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create UserBadge.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
-        public async Task<UserBadgeModel> Update(UserBadgeModel model)
+        public async Task<ServiceResponse<UserBadgeModel>> Update(UserBadgeModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<UserBadgeModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var userBadge = await _context.UserBadges.FindAsync(model.Id);
-                    if (userBadge == null) return null;
-
-                    userBadge.UserId = model.UserId;
-                    userBadge.BadgeId = model.BadgeId;
-                    userBadge.DateEarned = model.DateEarned;
-
-                    _context.UserBadges.Update(userBadge);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+
+            var UserBadge = await _context.UserBadges.FindAsync(model.Id);
+            if (UserBadge == null)
+            {
+                response.Success = false;
+                response.Message = "UserBadge not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        UserBadge.DateEarned = model.DateEarned;
+
+
+                        _context.UserBadges.Update(UserBadge);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update UserBadge: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
+    
     }
 }

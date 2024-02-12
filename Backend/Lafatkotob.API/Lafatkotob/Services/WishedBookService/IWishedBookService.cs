@@ -6,10 +6,10 @@ namespace Lafatkotob.Services.WishedBookService
 {
     public interface IWishedBookService
     {
-        Task<WishedBookModel> Post(WishedBookModel model);
+        Task<ServiceResponse<WishedBookModel>> Post(WishedBookModel model);
         Task<WishedBookModel> GetById(int id);
         Task<List<WishedBookModel>> GetAll();
-        Task<WishedBookModel> Update(WishedBookModel model);
-        Task<WishedBookModel> Delete(int id);
+        Task<ServiceResponse<WishedBookModel>> Update(WishedBookModel model);
+        Task<ServiceResponse<WishedBookModel>> Delete(int id);
     }
 }

@@ -14,7 +14,6 @@ namespace Lafatkotob.Services.AppUserService
         Task<AppUserModel> GetUserById(string userId);
         Task<ServiceResponse<bool>> DeleteUser(string userId);
         Task<LoginResultModel> LoginUser(LoginModel model);
-        Task<ServiceResponse<bool>> ConfirmEmail(string userId, string token);
 
     }
 }

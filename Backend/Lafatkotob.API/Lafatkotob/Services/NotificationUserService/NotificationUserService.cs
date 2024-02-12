@@ -16,32 +16,48 @@ namespace Lafatkotob.Services.NotificationUserService
             _context = context;
         }
 
-        public async Task<NotificationUserModel> Delete(int id)
+        public async Task<ServiceResponse<NotificationUserModel>> Delete(int id)
         {
-            var notificationUser = await _context.NotificationUsers.FindAsync(id);
-            if (notificationUser == null) return null;
+            var response = new ServiceResponse<NotificationUserModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var NotificationUser = await _context.NotificationUsers.FindAsync(id);
+            if (NotificationUser == null)
             {
-                try
-                {
-                    _context.NotificationUsers.Remove(notificationUser);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new NotificationUserModel
-                    {
-                        Id = notificationUser.Id,
-                        UserId = notificationUser.UserId,
-                        NotificationId = notificationUser.NotificationId
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "NotificationUser not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.NotificationUsers.Remove(NotificationUser);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new NotificationUserModel
+                        {
+                            Id = NotificationUser.Id,
+                            UserId = NotificationUser.UserId,
+                            NotificationId = NotificationUser.NotificationId
+                        };
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete NotificationUser: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
         public async Task<NotificationUserModel> GetById(int id)
@@ -70,59 +86,91 @@ namespace Lafatkotob.Services.NotificationUserService
                 .ToListAsync();
         }
 
-        public async Task<NotificationUserModel> Post(NotificationUserModel model)
+        public async Task<ServiceResponse<NotificationUserModel>> Post(NotificationUserModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<NotificationUserModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var notificationUser = new NotificationUser
+                    try
                     {
-                        UserId = model.UserId,
-                        NotificationId = model.NotificationId
-                    };
 
-                    _context.NotificationUsers.Add(notificationUser);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var NotificationUser = new NotificationUser
+                        {
+                            UserId = model.UserId,
+                            NotificationId = model.NotificationId
+                        };
+                       
+                        _context.NotificationUsers.Add(NotificationUser);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = notificationUser.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create NotificationUser.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
-        public async Task<NotificationUserModel> Update(NotificationUserModel model)
+        public async Task<ServiceResponse<NotificationUserModel>> Update(NotificationUserModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<NotificationUserModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var notificationUser = await _context.NotificationUsers.FindAsync(model.Id);
-                    if (notificationUser == null) return null;
-
-                    notificationUser.UserId = model.UserId;
-                    notificationUser.NotificationId = model.NotificationId;
-
-                    _context.NotificationUsers.Update(notificationUser);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+
+            var NotificationUser = await _context.NotificationUsers.FindAsync(model.Id);
+            if (NotificationUser == null)
+            {
+                response.Success = false;
+                response.Message = "NotificationUser not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        NotificationUser.NotificationId = model.NotificationId;
+                        NotificationUser.UserId = model.UserId;
+
+                        _context.NotificationUsers.Update(NotificationUser);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update NotificationUser: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
+    
     }
 }

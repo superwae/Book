@@ -887,9 +887,6 @@ namespace Lafatkotob.Migrations
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
                     b.HasIndex("UserName")
                         .IsUnique();
 

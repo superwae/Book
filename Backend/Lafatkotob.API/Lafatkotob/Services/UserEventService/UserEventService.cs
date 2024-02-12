@@ -16,32 +16,48 @@ namespace Lafatkotob.Services.UserEventService
             _context = context;
         }
 
-        public async Task<UserEventModel> Delete(int id)
+        public async Task<ServiceResponse<UserEventModel>> Delete(int id)
         {
-            var userEvent = await _context.UserEvents.FindAsync(id);
-            if (userEvent == null) return null;
+            var response = new ServiceResponse<UserEventModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var UserEvent = await _context.UserEvents.FindAsync(id);
+            if (UserEvent == null)
             {
-                try
-                {
-                    _context.UserEvents.Remove(userEvent);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new UserEventModel
-                    {
-                        Id = userEvent.Id,
-                        UserId = userEvent.UserId,
-                        EventId = userEvent.EventId
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "UserEvent not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.UserEvents.Remove(UserEvent);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new UserEventModel
+                        {
+                            Id = UserEvent.Id,
+                            UserId = UserEvent.UserId,
+                            EventId = UserEvent.EventId
+                        };
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete UserEvent: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
         public async Task<UserEventModel> GetById(int id)
@@ -70,59 +86,91 @@ namespace Lafatkotob.Services.UserEventService
                 .ToListAsync();
         }
 
-        public async Task<UserEventModel> Post(UserEventModel model)
+        public async Task<ServiceResponse<UserEventModel>> Post(UserEventModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<UserEventModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var userEvent = new UserEvent
+                    try
                     {
-                        UserId = model.UserId,
-                        EventId = model.EventId
-                    };
 
-                    _context.UserEvents.Add(userEvent);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var UserEvent = new UserEvent
+                        {
+                            UserId = model.UserId,
+                            EventId = model.EventId
+                        };
+                        
+                        _context.UserEvents.Add(UserEvent);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = userEvent.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create UserEvent.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
-        public async Task<UserEventModel> Update(UserEventModel model)
+        public async Task<ServiceResponse<UserEventModel>> Update(UserEventModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<UserEventModel>();
+
+            if (model == null)
             {
-                if (model == null) throw new ArgumentNullException(nameof(model));
-
-                try
-                {
-                    var userEvent = await _context.UserEvents.FindAsync(model.Id);
-                    if (userEvent == null) return null;
-
-                    userEvent.UserId = model.UserId;
-                    userEvent.EventId = model.EventId;
-
-                    _context.UserEvents.Update(userEvent);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+
+            var UserEvent = await _context.UserEvents.FindAsync(model.Id);
+            if (UserEvent == null)
+            {
+                response.Success = false;
+                response.Message = "UserEvent not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        UserEvent.EventId = model.EventId;
+                        UserEvent.UserId = model.UserId;
+
+
+                        _context.UserEvents.Update(UserEvent);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update UserEvent: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
     }
 }

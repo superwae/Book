@@ -1,14 +1,15 @@
 ﻿using Lafatkotob.ViewModels;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Lafatkotob.Services.WishListService
 {
     public interface IWishListService
     {
-        Task<WishlistModel> Post(WishlistModel model);
-        Task<WishlistModel> GetById(int id);
-        Task<List<WishlistModel>> GetAll();
-        Task<WishlistModel> Update(WishlistModel model);
-        Task<WishlistModel> Delete(int id);
-
+        Task<ServiceResponse<WishlistModel>> Post(WishlistModel model);
+        Task<ServiceResponse<WishlistModel>> GetById(int id);
+        Task<ServiceResponse<List<WishlistModel>>> GetAll();
+        Task<ServiceResponse<WishlistModel>> Update(WishlistModel model);
+        Task<ServiceResponse<WishlistModel>> Delete(int id);
     }
 }

@@ -176,26 +176,6 @@ namespace Lafatkotob.Services.AppUserService
             };
         }
 
-        public async Task<ServiceResponse<bool>> ConfirmEmail(string userId, string token)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return new ServiceResponse<bool> { Success = false, Message = "User not found." };
-            }
-
-            var result = await _userManager.ConfirmEmailAsync(user, token);
-            if (!result.Succeeded)
-            {
-                return new ServiceResponse<bool>
-                {
-                    Success = false,
-                    Message = "Email confirmation failed.",
-                    Errors = result.Errors.Select(e => e.Description).ToList()
-                };
-            }
-
-            return new ServiceResponse<bool> { Success = true, Data = true };
-        }
+        
     }
 }

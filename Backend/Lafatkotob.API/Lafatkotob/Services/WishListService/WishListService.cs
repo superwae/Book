@@ -2,6 +2,8 @@
 using Lafatkotob.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Lafatkotob.Services.WishListService
@@ -15,125 +17,172 @@ namespace Lafatkotob.Services.WishListService
             _context = context;
         }
 
-        public async Task<WishlistModel> Delete(int id)
+        public async Task<ServiceResponse<WishlistModel>> Post(WishlistModel model)
         {
-            var wishlist = await _context.Wishlists.FindAsync(id);
-            if (wishlist == null) return null;
+            var response = new ServiceResponse<WishlistModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    _context.Wishlists.Remove(wishlist);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new WishlistModel
+                    try
                     {
-                        Id = wishlist.Id,
-                        UserId = wishlist.UserId,
-                        DateAdded = wishlist.DateAdded
-                    };
+
+                        var Wishlist = new Wishlist
+                        {
+                            UserId = model.UserId,
+                            DateAdded = model.DateAdded
+                        };
+                       
+                        _context.Wishlists.Add(Wishlist);
+                        await _context.SaveChangesAsync();
+
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create Wishlist.";
+                    }
                 }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
-        public async Task<WishlistModel> GetById(int id)
+        public async Task<ServiceResponse<WishlistModel>> GetById(int id)
         {
             var wishlist = await _context.Wishlists.FindAsync(id);
-            if (wishlist == null) return null;
+            var response = new ServiceResponse<WishlistModel>();
 
-            return new WishlistModel
+            if (wishlist == null)
+            {
+                response.Success = false;
+                response.Message = "Wishlist not found.";
+                return response;
+            }
+
+            response.Data = new WishlistModel
             {
                 Id = wishlist.Id,
                 UserId = wishlist.UserId,
                 DateAdded = wishlist.DateAdded,
             };
+
+            return response;
         }
 
-        public async Task<List<WishlistModel>> GetAll()
+        public async Task<ServiceResponse<List<WishlistModel>>> GetAll()
         {
-            return await _context.Wishlists
-            .Select(wl => new WishlistModel
+            var response = new ServiceResponse<List<WishlistModel>>
             {
-                Id = wl.Id,
-                UserId = wl.UserId,
-                DateAdded = wl.DateAdded,
-            })
-            .ToListAsync();
+                Data = await _context.Wishlists
+                            .Select(wl => new WishlistModel
+                            {
+                                Id = wl.Id,
+                                UserId = wl.UserId,
+                                DateAdded = wl.DateAdded,
+                            })
+                            .ToListAsync()
+            };
+
+            return response;
         }
 
-        public async Task<WishlistModel> Post(WishlistModel model)
+        public async Task<ServiceResponse<WishlistModel>> Update(WishlistModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<WishlistModel>();
+
+            if (model == null)
             {
-                try
+                response.Success = false;
+                response.Message = "Wishlist cannot be null.";
+                return response;
+            }
+
+            var Wishlist = await _context.Wishlists.FindAsync(model.Id);
+            if (Wishlist == null)
+            {
+                response.Success = false;
+                response.Message = "Wishlist not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
-                    var wishlist = new Wishlist
+                    try
                     {
-                        UserId = model.UserId,
-                        DateAdded = model.DateAdded,
-                    };
+                        Wishlist.DateAdded = model.DateAdded;
 
-                    _context.Wishlists.Add(wishlist);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
 
-                    model.Id = wishlist.Id;
-                    return model;
+                        _context.Wishlists.Update(Wishlist);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update Wishlist: {ex.Message}";
+                    }
                 }
-                catch (Exception)
-                {
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
-
-        public async Task<WishlistModel> Update(WishlistModel model)
+        public async Task<ServiceResponse<WishlistModel>> Delete(int id)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<WishlistModel>();
+            var Wishlist = await _context.Wishlists.FindAsync(id);
 
-            var wishlist = await _context.Wishlists.FindAsync(model.Id);
-            if (wishlist == null) return null;
-
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (Wishlist == null)
             {
-                try
-                {
-                    wishlist.UserId = model.UserId;
-                    wishlist.DateAdded = model.DateAdded;
-
-                    _context.Wishlists.Update(wishlist);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Wishlist not found.";
+                return response;
             }
-        }
-        public async Task<List<WishlistModel>> get()
-        {
-            var wishlists = await _context.Wishlists.ToListAsync();
-            var wishlistModels = new List<WishlistModel>();
-            foreach (var wishlist in wishlists)
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                wishlistModels.Add(new WishlistModel
+                using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
-                    Id = wishlist.Id,
-                    UserId = wishlist.UserId,
-                    DateAdded = wishlist.DateAdded,
-                });
+                    try
+                    {
+                        _context.Wishlists.Remove(Wishlist);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
 
-            }
-            return wishlistModels;
+                        response.Success = true;
+                        response.Data = new WishlistModel
+                        {
+                            Id = Wishlist.Id,
+                            UserId = Wishlist.UserId,
+                            DateAdded = Wishlist.DateAdded
+                        };
+                       
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete wishlist: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
     }

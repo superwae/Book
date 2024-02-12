@@ -18,38 +18,48 @@ namespace Lafatkotob.Services.MessageService
             _context = context;
         }
 
-        public async Task<MessageModel> Post(MessageModel model)
+        public async Task<ServiceResponse<MessageModel>> Post(MessageModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<MessageModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var message = new Message
+                    try
                     {
-                        ConversationId = model.ConversationId,
-                        SenderUserId = model.SenderUserId,
-                        ReceiverUserId = model.ReceiverUserId,
-                        MessageText = model.MessageText,
-                        DateSent = DateTime.Now,
-                        IsReceived = false,
-                        IsRead = false,
-                        IsDeletedBySender = false,
-                        IsDeletedByReceiver = false
-                    };
 
-                    _context.Messages.Add(message);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var Message = new Message
+                        {
+                            ConversationId = model.ConversationId,
+                            SenderUserId = model.SenderUserId,
+                            ReceiverUserId = model.ReceiverUserId,
+                            MessageText = model.MessageText,
+                            DateSent = DateTime.Now,
+                            IsReceived = model.IsReceived,
+                            IsRead = model.IsRead,
+                            IsDeletedBySender = model.IsDeletedBySender,
+                            IsDeletedByReceiver = model.IsDeletedByReceiver
+                        };
+                       
+                        _context.Messages.Add(Message);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = message.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create Message.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
         public async Task<MessageModel> GetById(int id)
@@ -94,72 +104,112 @@ namespace Lafatkotob.Services.MessageService
                 .ToListAsync();
         }
 
-        public async Task<MessageModel> Update(MessageModel model)
+        public async Task<ServiceResponse<MessageModel>> Update(MessageModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<MessageModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var existingMessage = await _context.Messages.FindAsync(model.Id);
-                    if (existingMessage == null) return null;
-
-                    existingMessage.MessageText = model.MessageText;
-                    existingMessage.DateSent = model.DateSent; 
-                    existingMessage.IsReceived = model.IsReceived;
-                    existingMessage.IsRead = model.IsRead;
-                    existingMessage.IsDeletedBySender = model.IsDeletedBySender;
-                    existingMessage.IsDeletedByReceiver = model.IsDeletedByReceiver;
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
-        }
 
-        public async Task<MessageModel> Delete(int id)
-        {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var Message = await _context.Messages.FindAsync(model.Id);
+            if (Message == null)
             {
-                try
+                response.Success = false;
+                response.Message = "Message not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
-                    var message = await _context.Messages.FindAsync(id);
-                    if (message == null) return null;
-
-                    _context.Messages.Remove(message);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new MessageModel
+                    try
                     {
-                        Id = message.Id,
-                        ConversationId = message.ConversationId,
-                        SenderUserId = message.SenderUserId,
-                        ReceiverUserId = message.ReceiverUserId,
-                        MessageText = message.MessageText,
-                        DateSent = message.DateSent,
-                        IsReceived = message.IsReceived,
-                        IsRead = message.IsRead,
-                        IsDeletedBySender = message.IsDeletedBySender,
-                        IsDeletedByReceiver = message.IsDeletedByReceiver
+                        Message.DateSent = model.DateSent;
+                        Message.IsReceived = model.IsReceived;
+                        Message.IsRead = model.IsRead;
+                        Message.IsDeletedBySender = model.IsDeletedBySender;
+                        Message.IsDeletedByReceiver = model.IsDeletedByReceiver;
+                        Message.IsRead = model.IsRead;
+                        Message.MessageText = model.MessageText;
+                        Message.ReceiverUserId = model.ReceiverUserId;
+                        Message.SenderUserId = model.SenderUserId;
+                        Message.ConversationId = model.ConversationId;
 
+                        _context.Messages.Update(Message);
+                        await _context.SaveChangesAsync();
 
-                    };
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Message to update badge: {ex.Message}";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
+        public async Task<ServiceResponse<MessageModel>> Delete(int id)
+        {
+            var response = new ServiceResponse<MessageModel>();
+
+            var Message = await _context.Messages.FindAsync(id);
+            if (Message == null)
+            {
+                response.Success = false;
+                response.Message = "Message not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.Messages.Remove(Message);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new MessageModel
+                        {
+                            Id = Message.Id,
+                            ConversationId = Message.ConversationId,
+                            SenderUserId = Message.SenderUserId,
+                            ReceiverUserId = Message.ReceiverUserId,
+                            MessageText = Message.MessageText,
+                            DateSent = Message.DateSent,
+                            IsReceived = Message.IsReceived,
+                            IsRead = Message.IsRead,
+                            IsDeletedBySender = Message.IsDeletedBySender,
+                            IsDeletedByReceiver = Message.IsDeletedByReceiver
+                        };
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete Message: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
+        }
+    
     }
 }

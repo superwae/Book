@@ -17,34 +17,45 @@ namespace Lafatkotob.Services.HistoryService
             _context = context;
         }
 
-        public async Task<HistoryModel> Post(HistoryModel model)
+        public async Task<ServiceResponse<HistoryModel>> Post(HistoryModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<HistoryModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var history = new History
+                    try
                     {
-                        UserId = model.UserId,
-                        Date = model.Date,
-                        Type = model.Type,
-                        State = model.State
-                    };
 
-                    _context.History.Add(history);
-                    await _context.SaveChangesAsync();
+                        var History = new History
+                        {
+                            Id = model.Id,
+                            UserId = model.UserId,
+                            Date = DateTime.Now,
+                            Type = model.Type,
+                            State = model.State
+                        };
 
-                    await transaction.CommitAsync();
+                       
+                        _context.History.Add(History);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = history.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create History.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
         public async Task<HistoryModel> GetById(int id)
@@ -76,63 +87,101 @@ namespace Lafatkotob.Services.HistoryService
                 .ToListAsync();
         }
 
-        public async Task<HistoryModel> Update(HistoryModel model)
+        public async Task<ServiceResponse<HistoryModel>> Update(HistoryModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<HistoryModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var history = await _context.History.FindAsync(model.Id);
-                    if (history == null) return null;
-
-                    history.UserId = model.UserId;
-                    history.Date = model.Date;
-                    history.Type = model.Type;
-                    history.State = model.State;
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+
+            var History = await _context.History.FindAsync(model.Id);
+            if (History == null)
+            {
+                response.Success = false;
+                response.Message = "History not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        History.Date = model.Date;
+                        History.Type = model.Type;
+                        History.State = model.State;
+
+
+                        _context.History.Update(History);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update History: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
-        public async Task<HistoryModel> Delete(int id)
+        public async Task<ServiceResponse<HistoryModel>> Delete(int id)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<HistoryModel>();
+
+            var History = await _context.History.FindAsync(id);
+            if (History == null)
             {
-                try
-                {
-                    var history = await _context.History.FindAsync(id);
-                    if (history == null) return null;
-
-                    _context.History.Remove(history);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new HistoryModel
-                    {
-                        Id = history.Id,
-                        UserId = history.UserId,
-                        Date = history.Date,
-                        Type = history.Type,
-                        State = history.State
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "History not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.History.Remove(History);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new HistoryModel
+                        {
+                            Id = History.Id,
+                            UserId = History.UserId,
+                            Date = History.Date,
+                            Type = History.Type,
+                            State = History.State
+                        };
+                       
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete History: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
     }
 }
