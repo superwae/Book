@@ -20,7 +20,6 @@ namespace Lafatkotob.Configuration
             builder.Property(u => u.PhoneNumber).IsRequired(false);
 
             //unique properties
-            builder.HasIndex(u => u.Email).IsUnique();
             builder.HasIndex(u => u.UserName).IsUnique();
 
             // Custom properties

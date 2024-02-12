@@ -21,6 +21,8 @@ public class AccountController : ControllerBase
             return BadRequest("User ID or token is missing.");
         }
 
+        token = System.Net.WebUtility.UrlDecode(token);
+
         var user = await _userManager.FindByIdAsync(userId);
         if (user == null)
         {
@@ -30,10 +32,10 @@ public class AccountController : ControllerBase
         var result = await _userManager.ConfirmEmailAsync(user, token);
         if (!result.Succeeded)
         {
-            return BadRequest("Email confirmation failed.");
+            // For debug purposes, consider logging the error details to understand why it fails
+            return BadRequest($"Email confirmation failed. Errors: {string.Join(", ", result.Errors.Select(e => e.Description))}");
         }
 
-        // Redirect or return success message
-        return Ok("Email confirmed successfully.");
+        return RedirectToAction("Index", "Home");
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lafatkotob.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240211124042_FirstMirgtion")]
-    partial class FirstMirgtion
+    [Migration("20240212102752_firstm")]
+    partial class firstm
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -889,9 +889,6 @@ namespace Lafatkotob.Migrations
                     b.Property<string>("ProfilePicture")
                         .HasMaxLength(2048)
                         .HasColumnType("nvarchar(2048)");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
 
                     b.HasIndex("UserName")
                         .IsUnique();

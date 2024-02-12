@@ -18,34 +18,44 @@ namespace Lafatkotob.Services.EventService
             _context = context;
         }
 
-        public async Task<EventModel> Post(EventModel model)
+        public async Task<ServiceResponse<EventModel>> Post(EventModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<EventModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var eventEntity = new Event
+                    try
                     {
-                        EventName = model.EventName,
-                        Description = model.Description,
-                        DateScheduled = model.DateScheduled,
-                        Location = model.Location,
-                        HostUserId = model.HostUserId
-                    };
 
-                    _context.Events.Add(eventEntity);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var Event = new Event
+                        {
+                            EventName = model.EventName,
+                            Description = model.Description,
+                            DateScheduled = model.DateScheduled,
+                            Location = model.Location,
+                            HostUserId = model.HostUserId
+                        };
+                       
+                        _context.Events.Add(Event);
+                        await _context.SaveChangesAsync();
 
-                    model.Id = eventEntity.Id;
-                    return model;
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create Event.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
         public async Task<EventModel> GetById(int id)
@@ -81,66 +91,104 @@ namespace Lafatkotob.Services.EventService
                 .ToListAsync();
         }
 
-        public async Task<EventModel> Update(EventModel model)
+        public async Task<ServiceResponse<EventModel>> Update(EventModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<EventModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var eventEntity = await _context.Events.FindAsync(model.Id);
-                    if (eventEntity == null) return null;
-
-                    eventEntity.EventName = model.EventName;
-                    eventEntity.Description = model.Description;
-                    eventEntity.DateScheduled = model.DateScheduled;
-                    eventEntity.Location = model.Location;
-                    eventEntity.HostUserId = model.HostUserId;
-
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Model cannot be null.";
+                return response;
             }
+
+            var Event = await _context.Events.FindAsync(model.Id);
+            if (Event == null)
+            {
+                response.Success = false;
+                response.Message = "Event not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        Event.Location = model.Location;
+                        Event.Description = model.Description;
+                        Event.DateScheduled = model.DateScheduled;
+                        Event.EventName = model.EventName;
+                        Event.HostUserId = model.HostUserId;
+
+
+                        _context.Events.Update(Event);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update Event: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
-        public async Task<EventModel> Delete(int id)
+        public async Task<ServiceResponse<EventModel>> Delete(int id)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<EventModel>();
+
+            var Event = await _context.Events.FindAsync(id);
+            if (Event == null)
             {
-                try
-                {
-                    var eventEntity = await _context.Events.FindAsync(id);
-                    if (eventEntity == null) return null;
-
-                    _context.Events.Remove(eventEntity);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new EventModel
-                    {
-                        Id = eventEntity.Id,
-                        EventName = eventEntity.EventName,
-                        Description = eventEntity.Description,
-                        DateScheduled = eventEntity.DateScheduled,
-                        Location = eventEntity.Location,
-                        HostUserId = eventEntity.HostUserId
-
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "Event not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.Events.Remove(Event);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new EventModel
+                        {
+                            Id = Event.Id,
+                            EventName = Event.EventName,
+                            Description = Event.Description,
+                            DateScheduled = Event.DateScheduled,
+                            Location = Event.Location,
+                            HostUserId = Event.HostUserId
+                        };
+                        
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete Event: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
     }
 }

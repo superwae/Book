@@ -17,32 +17,48 @@ namespace Lafatkotob.Services.WishedBookService
             _context = context;
         }
 
-        public async Task<WishedBookModel> Delete(int id)
+        public async Task<ServiceResponse<WishedBookModel>> Delete(int id)
         {
-            var wishedBook = await _context.WishedBooks.FindAsync(id);
-            if (wishedBook == null) return null;
+            var response = new ServiceResponse<WishedBookModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var WishedBook = await _context.WishedBooks.FindAsync(id);
+            if (WishedBook == null)
             {
-                try
-                {
-                    _context.WishedBooks.Remove(wishedBook);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return new WishedBookModel
-                    {
-                        Id = wishedBook.Id,
-                        BooksInWishlistsId = wishedBook.BooksInWishlistsId,
-                        WishlistId = wishedBook.WishlistId
-                    };
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "WishedBook not found.";
+                return response;
             }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.WishedBooks.Remove(WishedBook);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = new WishedBookModel
+                        {
+                            Id = WishedBook.Id,
+                            BooksInWishlistsId = WishedBook.BooksInWishlistsId,
+                            WishlistId = WishedBook.WishlistId
+                        };
+                      
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to delete WishedBook: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
 
         public async Task<WishedBookModel> GetById(int id)
@@ -70,59 +86,90 @@ namespace Lafatkotob.Services.WishedBookService
                 .ToListAsync();
         }
 
-        public async Task<WishedBookModel> Post(WishedBookModel model)
+        public async Task<ServiceResponse<WishedBookModel>> Post(WishedBookModel model)
         {
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            var response = new ServiceResponse<WishedBookModel>();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
             {
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var wishedBook = new WishedBook
+                    try
                     {
-                        BooksInWishlistsId = model.BooksInWishlistsId,
-                        WishlistId = model.WishlistId
-                    };
 
-                    _context.WishedBooks.Add(wishedBook);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
+                        var WishedBook = new WishedBook
+                        {
+                           BooksInWishlistsId = model.BooksInWishlistsId,
+                           WishlistId = model.WishlistId
 
-                    model.Id = wishedBook.Id;
-                    return model;
+                        };
+                        _context.WishedBooks.Add(WishedBook);
+                        await _context.SaveChangesAsync();
+
+                        transaction.Commit();
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        response.Success = false;
+                        response.Message = "Failed to create WishedBook.";
+                    }
                 }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
-            }
+            });
+
+            return response;
         }
 
-        public async Task<WishedBookModel> Update(WishedBookModel model)
+        public async Task<ServiceResponse<WishedBookModel>> Update(WishedBookModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
+            var response = new ServiceResponse<WishedBookModel>();
 
-            using (var transaction = await _context.Database.BeginTransactionAsync())
+            if (model == null)
             {
-                try
-                {
-                    var wishedBook = await _context.WishedBooks.FindAsync(model.Id);
-                    if (wishedBook == null) return null;
-
-                    wishedBook.BooksInWishlistsId = model.BooksInWishlistsId;
-                    wishedBook.WishlistId = model.WishlistId;
-
-                    _context.Update(wishedBook);
-                    await _context.SaveChangesAsync();
-                    await transaction.CommitAsync();
-
-                    return model;
-                }
-                catch (Exception)
-                {
-                    await transaction.RollbackAsync();
-                    throw;
-                }
+                response.Success = false;
+                response.Message = "WishedBook cannot be null.";
+                return response;
             }
+
+            var WishedBook = await _context.WishedBooks.FindAsync(model.Id);
+            if (WishedBook == null)
+            {
+                response.Success = false;
+                response.Message = "WishedBook not found.";
+                return response;
+            }
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        WishedBook.BooksInWishlistsId = model.BooksInWishlistsId;
+                        WishedBook.WishlistId = model.WishlistId;
+
+                        _context.WishedBooks.Update(WishedBook);
+                        await _context.SaveChangesAsync();
+
+                        await transaction.CommitAsync();
+
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to update WishedBook: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
         }
     }
 }

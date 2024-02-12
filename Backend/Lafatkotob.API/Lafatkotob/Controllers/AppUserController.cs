@@ -38,18 +38,7 @@ namespace Lafatkotob.Controllers
             return Ok(new { Token = loginResult.Token });
         }
 
-        [HttpGet("ConfirmEmail")]
-        public async Task<IActionResult> ConfirmEmail(string userId, string token)
-        {
-            var result = await _userService.ConfirmEmail(userId, token);
-            if (!result.Success)
-            {
-                return BadRequest(result.Message);
-            }
-
-            return Ok("Email confirmed successfully.");
-        }
-
+        
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -79,7 +68,7 @@ namespace Lafatkotob.Controllers
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpPost("UpdateUser")]
+        [HttpPut("UpdateUser")]
         public async Task<IActionResult> UpdateUser(UpdateUserModel model)
         {
             if (!ModelState.IsValid)
