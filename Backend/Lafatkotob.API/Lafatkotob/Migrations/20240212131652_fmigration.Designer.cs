@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Lafatkotob.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240212124114_fmigration")]
+    [Migration("20240212131652_fmigration")]
     partial class fmigration
     {
         /// <inheritdoc />
