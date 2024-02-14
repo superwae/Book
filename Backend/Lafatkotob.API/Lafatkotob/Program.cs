@@ -41,26 +41,26 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IBadgeService, BadgeService>();
-builder.Services.AddScoped<IBookGenreServices,BookGenreServices>();
-builder.Services.AddScoped<IBookPostCommentServices,BookPostCommentServices>();
-builder.Services.AddScoped<IBookPostLikeService,BookPostLikeService>();
-builder.Services.AddScoped<IBooksInWishlistsService,BooksInWishlistsService>();
-builder.Services.AddScoped<IGenreService,GenreService>();
-builder.Services.AddScoped<IConversationService,ConversationService>();
-builder.Services.AddScoped<IConversationsUserService,ConversationsUserService>();
-builder.Services.AddScoped<ITokenSerive,TokenService>();
-builder.Services.AddScoped<IUserLikeService,UserLikeService>();
-builder.Services.AddScoped<IUserEventService,UserEventService>();
-builder.Services.AddScoped<IWishedBookService,WishedBookService>();
-builder.Services.AddScoped<IWishListService,WishListService>();
-builder.Services.AddScoped<IUserService,UserService>();
-builder.Services.AddScoped<IMessageService,MessageService>();
-builder.Services.AddScoped<INotificationService,NotificationService>();
-builder.Services.AddScoped<IEmailService,EmailService>();
-builder.Services.AddScoped<IUserPreferenceService,UserPreferenceService>();
-builder.Services.AddScoped<INotificationUserService,NotificationUserService>();
-builder.Services.AddScoped<IUserBadgeService,UserBadgeService>();
-builder.Services.AddScoped<IUserReviewService,UserReviewService>();
+builder.Services.AddScoped<IBookGenreServices, BookGenreServices>();
+builder.Services.AddScoped<IBookPostCommentServices, BookPostCommentServices>();
+builder.Services.AddScoped<IBookPostLikeService, BookPostLikeService>();
+builder.Services.AddScoped<IBooksInWishlistsService, BooksInWishlistsService>();
+builder.Services.AddScoped<IGenreService, GenreService>();
+builder.Services.AddScoped<IConversationService, ConversationService>();
+builder.Services.AddScoped<IConversationsUserService, ConversationsUserService>();
+builder.Services.AddScoped<ITokenSerive, TokenService>();
+builder.Services.AddScoped<IUserLikeService, UserLikeService>();
+builder.Services.AddScoped<IUserEventService, UserEventService>();
+builder.Services.AddScoped<IWishedBookService, WishedBookService>();
+builder.Services.AddScoped<IWishListService, WishListService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserPreferenceService, UserPreferenceService>();
+builder.Services.AddScoped<INotificationUserService, NotificationUserService>();
+builder.Services.AddScoped<IUserBadgeService, UserBadgeService>();
+builder.Services.AddScoped<IUserReviewService, UserReviewService>();
 builder.Services.AddScoped<IHistoryService, HistoryService>();
 builder.Services.AddIdentity<AppUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -147,8 +147,12 @@ builder.Services.AddCors(options =>
 
 
 
-var app = builder.Build();
+var app = builder.Build(); 
+app.UseCors("AllowAll");
 
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller}/{action}/{id?}");
 
 using (var scope = app.Services.CreateScope())
 {
@@ -162,9 +166,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-
 app.UseHttpsRedirection();
-app.UseCors("AllowAll"); 
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

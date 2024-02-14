@@ -110,7 +110,7 @@ namespace Lafatkotob.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterModel model,string role)
+        public async Task<IActionResult> Register([FromBody] RegisterModel model, [FromQuery] string role)
         {
             if (!ModelState.IsValid)
             {
