@@ -26,7 +26,7 @@ namespace Lafatkotob.Services.AppUserService
             _tokenService = tokenService;
         }
 
-        public async Task<ServiceResponse<AppUser>> RegisterUser(RegisterModel model, string baseUrl)
+        public async Task<ServiceResponse<AppUser>> RegisterUser(RegisterModel model, string role)
         {
             var user = new AppUser
             {
@@ -40,7 +40,7 @@ namespace Lafatkotob.Services.AppUserService
                 About = model.About,
                 DTHDate = model.DTHDate,
             };
-
+            
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
@@ -51,7 +51,8 @@ namespace Lafatkotob.Services.AppUserService
                     Errors = result.Errors.Select(e => e.Description).ToList()
                 };
             }
-
+        
+            var roleResult = await _userManager.AddToRoleAsync(user, role);
 
             return new ServiceResponse<AppUser>
             {

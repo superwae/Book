@@ -1,5 +1,7 @@
 ﻿using Lafatkotob.Services.BadgeService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
@@ -7,6 +9,7 @@ namespace Lafatkotob.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")] 
     public class BadgeController : Controller
     {
       
@@ -14,7 +17,7 @@ namespace Lafatkotob.Controllers
         public BadgeController(IBadgeService badgeService)
         {
                 _badgeService = badgeService;
-              }
+        }
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllBadges()
         {

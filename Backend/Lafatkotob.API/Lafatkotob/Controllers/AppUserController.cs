@@ -62,10 +62,17 @@ namespace Lafatkotob.Controllers
             return Ok(user);
         }
 
-        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("DeleteUser")]
         public async Task<IActionResult> DeleteUser(string userId)
         {
+            var UserName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+            
+            if(user.UserName != UserName && !User.HasClaim(ClaimTypes.Role, "Admin"))
+            {
+                return BadRequest("you are not authorized to delete this user");
+            }
             var result = await _userService.DeleteUser(userId);
             if (!result.Success)
             {
@@ -76,9 +83,9 @@ namespace Lafatkotob.Controllers
         }
 
 
-       // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut("UpdateUser")]
-        public async Task<IActionResult> UpdateUser(UpdateUserModel model,string userId)
+        public async Task<IActionResult> UpdateUser(UpdateUserModel model, string userId)
 
         {
             if (!ModelState.IsValid)
@@ -86,7 +93,13 @@ namespace Lafatkotob.Controllers
                 return BadRequest(ModelState);
             }
 
-            var userId2 = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var UserName = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.UserName != UserName && !User.HasClaim(ClaimTypes.Role, "Admin"))
+            {
+                return BadRequest("you are not authorized to update this user");
+            }
             var result = await _userService.UpdateUser(model, userId);
             if (!result.Success)
             {
@@ -97,16 +110,14 @@ namespace Lafatkotob.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterModel model)
+        public async Task<IActionResult> Register(RegisterModel model,string role)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            
-            string baseUrl = $"{Request.Scheme}://{Request.Host}";
-            var result = await _userService.RegisterUser(model, baseUrl);
+            var result = await _userService.RegisterUser(model, role);
             if (!result.Success)
             {
                 return BadRequest(result.Message);
