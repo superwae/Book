@@ -1,11 +1,14 @@
 ﻿using Lafatkotob.Services.MessageService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class MessageController : Controller
     {
         private readonly IMessageService _messageService;
@@ -14,6 +17,7 @@ namespace Lafatkotob.Controllers
             _messageService = messageService;
         }
         [HttpGet("getall")]
+       
         public async Task<IActionResult> GetAllMessages()
         {
             var messages = await _messageService.GetAll();
@@ -21,6 +25,7 @@ namespace Lafatkotob.Controllers
             return Ok(messages);
         }
         [HttpGet("getbyid")]
+    
         public async Task<IActionResult> GetMessageById(int messageId)
         {
             var message = await _messageService.GetById(messageId);
@@ -28,6 +33,7 @@ namespace Lafatkotob.Controllers
             return Ok(message);
         }
         [HttpPost("post")]
+
         public async Task<IActionResult> PostMessage(MessageModel model)
         {
             if (!ModelState.IsValid)
@@ -38,6 +44,7 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+       
         public async Task<IActionResult> DeleteMessage(int messageId)
         {
             var message = await _messageService.Delete(messageId);
@@ -45,6 +52,7 @@ namespace Lafatkotob.Controllers
             return Ok(message);
         }
         [HttpPut("update")]
+       
         public async Task<IActionResult> UpdateMessage(MessageModel model)
         {
             if (!ModelState.IsValid)

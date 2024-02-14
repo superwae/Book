@@ -1,5 +1,7 @@
 ﻿using Lafatkotob.Services.BookPostLikeServices;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
@@ -28,6 +30,8 @@ namespace Lafatkotob.Controllers
             return Ok(bookPostLike);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> PostBookPostLike(BookPostLikeModel model)
         {
             if (!ModelState.IsValid)
@@ -38,6 +42,8 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> DeleteBookPostLike(int bookPostLikeId)
         {
             var bookPostLike = await _bookPostLikeService.Delete(bookPostLikeId);
@@ -45,6 +51,8 @@ namespace Lafatkotob.Controllers
             return Ok(bookPostLike);
         }
         [HttpPut("update")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> UpdateBookPostLike(BookPostLikeModel model)
         {
             if (!ModelState.IsValid)

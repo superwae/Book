@@ -1,5 +1,7 @@
 ﻿using Lafatkotob.Services.UserReviewService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
@@ -28,6 +30,8 @@ namespace Lafatkotob.Controllers
             return Ok(userReview);
         }
         [HttpPost("post")]
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PostUserReview(UserReviewModel model)
         {
             if (!ModelState.IsValid)
@@ -38,6 +42,8 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteUserReview(int userReviewId)
         {
             var userReview = await _userReviewService.Delete(userReviewId);
@@ -45,6 +51,7 @@ namespace Lafatkotob.Controllers
             return Ok(userReview);
         }
         [HttpPut("update")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateUserReview(UserReviewModel model)
         {
             if (!ModelState.IsValid)

@@ -1,5 +1,7 @@
 ﻿using Lafatkotob.Services.ConversationService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
@@ -29,6 +31,8 @@ namespace Lafatkotob.Controllers
             return Ok(conversation);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> PostConversation(ConversationModel model)
         {
             if (!ModelState.IsValid)
@@ -39,6 +43,8 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> DeleteConversation(int conversationId)
         {
             var conversation = await _conversationService.Delete(conversationId);
@@ -46,6 +52,8 @@ namespace Lafatkotob.Controllers
             return Ok(conversation);
         }
         [HttpPut("update")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> UpdateConversation(ConversationModel model)
         {
             if (!ModelState.IsValid)

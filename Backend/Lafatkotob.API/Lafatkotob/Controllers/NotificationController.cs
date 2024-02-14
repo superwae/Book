@@ -1,5 +1,7 @@
 ﻿using Lafatkotob.Services.NotificationService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
@@ -14,6 +16,7 @@ namespace Lafatkotob.Controllers
             _notificationService = notificationService;
         }
         [HttpGet("getall")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetAllNotifications()
         {
             var notifications = await _notificationService.GetAll();
@@ -21,6 +24,7 @@ namespace Lafatkotob.Controllers
             return Ok(notifications);
         }
         [HttpGet("getbyid")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetNotificationById(int notificationId)
         {
             var notification = await _notificationService.GetById(notificationId);
@@ -28,6 +32,7 @@ namespace Lafatkotob.Controllers
             return Ok(notification);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PostNotification(NotificationModel model)
         {
             if (!ModelState.IsValid)
@@ -38,6 +43,7 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteNotification(int notificationId)
         {
             var notification = await _notificationService.Delete(notificationId);
@@ -45,6 +51,7 @@ namespace Lafatkotob.Controllers
             return Ok(notification);
         }
         [HttpPut("update")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateNotification(NotificationModel model)
         {
             if (!ModelState.IsValid)

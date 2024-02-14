@@ -1,5 +1,7 @@
 ﻿using Lafatkotob.Services.UserLikeService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
@@ -28,6 +30,7 @@ namespace Lafatkotob.Controllers
             return Ok(userLike);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PostUserLike(UserLikeModel model)
         {
             if (!ModelState.IsValid)
@@ -38,6 +41,7 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteUserLike(int userLikeId)
         {
             var userLike = await _userLikeService.Delete(userLikeId);
@@ -45,6 +49,7 @@ namespace Lafatkotob.Controllers
             return Ok(userLike);
         }
         [HttpPut("update")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateUserLike(UserLikeModel model)
         {
             if (!ModelState.IsValid)

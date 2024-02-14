@@ -1,11 +1,14 @@
 ﻿using Lafatkotob.Services.UserPreferenceService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UserPreferenceController : Controller
     {
         private readonly IUserPreferenceService _userPreferenceService;

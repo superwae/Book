@@ -1,6 +1,8 @@
 ﻿using Lafatkotob.Services.BadgeService;
 using Lafatkotob.Services.EventService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
 
@@ -30,6 +32,8 @@ namespace Lafatkotob.Controllers
             return Ok(Event);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium")]
+
         public async Task<IActionResult> PostEvent(EventModel model)
         {
             if (!ModelState.IsValid)
@@ -40,6 +44,8 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium")]
+
         public async Task<IActionResult> DeleteEvent(int EventId)
         {
             var Event = await _EventService.Delete(EventId);
@@ -47,6 +53,9 @@ namespace Lafatkotob.Controllers
             return Ok(Event);
         }
         [HttpPut("update")]
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium")]
+
         public async Task<IActionResult> UpdateEvent(EventModel model)
         {
             if (!ModelState.IsValid)

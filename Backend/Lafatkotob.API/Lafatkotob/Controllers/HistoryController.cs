@@ -1,5 +1,7 @@
 ﻿using Lafatkotob.Services.HistoryService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
@@ -29,6 +31,8 @@ namespace Lafatkotob.Controllers
             return Ok(history);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> PostHistory(HistoryModel model)
         {
             if (!ModelState.IsValid)
@@ -39,6 +43,7 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteHistory(int historyId)
         {
             var history = await _historyService.Delete(historyId);
@@ -46,6 +51,7 @@ namespace Lafatkotob.Controllers
             return Ok(history);
         }
         [HttpPut("update")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateHistory(HistoryModel model)
         {
             if (!ModelState.IsValid)

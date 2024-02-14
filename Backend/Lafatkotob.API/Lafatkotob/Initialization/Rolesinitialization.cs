@@ -7,7 +7,7 @@ namespace Lafatkotob.Initialization
         public static async Task SeedRoles(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            string[] roleNames = { "Admin", "User", "premium" };
+            string[] roleNames = { "Admin", "User", "Premium" };
             foreach (var roleName in roleNames)
             {
                 var roleExist = await roleManager.RoleExistsAsync(roleName);

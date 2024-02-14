@@ -1,11 +1,14 @@
 ﻿using Lafatkotob.Services.WishedBookService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    
     public class WishedBookController : Controller
     {
         private readonly IWishedBookService _wishedBookService;
@@ -28,6 +31,7 @@ namespace Lafatkotob.Controllers
             return Ok(wishedBook);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PostWishedBook(WishedBookModel model)
         {
             if (!ModelState.IsValid)
@@ -38,6 +42,7 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteWishedBook(int wishedBookId)
         {
             var wishedBook = await _wishedBookService.Delete(wishedBookId);
@@ -45,6 +50,7 @@ namespace Lafatkotob.Controllers
             return Ok(wishedBook);
         }
         [HttpPut("update")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateWishedBook(WishedBookModel model)
         {
             if (!ModelState.IsValid)

@@ -1,5 +1,7 @@
 ﻿using Lafatkotob.Services.BooksInWishlistsService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
@@ -28,6 +30,8 @@ namespace Lafatkotob.Controllers
             return Ok(booksInWishlists);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "User")]
+
         public async Task<IActionResult> PostBooksInWishlists(BookInWishlistsModel model)
         {
             if (!ModelState.IsValid)
@@ -38,6 +42,8 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "User")]
+
         public async Task<IActionResult> DeleteBooksInWishlists(int booksInWishlistsId)
         {
             var booksInWishlists = await _booksInWishlistsService.Delete(booksInWishlistsId);
@@ -45,6 +51,9 @@ namespace Lafatkotob.Controllers
             return Ok(booksInWishlists);
         }
         [HttpPut("update")]
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles ="User")]
+
         public async Task<IActionResult> UpdateBooksInWishlists(BookInWishlistsModel model)
         {
             if (!ModelState.IsValid)

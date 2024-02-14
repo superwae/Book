@@ -12,6 +12,7 @@ namespace Lafatkotob.Controllers
     public class BookController : Controller
     {
         private readonly IBookService _bookService;
+     
         public BookController(IBookService bookService)
         {
             _bookService = bookService;
@@ -46,7 +47,7 @@ namespace Lafatkotob.Controllers
 
         public async Task<IActionResult> DeleteBook(int bookId)
         {
-
+           
             var book = await _bookService.Delete(bookId);
                 if (book == null) return BadRequest();
             return Ok(book);

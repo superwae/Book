@@ -1,5 +1,7 @@
 ﻿using Lafatkotob.Services.BookGenreService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
@@ -28,6 +30,8 @@ namespace Lafatkotob.Controllers
             return Ok(bookGenre);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> PostBookGenre(BookGenreModel model)
         {
             if (!ModelState.IsValid)
@@ -38,6 +42,8 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> DeleteBookGenre(int bookGenreId)
         {
             var bookGenre = await _bookGenreService.Delete(bookGenreId);
@@ -45,6 +51,9 @@ namespace Lafatkotob.Controllers
             return Ok(bookGenre);
         }
         [HttpPut("update")]
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+
         public async Task<IActionResult> UpdateBookGenre(BookGenreModel model)
         {
             if (!ModelState.IsValid)

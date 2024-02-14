@@ -1,11 +1,14 @@
 ﻿using Lafatkotob.Services.UserBadgeService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+
     public class UserBadgeController : Controller
     {
         private readonly IUserBadgeService _userBadgeService;
@@ -28,6 +31,7 @@ namespace Lafatkotob.Controllers
             return Ok(userBadge);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PostUserBadge(UserBadgeModel model)
         {
             if (!ModelState.IsValid)
@@ -38,6 +42,7 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteUserBadge(int userBadgeId)
         {
             var userBadge = await _userBadgeService.Delete(userBadgeId);
@@ -45,6 +50,7 @@ namespace Lafatkotob.Controllers
             return Ok(userBadge);
         }
         [HttpPut("update")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateUserBadge(UserBadgeModel model)
         {
             if (!ModelState.IsValid)

@@ -1,5 +1,7 @@
 ﻿using Lafatkotob.Services.GenreService;
 using Lafatkotob.ViewModels;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Lafatkotob.Controllers
@@ -28,6 +30,8 @@ namespace Lafatkotob.Controllers
             return Ok(genre);
         }
         [HttpPost("post")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles ="Admin")]
+
         public async Task<IActionResult> PostGenre(GenreModel model)
         {
             if (!ModelState.IsValid)
@@ -38,6 +42,8 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+
         public async Task<IActionResult> DeleteGenre(int genreId)
         {
             var genre = await _genreService.Delete(genreId);
@@ -45,6 +51,8 @@ namespace Lafatkotob.Controllers
             return Ok(genre);
         }
         [HttpPut("update")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+
         public async Task<IActionResult> UpdateGenre(GenreModel model)
         {
             if (!ModelState.IsValid)

@@ -2,6 +2,7 @@
 using Lafatkotob.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Net.NetworkInformation;
+using System.Security.Claims;
 
 namespace Lafatkotob.Services.BookService
 {
@@ -171,9 +172,10 @@ private readonly ApplicationDbContext _context;
             if (book == null)
             {
                 response.Success = false;
-                response.Message = "Badge not found.";
+                response.Message = "book not found.";
                 return response;
             }
+           
             var executionStrategy = _context.Database.CreateExecutionStrategy();
             await executionStrategy.ExecuteAsync(async () =>
             {
