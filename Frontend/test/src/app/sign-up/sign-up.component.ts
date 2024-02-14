@@ -13,10 +13,11 @@ import { Router } from '@angular/router';
 })
 export class SignUpComponent {
   signUpForm: FormGroup;
-  role: string="";
+  
   constructor(private appuserSerivece: AppUserServiceService,private router: Router) {
     
     this.signUpForm = new FormGroup({
+      role: new FormControl('', Validators.required),
       name: new FormControl('', Validators.required),
       password: new FormControl('', [Validators.required, Validators.minLength(8)]),
       confirmNewPassword: new FormControl('', Validators.required),
@@ -29,10 +30,12 @@ export class SignUpComponent {
       about: new FormControl('')
     });
   }
-
   onSubmit(): void {
     if (this.signUpForm.valid) {
-      this.appuserSerivece.createUser(this.signUpForm.value, this.role).subscribe({
+      // Access role from the form's value
+      const role = this.signUpForm.value.role;
+  
+      this.appuserSerivece.createUser(this.signUpForm.value, role).subscribe({
         next: (user) => {
           console.log(user);
           // Handle successful registration, e.g., navigate to a different page
@@ -44,9 +47,10 @@ export class SignUpComponent {
         }
       });
     } else {
-      // Handle the case where the role is not provided or the form is invalid
-      console.error('Form is invalid or role is not set');
+      // Handle the case where the form is invalid
+      console.error('Form is invalid');
     }
   }
+  
   
 }

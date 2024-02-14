@@ -7,8 +7,7 @@ namespace login.ViewModel
         [Required]
         [StringLength(15)]
         public string Name { get; set; }
-        [Required]
-        string Role { get; set; }
+
 
         [Required]
         [DataType(DataType.Password)]

@@ -14,6 +14,8 @@ export class AppUserServiceService {
   constructor(private http: HttpClient) { }
 
   createUser(userData: register, role: string): Observable<register> {
+    console.log('Sending user data to backend:', userData);
+    console.log('With role:', role);
     const params = new HttpParams().set('role', role);
     return this.http.post<register>(`${this.apiurl}/api/AppUser/register`, userData, { params });
   }
