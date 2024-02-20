@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace login.ViewModel
+namespace Lafatkotob.ViewModel
 {
     public class RegisterModel
     {
