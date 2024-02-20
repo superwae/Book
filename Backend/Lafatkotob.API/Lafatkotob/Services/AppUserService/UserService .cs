@@ -3,7 +3,6 @@ using Lafatkotob.Services.EmailService;
 using Lafatkotob.Services.TokenService;
 using Lafatkotob.ViewModel;
 using Lafatkotob.ViewModels;
-using login.ViewModel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;

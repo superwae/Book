@@ -2,7 +2,6 @@
 using Lafatkotob.Entities;
 using Lafatkotob.ViewModels;
 using Microsoft.AspNetCore.Identity;
-using login.ViewModel;
 
 namespace Lafatkotob.Services.AppUserService
 {
