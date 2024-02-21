@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -109,7 +110,7 @@ namespace Lafatkotob.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromBody] RegisterModel model, [FromQuery] string role)
+            public async Task<IActionResult> Register([FromBody] RegisterModel model, [FromQuery] string role)
         {
             if (!ModelState.IsValid)
             {
@@ -151,5 +152,52 @@ namespace Lafatkotob.Controllers
             var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return Ok(new { UserName = userName, UserId = userIdClaim });
         }
+        [HttpPost]
+        [Route("forgot-password")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            //var user = await _userManager.FindByEmailAsync(model.Email); use this when the email in unique
+            if (user != null) 
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+             
+
+                var frontendResetLink = $"http://localhost:4200/reset-password?email={Uri.EscapeDataString(model.Email)}&token={Uri.EscapeDataString(token)}";
+                await _emailService.SendPasswordResetEmailAsync(model.Email, frontendResetLink, user.UserName);
+
+            }
+            return Ok(new { Message = "Please check your email to reset your password." });
+        }
+        [HttpPut]
+        [Route("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+            //var user = await _userManager.FindByEmailAsync(model.Email); use this when the email in unique
+            if (user == null)
+            {
+
+                return BadRequest("Invalid request");
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            if (result.Succeeded)
+            {
+                return Ok(new { Message = "Password has been reset successfully." });
+            }
+            return BadRequest(result.Errors);
+        }
+
+
     }
 }

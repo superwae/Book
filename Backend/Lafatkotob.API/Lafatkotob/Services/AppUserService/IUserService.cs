@@ -14,5 +14,6 @@ namespace Lafatkotob.Services.AppUserService
         Task<ServiceResponse<UpdateUserModel>> DeleteUser(string userId);
         Task<LoginResultModel> LoginUser(LoginModel model);
 
+
     }
 }

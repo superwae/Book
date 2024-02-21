@@ -8,9 +8,7 @@ namespace Lafatkotob.ViewModel
         [StringLength(15)]
         public string Name { get; set; }
         [Required]
-        string Role { get; set; }
 
-        [Required]
         [DataType(DataType.Password)]
         [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).{8,}$", ErrorMessage = "Password must be at least 8 characters and contain at least one letter and one number.")]
         public string Password { get; set; }

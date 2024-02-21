@@ -34,5 +34,18 @@ namespace Lafatkotob.Services.EmailService
                 await client.SendMailAsync(mailMessage);
             }
         }
+
+        public async Task SendPasswordResetEmailAsync(string email, string resetLink, string userName)
+        {
+            string subject = "Reset Your Password";
+            string body = $@"Hello {userName},<br><br>
+                     You've requested to reset your password. Please click the link below to set a new password:<br>
+                     <a href='{resetLink}'>Reset Password</a><br><br>
+                     If you didn't request this, please ignore this email.<br><br>
+                     Thank you.";
+
+
+            await SendEmailAsync(email, subject, body);
+        }
     }
 }

@@ -1,0 +1,92 @@
+<div class="app-container">
+    <router-outlet></router-outlet>
+    <div class="main">
+      <input type="checkbox" id="chk" aria-hidden="true">
+  
+      <div class="signup">
+        <form [formGroup]="registerForm" (ngSubmit)="Register()">
+          <label for="chk" aria-hidden="true">Sign up</label>
+  
+          <!-- UserName -->
+          <div>
+            <input type="text" formControlName="UserName" placeholder="UserName" required>
+            <div class="error-container" *ngIf="registerForm.get('UserName')?.touched && registerForm.get('UserName')?.errors ">
+              <small class="error-message" *ngIf="registerForm.get('UserName')?.errors?.['required']">User name is required.</small>
+            </div>
+          </div>
+        
+          <!-- Email -->
+          <div>
+            <input type="email" formControlName="Email" placeholder="Email" required>
+            <div class="error-container" *ngIf="registerForm.get('Email')?.touched && registerForm.get('Email')?.errors">
+              <small class="error-message" *ngIf="registerForm.get('Email')?.errors?.['required']">Email is required.</small>
+              <small class="error-message" *ngIf="registerForm.get('Email')?.errors?.['email']">Please enter a valid email.</small>
+            </div>
+          </div>
+        
+          <!-- Password -->
+          <div>
+            <input type="password" formControlName="Password" placeholder="Password" required>
+            <div class="error-container" *ngIf="registerForm.get('Password')?.touched && registerForm.get('Password')?.errors">
+              <small class="error-message" *ngIf="registerForm.get('Password')?.errors?.['required']">Password is required.</small>
+              <small class="error-message" *ngIf="registerForm.get('Password')?.errors?.['pattern']">Password must be at least 8 characters and<br> contain at least one letter and one number.</small>
+            </div>
+          </div>
+        
+          <!-- ConfirmNewPassword -->
+          <div>
+            <input type="password" formControlName="ConfirmNewPassword" placeholder="Confirm Password" required>
+            <div class="error-container" *ngIf="registerForm.errors?.['notSame'] && (registerForm.get('ConfirmNewPassword')?.touched || registerForm.get('ConfirmNewPassword')?.dirty)">
+              <small class="error-message" >Passwords do not match.</small>
+            </div>
+          </div>
+        
+          <!-- DthDate -->
+          <div>
+            <input type="date" formControlName="DTHDate" required>
+            <div class="error-container" *ngIf="registerForm.get('DTHDate')?.touched && registerForm.get('DTHDate')?.errors">
+              <small class="error-message" *ngIf="registerForm.get('DTHDate')?.errors?.['required']">Date of birth is required.</small>
+            </div>
+          </div>
+        
+          <!-- City -->
+          <div>
+            <input type="text" formControlName="City" placeholder="City" required>
+            <div class="error-container" *ngIf="registerForm.get('City')?.touched && registerForm.get('City')?.errors">
+              <small class="error-message"  *ngIf="registerForm.get('City')?.errors?.['required']">City is required.</small>
+            </div>
+          </div>
+        
+          <button type="submit" [disabled]="!registerForm.valid">Sign up</button>
+        </form>
+        
+        
+      </div>
+  
+      <div class="login">
+        <form [formGroup]="loginForm" (ngSubmit)="login()">
+          <label for="chk" aria-hidden="true">Login</label>
+          <input type="text" formControlName="UserName" placeholder="UserName" required>
+          <div>
+            <input type="password" formControlName="Password" placeholder="Password" required>
+            <div class="error-container" *ngIf="loginForm.get('Password')?.touched && loginForm.get('Password')?.errors">
+              <small class="error-message" *ngIf="loginForm.get('Password')?.errors?.['required']">Password is required.</small>
+            </div>
+          </div>
+          <a href="#" (click)="forgotPassword()" class="forgot-password-link">Forgot Password?</a>
+          <button type="submit" [disabled]="!loginForm.valid">Login</button>
+          <!-- Forgot Password Button -->
+          
+          </form>
+      </div>
+      
+  
+    </div>
+  
+  </div>
+  
+  
+  
+  
+  
+  
