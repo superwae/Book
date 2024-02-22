@@ -12,7 +12,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './forgot-password.component.html',
   styleUrl: './forgot-password.component.css'
 })
-export class ForgotPasswordComponent implements OnInit {
+export class ForgotPasswordComponent  {
   forgotPasswordForm: FormGroup;
   constructor(
     private fb: FormBuilder,
@@ -24,30 +24,36 @@ export class ForgotPasswordComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]]
     });
   }
+ // In your ForgotPasswordComponent
 
- 
-ngOnInit() {
-  this.route.queryParams.subscribe(params => {
-    let token = params['token'];
-    let email = params['email'];
-  });
-}
+// Add a property to hold the message for the user
+public userMessage: string | null = null;
+public errorMessage: string | null = null;
 
-  submitForgotPassword(): void {
-    if (this.forgotPasswordForm.valid) {
-    
-       this.AppUserServiceService.forgotPassword(this.forgotPasswordForm.value.email).subscribe(
-         (response) => {
-
-         },
-         (error) => {
-         }
-       );
-
-      console.log(this.forgotPasswordForm.value);
-      this.forgotPasswordForm.reset();
-      
-       //this.router.navigate(['/login']);
-    }
+submitForgotPassword(): void {
+  if (this.forgotPasswordForm.valid) {
+    this.AppUserServiceService.forgotPassword(this.forgotPasswordForm.value.email).subscribe(
+      (response) => {
+        // Notify user with a generic message
+        this.userMessage = 'If your email address is registered with us, you will receive an email.';
+        this.errorMessage = '';
+        this.forgotPasswordForm.reset();
+      },
+      (error) => {
+        if (error.status === 429) {
+          // Specific message for rate limit errors
+          this.userMessage = '';
+          this.errorMessage = 'You have made too many requests. Please wait a while before trying again.';
+        } else {
+          // Generic error message for other errors
+          this.userMessage = 'An error occurred while attempting to perform password reset. Please try again later.';
+          this.errorMessage = '';
+        }
+      }
+    );
+  } else {
+    // Notify user to fill in the form correctly
+    this.userMessage = 'Please fill in the form correctly.';
   }
+}
 }

@@ -75,7 +75,9 @@ export class LoginRegisterComponent implements OnInit {
     let confirmPass = group.get('ConfirmNewPassword')?.value;
     return pass === confirmPass ? null : { notSame: true };
   }
-  forgotPassword(): void {
-          this.router.navigate(['/forgot-password']);
+  forgotPassword(event: Event): void {
+    event.preventDefault();
+    this.router.navigate(['/forgot-password']);
   }
+  
 }

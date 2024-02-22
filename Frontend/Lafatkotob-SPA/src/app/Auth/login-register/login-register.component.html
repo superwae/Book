@@ -1,3 +1,5 @@
+<router-outlet></router-outlet>
+
 <div class="app-container">
     <router-outlet></router-outlet>
     <div class="main">
@@ -73,7 +75,7 @@
               <small class="error-message" *ngIf="loginForm.get('Password')?.errors?.['required']">Password is required.</small>
             </div>
           </div>
-          <a href="#" (click)="forgotPassword()" class="forgot-password-link">Forgot Password?</a>
+          <a href="#" (click)="forgotPassword($event)" class="forgot-password-link">Forgot Password?</a>
           <button type="submit" [disabled]="!loginForm.valid">Login</button>
           <!-- Forgot Password Button -->
           

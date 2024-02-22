@@ -42,14 +42,18 @@ export class ResetPasswordComponent implements OnInit {
   }
 
   passwordMatchValidator(fg: FormGroup): { [key: string]: boolean } | null {
-    const password = fg.get('password')?.value;
+    const newPassword = fg.get('newPassword')?.value;
     const confirmPassword = fg.get('confirmPassword')?.value;
-    if (password && confirmPassword && password !== confirmPassword) {
+    if (newPassword && confirmPassword && newPassword !== confirmPassword) {
       return { 'passwordMismatch': true };
     }
     return null;
   }
+  
 
+  public userMessage: string = '';
+  public isSuccess: boolean = false;
+  
   submitResetPassword(): void {
     if (this.resetPasswordForm.valid && this.email && this.token) {
       const resetData = {
@@ -58,20 +62,25 @@ export class ResetPasswordComponent implements OnInit {
         newPassword: this.resetPasswordForm.value.newPassword,
         confirmPassword: this.resetPasswordForm.value.confirmPassword
       };
-      console.log('Reset password data', resetData);
-
+  
       this.AppUserServiceService.resetPassword(resetData).subscribe({
         next: (response) => {
-          // Handle successful response
-          console.log('Password reset successful', response);
-          // Optionally navigate to the login page or show success message
-          this.router.navigate(['/login']);
+          this.userMessage = 'Your password has been successfully reset.';
+          this.isSuccess = true;
+          // Optionally wait a few seconds, then navigate to the login page
+          setTimeout(() => this.router.navigate(['/login']), 5000);
         },
         error: (error) => {
-          // Handle error
-          console.error('Password reset error', error);
+          if (error.status === 429) {
+            // Specific message for rate limit errors
+            this.userMessage = 'You have made too many requests. Please wait a while before trying again.';
+          } else {
+            // Generic error message for other errors
+            this.userMessage = 'The password reset link is invalid or has expired. Please request a new link.';
+          }
+          this.isSuccess = false;
         }
       });
     }
   }
-}
+}  

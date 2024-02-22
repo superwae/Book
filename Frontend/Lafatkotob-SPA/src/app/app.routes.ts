@@ -5,26 +5,32 @@ import { ForgotPasswordComponent } from './Auth/forgot-password/forgot-password.
 import { LoginRegisterComponent } from './Auth/login-register/login-register.component';
 
 export const routes: Route[] = [
+
   { path: '', pathMatch: 'full', redirectTo: 'login' },
 
   { 
     path: 'login', 
-    component:LoginRegisterComponent  
+    loadComponent: () => import('./Auth/login-register/login-register.component').then(m => m.LoginRegisterComponent)
   },
 
   {
     path:'forgot-password',
-    component:ForgotPasswordComponent,
+    loadComponent: () => import('./Auth/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+      
   },
   
+
   {
     path:'reset-password',
     loadComponent: () => import('./Auth/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
-  }
+  },
+
+
  
 ];
 @NgModule({
     imports: [RouterModule.forRoot(routes)],
     exports: [RouterModule],
+    
 })
 export class AppRoutingModule { }

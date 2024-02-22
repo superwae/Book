@@ -31,6 +31,7 @@ using Lafatkotob.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Lafatkotob.Initialization;
+using AspNetCoreRateLimit;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,22 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+
+// Configuration for IP rate limiting
+builder.Services.AddMemoryCache();
+
+// Load IP rate limiting settings from appsettings.json
+builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
+
+// Add IP rate limiting service
+builder.Services.AddInMemoryRateLimiting();
+
+builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+builder.Services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+builder.Services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+
+
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IBadgeService, BadgeService>();
@@ -165,6 +182,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseIpRateLimiting();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
