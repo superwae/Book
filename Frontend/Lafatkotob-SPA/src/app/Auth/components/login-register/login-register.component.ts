@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { AppUserServiceService } from '../Services/app-user-service.service';
+import { AppUserServiceService } from '../../services/app-user-service.service';
 
 @Component({
   selector: 'app-login-register',
   standalone: true,
-  imports: [ReactiveFormsModule,CommonModule,FormsModule,RouterModule],
+  imports: [ReactiveFormsModule,CommonModule,FormsModule,RouterModule,RouterLink],
   templateUrl: './login-register.component.html',
   styleUrl: './login-register.component.css'
 })
@@ -75,9 +75,6 @@ export class LoginRegisterComponent implements OnInit {
     let confirmPass = group.get('ConfirmNewPassword')?.value;
     return pass === confirmPass ? null : { notSame: true };
   }
-  forgotPassword(event: Event): void {
-    event.preventDefault();
-    this.router.navigate(['/forgot-password']);
-  }
+ 
   
 }

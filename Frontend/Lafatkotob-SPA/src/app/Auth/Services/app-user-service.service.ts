@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { register } from '../Models/registerModel';
 import { login } from '../Models/LoginModel';
-import { ResetPasswordComponent } from '../reset-password/reset-password.component';
+import { ResetPasswordComponent } from '../components/reset-password/reset-password.component';
 import { ResetPasswordModel } from '../Models/ResetPasswordModel';
 
 @Injectable({
