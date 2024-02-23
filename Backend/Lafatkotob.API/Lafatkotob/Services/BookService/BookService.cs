@@ -6,25 +6,29 @@ using System.Security.Claims;
 
 namespace Lafatkotob.Services.BookService
 {
-    public class BookService: IBookService
+    public class BookService : IBookService
     {
-private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
         public BookService(ApplicationDbContext context)
         {
             _context = context;
         }
-        //done post
-        public async Task<ServiceResponse<BooksModel>> Post(BooksModel model)
+
+
+        public async Task<ServiceResponse<BooksModel>> Post(BooksModel model, IFormFile imageFile)
         {
             var response = new ServiceResponse<BooksModel>();
-
             var executionStrategy = _context.Database.CreateExecutionStrategy();
+
             await executionStrategy.ExecuteAsync(async () =>
             {
-                using (var transaction = _context.Database.BeginTransaction())
+                using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
                     try
                     {
+                        // Handle image saving here and get the path or URL
+                        var imagePath = await SaveImageAsync(imageFile);
+
                         var book = new Book
                         {
                             Id = model.Id,
@@ -40,25 +44,30 @@ private readonly ApplicationDbContext _context;
                             Condition = model.Condition,
                             Type = model.Type,
                             Status = model.Status,
-                            PartnerUserId = model.PartnerUserId
-
+                            PartnerUserId = model.PartnerUserId,
                         };
+
                         _context.Books.Add(book);
                         await _context.SaveChangesAsync();
-                        transaction.Commit();
+                        await transaction.CommitAsync();
+
+                        model.CoverImage = imagePath; // Update model with image path for response
                         response.Success = true;
                         response.Data = model;
                     }
-                    catch (Exception )
+                    catch (Exception ex)
                     {
-                        transaction.Rollback();
+                        await transaction.RollbackAsync();
                         response.Success = false;
-                        response.Message = "Failed to create badge.";
+                        response.Message = $"Failed to create book: {ex.Message}";
                     }
                 }
             });
+
             return response;
         }
+
+
 
         public async Task<BooksModel> GetById(int id)
         {
@@ -82,50 +91,55 @@ private readonly ApplicationDbContext _context;
                 Status = Book.Status,
                 PartnerUserId = Book.PartnerUserId
             };
-         
+
         }
-       
+
         public async Task<List<BooksModel>> GetAll()
         {
 
-         return await _context.Books   
-       .Select(up => new BooksModel
-       {
-        Id = up.Id,
-        Title = up.Title,
-        Author = up.Author,
-        Description = up.Description,
-        CoverImage = up.CoverImage,
-        UserId = up.UserId,
-        HistoryId = up.HistoryId,
-        PublicationDate = up.PublicationDate,
-        ISBN = up.ISBN,
-        PageCount = up.PageCount,
-        Condition = up.Condition,
-        Status = up.Status,
-        Type = up.Type,
-        PartnerUserId = up.PartnerUserId
-       })
-       .ToListAsync();   
+            return await _context.Books
+          .Select(up => new BooksModel
+          {
+              Id = up.Id,
+              Title = up.Title,
+              Author = up.Author,
+              Description = up.Description,
+              CoverImage = up.CoverImage,
+              UserId = up.UserId,
+              HistoryId = up.HistoryId,
+              PublicationDate = up.PublicationDate,
+              ISBN = up.ISBN,
+              PageCount = up.PageCount,
+              Condition = up.Condition,
+              Status = up.Status,
+              Type = up.Type,
+              PartnerUserId = up.PartnerUserId
+          })
+              .ToListAsync();
         }
 
+
        
-        public async Task<ServiceResponse<BooksModel>> Update(BooksModel model)
+
+
+        public async Task<ServiceResponse<UpdateBookModel>> Update(int id, UpdateBookModel model, IFormFile imageFile = null)
         {
-            var response = new ServiceResponse<BooksModel>();
-            if (model == null) {
+            var response = new ServiceResponse<UpdateBookModel>();
+            if (model == null)
+            {
                 response.Success = false;
                 response.Message = "Model cannot be null.";
                 return response;
             }
 
-            var Books = await _context.Books.FindAsync(model.Id);
-            if (Books == null)
+            var book = await _context.Books.FindAsync(id);
+            if (book == null)
             {
                 response.Success = false;
                 response.Message = "Book not found.";
                 return response;
             }
+
             var executionStrategy = _context.Database.CreateExecutionStrategy();
             await executionStrategy.ExecuteAsync(async () =>
             {
@@ -133,38 +147,70 @@ private readonly ApplicationDbContext _context;
                 {
                     try
                     {
-                        Books.Id = model.Id;
-                        Books.Title = model.Title;
-                        Books.Author = model.Author;
-                        Books.Description = model.Description;
-                        Books.CoverImage = model.CoverImage;
-                        Books.UserId = model.UserId;
-                        Books.HistoryId = model.HistoryId;
-                        Books.PublicationDate = model.PublicationDate;
-                        Books.ISBN = model.ISBN;
-                        Books.PageCount = model.PageCount;
-                        Books.Condition = model.Condition;
-                        Books.Status = model.Status;
-                        Books.Type = model.Type;
-                        Books.PartnerUserId = model.PartnerUserId;
+                        book.Title = model.Title ?? book.Title;
+                        book.Author = model.Author ?? book.Author;
+                        book.Description = model.Description ?? book.Description;
+                        // For CoverImage, handle separately as it involves file processing
+                        if (imageFile != null)
+                        {
+                            var imagePath = await SaveImageAsync(imageFile);
+                            book.CoverImage = imagePath;
+                        }
+                        book.ISBN = model.ISBN ?? book.ISBN;
+                        book.PageCount = model.PageCount ?? book.PageCount;
+                        book.Condition = model.Condition ?? book.Condition;
+                        book.Status = model.Status ?? book.Status;
+                        book.Type = model.Type ?? book.Type;
 
-                        _context.Books.Update(Books);
+                        _context.Books.Update(book);
                         await _context.SaveChangesAsync();
                         await transaction.CommitAsync();
 
-                        return model;
+                        response.Success = true;
+                        response.Data = model; 
                     }
-
-                    catch (Exception)
+                    catch (Exception ex)
                     {
                         await transaction.RollbackAsync();
-                        throw;
+                        response.Success = false;
+                        response.Message = $"Failed to update book: {ex.Message}";
                     }
                 }
             });
+
             return response;
         }
-        //done delete
+
+        private async Task<string> SaveImageAsync(IFormFile imageFile)
+        {
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                throw new ArgumentException("The file is empty or null.", nameof(imageFile));
+            }
+
+            // Ensure the uploads directory exists
+            var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+            if (!Directory.Exists(uploadsFolderPath))
+            {
+                Directory.CreateDirectory(uploadsFolderPath);
+            }
+
+            // Generate a unique filename for the image to avoid name conflicts
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+            var filePath = Path.Combine(uploadsFolderPath, fileName);
+
+            // Save the file
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+
+            var imageUrl = $"/uploads/{fileName}";
+            return imageUrl;
+        }
+
+
+
         public async Task<ServiceResponse<BooksModel>> Delete(int id)
         {
             var response = new ServiceResponse<BooksModel>();
@@ -175,7 +221,7 @@ private readonly ApplicationDbContext _context;
                 response.Message = "book not found.";
                 return response;
             }
-           
+
             var executionStrategy = _context.Database.CreateExecutionStrategy();
             await executionStrategy.ExecuteAsync(async () =>
             {

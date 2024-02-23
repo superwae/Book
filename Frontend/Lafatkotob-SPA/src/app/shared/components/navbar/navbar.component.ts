@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Component, HostListener, inject } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
@@ -10,8 +10,11 @@ import { RouterLink } from '@angular/router';
   standalone: true
 })
 export class NavbarComponent {
+  private router = inject(Router);
   currentIndex = 0;
-
+  isLoginPage(): boolean {
+    return this.router.url === '/login';
+  }
   @HostListener('window:scroll', ['$event'])
   onWindowScroll() {
     const scrollY = window.scrollY;

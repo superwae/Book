@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Microsoft.Extensions.Hosting;
 
 namespace Lafatkotob.Controllers
 {
@@ -17,6 +18,8 @@ namespace Lafatkotob.Controllers
         {
             _bookService = bookService;
         }
+
+
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllBooks()
         {
@@ -24,6 +27,8 @@ namespace Lafatkotob.Controllers
             if(books == null) return BadRequest();
             return Ok(books);
         }
+
+
         [HttpGet("getbyid")]
         public async Task<IActionResult> GetBookById(int bookId)
         {
@@ -31,17 +36,26 @@ namespace Lafatkotob.Controllers
             if (book == null) return BadRequest();
             return Ok(book);
         }
+
+
         [HttpPost("post")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        public async Task<IActionResult> PostBook(BooksModel model)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> PostBook([FromForm] BooksModel model, IFormFile imageFile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-            await _bookService.Post(model);
-            return Ok();
+            var result = await _bookService.Post(model, imageFile);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
         }
+
+
         [HttpDelete("delete")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
@@ -52,18 +66,25 @@ namespace Lafatkotob.Controllers
                 if (book == null) return BadRequest();
             return Ok(book);
         }
-        [HttpPut("update")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
-        public async Task<IActionResult> UpdateBook(BooksModel model)
+        [HttpPut("update/{bookId}"), DisableRequestSizeLimit]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Consumes("multipart/form-data")] 
+        public async Task<IActionResult> UpdateBook(int bookId, [FromForm] UpdateBookModel model,  IFormFile imageFile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-            await _bookService.Update(model);
-            return Ok();
+            var result = await _bookService.Update(bookId, model, imageFile);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
         }
-       
+
+
+
     }
 }

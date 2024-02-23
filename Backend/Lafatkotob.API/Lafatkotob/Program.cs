@@ -32,6 +32,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
 using Lafatkotob.Initialization;
 using AspNetCoreRateLimit;
+using Lafatkotob.Swagger;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -100,7 +101,6 @@ builder.Services
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-
     // Define the OAuth2.0 Bearer Scheme
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -128,6 +128,7 @@ builder.Services.AddSwaggerGen(c =>
                 new List<string>()
             }
         });
+    c.OperationFilter<FileUploadOperation>();
 });
 
 builder.Services
@@ -180,8 +181,15 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+        // If you have OAuth or other specific configurations for Swagger UI, set them here
+    });
 }
+
+
+
 app.UseIpRateLimiting();
 
 app.UseHttpsRedirection();

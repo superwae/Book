@@ -2,12 +2,15 @@
     <div class="container">
       <div class="logo">
         <a routerLink="/">
-          <img src="assets/images/Logo2.svg" alt="Your Logo">
+          <img src="assets/images/logo.svg" alt="Your Logo">
         </a>
               </div>
       <div id="mainListDiv" class="navigation-menu ">
+        <button  *ngIf="!isLoginPage()" routerLink="/login">Login</button>
+
         <ul class="navlinks">
-          <li><a routerLink="/contact">Contact</a></li>
+          
+
         </ul>
       </div>
       
