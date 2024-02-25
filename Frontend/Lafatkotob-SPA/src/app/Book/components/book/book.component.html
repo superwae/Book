@@ -1,1 +1,17 @@
-<p>book works!</p>
+<div *ngIf="book; else loading" class="book-container">
+  <div class="book-image">
+    <img *ngIf="book.coverImage" [src]="book.coverImage" [alt]="'Cover image of ' + book.title">
+  </div>
+  <div class="book-details">
+    <h1>{{ book.title }}</h1>
+    <p class="author">Author: {{ book.author }}</p>
+    <p class="published">Published: {{ book.publicationDate | date }}</p>
+    <p class="description">{{ book.description }}</p>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="loading-container">
+    <p>Loading book details...</p>
+  </div>
+</ng-template>

@@ -25,6 +25,12 @@ export const routes: Route[] = [
     loadComponent: () => import('./Auth/components/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
   },
 
+  {
+     path: 'books/:id', 
+    loadComponent: () => import('./Book/components/book/book.component').then(m => m.BookComponent)
+  },
+
+  { path: '**', loadComponent: () => import('./Auth/components/login-register/login-register.component').then(m => m.LoginRegisterComponent)},
 
  
 ];

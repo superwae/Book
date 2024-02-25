@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -62,6 +63,7 @@ namespace Lafatkotob.Controllers
             return Ok(user);
         }
 
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpDelete("DeleteUser")]
         public async Task<IActionResult> DeleteUser(string userId)
@@ -85,12 +87,22 @@ namespace Lafatkotob.Controllers
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPut("UpdateUser")]
-        public async Task<IActionResult> UpdateUser(UpdateUserModel model, string userId)
-
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateUser( string userId, [FromForm] UpdateUserModel model, IFormFile imageFile)
         {
+            var optionalFields = new List<string> { "Name", "Email", "UserName", "CurrentPassword", "NewPassword", "ConfirmNewPassword", "ProfilePictureUrl", "About", "City" };
+            foreach (var field in optionalFields)
+            {
+                ModelState.Remove(field); 
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+            }
+
+            if (imageFile != null && !imageFile.ContentType.StartsWith("image/"))
+            {
+                return BadRequest("Only image files are allowed.");
             }
 
             var UserName = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -100,7 +112,7 @@ namespace Lafatkotob.Controllers
             {
                 return BadRequest("you are not authorized to update this user");
             }
-            var result = await _userService.UpdateUser(model, userId);
+            var result = await _userService.UpdateUser(model, userId,  imageFile);
             if (!result.Success)
             {
                 return BadRequest(result.Message);
@@ -110,14 +122,19 @@ namespace Lafatkotob.Controllers
         }
 
         [HttpPost("Register")]
-            public async Task<IActionResult> Register([FromBody] RegisterModel model, [FromQuery] string role)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Register([FromQuery] string role, [FromForm] RegisterModel model, IFormFile imageFile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+            if (imageFile != null && !imageFile.ContentType.StartsWith("image/"))
+            {
+                return BadRequest("Only image files are allowed.");
+            }
 
-            var result = await _userService.RegisterUser(model, role);
+            var result = await _userService.RegisterUser(model, role,  imageFile);
             if (!result.Success)
             {
                 return BadRequest(result.Message);

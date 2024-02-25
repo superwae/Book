@@ -25,8 +25,9 @@ namespace Lafatkotob.Services.AppUserService
             _tokenService = tokenService;
         }
 
-        public async Task<ServiceResponse<AppUser>> RegisterUser(RegisterModel model, string role)
+        public async Task<ServiceResponse<AppUser>> RegisterUser(RegisterModel model, string role, IFormFile imageFile)
         {
+
             var user = new AppUser
             {
                 City = model.City,
@@ -35,11 +36,15 @@ namespace Lafatkotob.Services.AppUserService
                 UserName = model.UserName,
                 Email = model.Email,
                 Name = model.Name,
-                ProfilePicture = model.ProfilePictureUrl,
                 About = model.About,
                 DTHDate = model.DTHDate,
             };
-            
+            if (imageFile != null)
+            {
+                var imagePath = await SaveImageAsync(imageFile); 
+                user.ProfilePicture = imagePath;
+            }
+
             var result = await _userManager.CreateAsync(user, model.Password);
             if (!result.Succeeded)
             {
@@ -61,20 +66,72 @@ namespace Lafatkotob.Services.AppUserService
             };
         }
 
-        public async Task<ServiceResponse<UpdateUserModel>> UpdateUser(UpdateUserModel model,string userId)
+        public async Task<ServiceResponse<UpdateUserModel>> UpdateUser(UpdateUserModel model, string userId, IFormFile imageFile)
         {
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
                 return new ServiceResponse<UpdateUserModel> { Success = false, Message = "User not found." };
             }
+            if (imageFile != null)
+            {
+                var imagePath = await SaveImageAsync(imageFile); 
+                user.ProfilePicture = imagePath; 
+            }
+            if (model.Email != null && model.Email != user.Email)
+            {
+                var emailToken = await _userManager.GenerateChangeEmailTokenAsync(user, model.Email);
+                var changeEmailResult = await _userManager.ChangeEmailAsync(user, model.Email, emailToken);
+                if (!changeEmailResult.Succeeded)
+                {
+                    return new ServiceResponse<UpdateUserModel>
+                    {
+                        Success = false,
+                        Message = "Failed to update email.",
+                        Errors = changeEmailResult.Errors.Select(e => e.Description).ToList()
+                    };
+                }
+                user.EmailConfirmed = false; 
+            }
 
-            user.Email = model.Email;
-            user.UserName = model.UserName;
-            user.Name = model.Name;
-            user.City = model.City;
-            user.ProfilePicture = model.ProfilePictureUrl;
-            user.About = model.About;
+
+            if (!string.IsNullOrEmpty(model.CurrentPassword) && !string.IsNullOrEmpty(model.NewPassword))
+            {
+                if (model.NewPassword != model.ConfirmNewPassword)
+                {
+                    return new ServiceResponse<UpdateUserModel>
+                    {
+                        Success = false,
+                        Message = "New password and confirmation password do not match."
+                    };
+                }
+
+                var passwordCheck = await _userManager.CheckPasswordAsync(user, model.CurrentPassword);
+                if (!passwordCheck)
+                {
+                    return new ServiceResponse<UpdateUserModel>
+                    {
+                        Success = false,
+                        Message = "Current password is incorrect."
+                    };
+                }
+
+                var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+                if (!changePasswordResult.Succeeded)
+                {
+                    return new ServiceResponse<UpdateUserModel>
+                    {
+                        Success = false,
+                        Message = "Failed to change password.",
+                        Errors = changePasswordResult.Errors.Select(e => e.Description).ToList()
+                    };
+                }
+            }
+
+            user.UserName = model.UserName?? user.UserName;
+            user.Name = model.Name ?? user.Name;
+            user.City = model.City??user.City;
+            user.About = model.About ?? user.About;
      
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
@@ -105,8 +162,10 @@ namespace Lafatkotob.Services.AppUserService
                     About = user.About,
                     DTHDate = user.DTHDate,
                     HistoryId = user.HistoryId,
+
                 })
                 .ToListAsync();
+            users.ForEach(user => user.ProfilePicture = ConvertToFullUrl(user.ProfilePicture));
 
             return users;
         }
@@ -119,7 +178,7 @@ namespace Lafatkotob.Services.AppUserService
                 return null;
             }
 
-            return new AppUserModel
+            var userModel = new AppUserModel
             {
                 Id = user.Id,
                 Name = user.Name,
@@ -133,6 +192,9 @@ namespace Lafatkotob.Services.AppUserService
                 HistoryId = user.HistoryId,
 
             };
+            userModel.ProfilePicture = ConvertToFullUrl(userModel.ProfilePicture);
+
+            return userModel;
         }
 
         public async Task<ServiceResponse<UpdateUserModel>> DeleteUser(string userId)
@@ -189,7 +251,43 @@ namespace Lafatkotob.Services.AppUserService
             };
         }
 
-      
+        private async Task<string> SaveImageAsync(IFormFile imageFile)
+        {
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                throw new ArgumentException("The file is empty or null.", nameof(imageFile));
+            }
+
+            // Ensure the uploads directory exists
+            var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+            if (!Directory.Exists(uploadsFolderPath))
+            {
+                Directory.CreateDirectory(uploadsFolderPath);
+            }
+
+            // Generate a unique filename for the image to avoid name conflicts
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+            var filePath = Path.Combine(uploadsFolderPath, fileName);
+
+            // Save the file
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+
+            var imageUrl = $"/uploads/{fileName}";
+            return imageUrl;
+        }
+        private string ConvertToFullUrl(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath))
+                return null;
+
+            // Use your API's base URL here
+            var baseUrl = "https://localhost:7139";
+            return $"{baseUrl}{relativePath}";
+        }
+
 
 
     }

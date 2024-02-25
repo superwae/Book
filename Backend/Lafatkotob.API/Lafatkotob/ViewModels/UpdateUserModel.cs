@@ -4,12 +4,10 @@ namespace Lafatkotob.ViewModel
 {
     public class UpdateUserModel
     {
-        [Required]
         [StringLength(15)]
         
         public string Name { get; set; }
 
-        [Required]
         [EmailAddress]
         public string Email { get; set; }
 

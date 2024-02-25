@@ -188,13 +188,22 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-
+app.UseStaticFiles();
 
 app.UseIpRateLimiting();
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
 app.UseAuthentication();
+
 app.UseAuthorization();
-app.MapControllers();
+
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers(); 
+});
 
 app.Run();

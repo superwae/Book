@@ -29,11 +29,11 @@ namespace Lafatkotob.Controllers
         }
 
 
-        [HttpGet("getbyid")]
+        [HttpGet("{bookId}")]
         public async Task<IActionResult> GetBookById(int bookId)
         {
             var book = await _bookService.GetById(bookId);
-            if (book == null) return BadRequest();
+            if (book == null) return NotFound();
             return Ok(book);
         }
 
@@ -41,11 +41,15 @@ namespace Lafatkotob.Controllers
         [HttpPost("post")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> PostBook([FromForm] BooksModel model, IFormFile imageFile)
+        public async Task<IActionResult> PostBook([FromForm] BookModel model, IFormFile imageFile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
+            }
+            if (imageFile != null && !imageFile.ContentType.StartsWith("image/"))
+            {
+                return BadRequest("Only image files are allowed.");
             }
             var result = await _bookService.Post(model, imageFile);
             if (!result.Success)
@@ -75,6 +79,11 @@ namespace Lafatkotob.Controllers
             if (!ModelState.IsValid)
             {
                 return BadRequest();
+
+            }
+            if (imageFile != null && !imageFile.ContentType.StartsWith("image/"))
+            {
+                return BadRequest("Only image files are allowed.");
             }
             var result = await _bookService.Update(bookId, model, imageFile);
             if (!result.Success)

@@ -15,9 +15,9 @@ namespace Lafatkotob.Services.BookService
         }
 
 
-        public async Task<ServiceResponse<BooksModel>> Post(BooksModel model, IFormFile imageFile)
+        public async Task<ServiceResponse<BookModel>> Post(BookModel model, IFormFile imageFile)
         {
-            var response = new ServiceResponse<BooksModel>();
+            var response = new ServiceResponse<BookModel>();
             var executionStrategy = _context.Database.CreateExecutionStrategy();
 
             await executionStrategy.ExecuteAsync(async () =>
@@ -31,11 +31,9 @@ namespace Lafatkotob.Services.BookService
 
                         var book = new Book
                         {
-                            Id = model.Id,
                             Title = model.Title,
                             Author = model.Author,
                             Description = model.Description,
-                            CoverImage = model.CoverImage,
                             UserId = model.UserId,
                             HistoryId = model.HistoryId,
                             PublicationDate = model.PublicationDate,
@@ -45,6 +43,7 @@ namespace Lafatkotob.Services.BookService
                             Type = model.Type,
                             Status = model.Status,
                             PartnerUserId = model.PartnerUserId,
+                            CoverImage = imagePath
                         };
 
                         _context.Books.Add(book);
@@ -69,18 +68,18 @@ namespace Lafatkotob.Services.BookService
 
 
 
-        public async Task<BooksModel> GetById(int id)
+        public async Task<BookModel> GetById(int id)
         {
             var Book = await _context.Books.FindAsync(id);
             if (Book == null) return null;
 
-            return new BooksModel
+            return new BookModel
             {
                 Id = Book.Id,
                 Title = Book.Title,
                 Author = Book.Author,
                 Description = Book.Description,
-                CoverImage = Book.CoverImage,
+                CoverImage = ConvertToFullUrl(Book.CoverImage),
                 UserId = Book.UserId,
                 HistoryId = Book.HistoryId,
                 PublicationDate = Book.PublicationDate,
@@ -94,17 +93,17 @@ namespace Lafatkotob.Services.BookService
 
         }
 
-        public async Task<List<BooksModel>> GetAll()
+        public async Task<List<BookModel>> GetAll()
         {
 
             return await _context.Books
-          .Select(up => new BooksModel
+          .Select(up => new BookModel
           {
               Id = up.Id,
               Title = up.Title,
               Author = up.Author,
               Description = up.Description,
-              CoverImage = up.CoverImage,
+              CoverImage = ConvertToFullUrl(up.CoverImage),
               UserId = up.UserId,
               HistoryId = up.HistoryId,
               PublicationDate = up.PublicationDate,
@@ -211,9 +210,9 @@ namespace Lafatkotob.Services.BookService
 
 
 
-        public async Task<ServiceResponse<BooksModel>> Delete(int id)
+        public async Task<ServiceResponse<BookModel>> Delete(int id)
         {
-            var response = new ServiceResponse<BooksModel>();
+            var response = new ServiceResponse<BookModel>();
             var book = await _context.Books.FindAsync(id);
             if (book == null)
             {
@@ -233,7 +232,7 @@ namespace Lafatkotob.Services.BookService
                         await _context.SaveChangesAsync();
                         await transaction.CommitAsync();
                         response.Success = true;
-                        response.Data = new BooksModel
+                        response.Data = new BookModel
                         {
                             Id = book.Id,
                             Title = book.Title,
@@ -261,6 +260,14 @@ namespace Lafatkotob.Services.BookService
                 }
             });
             return response;
+        }
+        private string ConvertToFullUrl(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath))
+                return null;
+
+            var baseUrl = "https://localhost:7139"; 
+            return $"{baseUrl}{relativePath}";
         }
     }
 }
