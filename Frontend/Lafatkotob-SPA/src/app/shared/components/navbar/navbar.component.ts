@@ -1,25 +1,37 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, HostListener } from '@angular/core';
+import { Router, Event as RouterEvent, NavigationEnd, RouterLink } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [CommonModule,RouterLink],
-  standalone: true
+  standalone: true,
+  imports: [CommonModule,RouterLink]
 })
 export class NavbarComponent {
-  private router = inject(Router);
-  currentIndex = 0;
-  isLoginPage(): boolean {
-    return this.router.url === '/login';
+  isAffix: boolean = false;
+  navExpanded: boolean = false;
+  showMenu: boolean = true;
+
+  constructor(private router: Router) {
+    this.router.events.pipe(
+      filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      this.showMenu = event.urlAfterRedirects !== '/login';
+    });
   }
-  @HostListener('window:scroll', ['$event'])
+
+  @HostListener('window:scroll', [])
   onWindowScroll() {
-    const scrollY = window.scrollY;
-    const innerHeight = window.innerHeight;
-    this.currentIndex = Math.floor(scrollY / (innerHeight - 75));
-   
+    this.isAffix = window.pageYOffset > 50;
+  }
+
+  toggleNavbar() {
+    this.navExpanded = !this.navExpanded;
+  }
+  testClick() {
+    console.log('Link clicked!');
   }
 }

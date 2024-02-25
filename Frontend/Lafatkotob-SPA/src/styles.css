@@ -1,3 +1,22 @@
+:root {
+  --primary-color: #BEADFA; 
+  --primary-color-light: #E8E8E8; 
+  --primary-color-dark: #9c85f0; 
+
+
+  --secondary-color: #A7C6ED; 
+  --secondary-color-light: #d2e2f5; 
+  --secondary-color-dark: #2a74d2; 
+
+
+  --success-color: #28a745; 
+  --info-color: #17a2b8; 
+  --warning-color: #ffc107; 
+  --danger-color: #dc3545; 
+  --light-color: #f8f9fa; 
+  --dark-color: #343a40; 
+}
+
 body, html {
     height: 100%;
     width: 100%;

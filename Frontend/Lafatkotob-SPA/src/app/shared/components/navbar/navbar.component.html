@@ -1,19 +1,22 @@
-<nav class="nav">
+
+  <nav class="nav" [class.affix]="isAffix">
     <div class="container">
       <div class="logo">
-        <a routerLink="/">
-          <img src="assets/images/logo.svg" alt="Your Logo">
+        <a (click)="testClick()" routerLink="/">
+          <img src="assets/images/logo.svg" alt="Your Logo" class="navbar-logo">
         </a>
-              </div>
-      <div id="mainListDiv" class="navigation-menu ">
-        <button  *ngIf="!isLoginPage()" routerLink="/login">Login</button>
-
+      </div>
+      <div *ngIf="showMenu" id="mainListDiv" class="main_list" [class.show_list]="navExpanded">
         <ul class="navlinks">
-          
-
+          <li><a routerLink="/about">About</a></li>
+          <li><a routerLink="/portfolio">Portfolio</a></li>
+          <li><a routerLink="/services">Services</a></li>
+          <li><a routerLink="/contact">Contact</a></li>
         </ul>
       </div>
-      
+      <span *ngIf="showMenu" class="navTrigger" (click)="toggleNavbar()">
+   
+      </span>
     </div>
   </nav>
   
