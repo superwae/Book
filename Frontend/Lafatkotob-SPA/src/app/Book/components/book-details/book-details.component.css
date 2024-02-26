@@ -1,0 +1,120 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap');
+
+.card-wrapper {
+  padding-top: 6%;
+  max-width: 70vw;
+  position: relative;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+ 
+  overflow: hidden;
+  background-color: #fff;
+
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+@media screen and (min-width: 992px) {
+  .card {
+    flex-direction: row;
+  }
+}
+
+.product-imgs, .product-content {
+  flex: 1;
+}
+
+.img-display, .img-showcase img {
+  width: 100%;
+  object-fit: cover;
+}
+
+.product-content {
+  padding: 2rem 1rem;
+}
+
+.product-title {
+  font-size: 2rem;
+  color: #12263a;
+  margin-bottom: 1rem;
+}
+
+.product-author {
+  font-size: 1.4rem;
+  color: #12263a;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+.product-Poster {
+    font-size: 1.0rem;
+  color: #12263a;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+.product-author {
+  margin-top: 1rem;
+}
+
+.product-detail h2, h3 {
+  color: #12263a;
+  padding-bottom: 0.6rem;
+}
+
+.product-detail p, ul li {
+  font-size: 0.9rem;
+  padding: 0.3rem;
+  opacity: 0.8;
+}
+
+ul {
+  margin: 1rem 0;
+}
+
+ul li {
+  list-style: none;
+  padding-left: 1.7rem;
+  margin: 0.4rem 0;
+  background: url('https://fadzrinmadu.github.io/hosted-assets/product-detail-page-design-with-image-slider-html-css-and-javascript/checked.png') left center no-repeat;
+  background-size: 18px;
+  font-weight: 600;
+}
+
+ul li span {
+  font-weight: 400;
+}
+
+
+.book-card-action-button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+  padding-top: 15px;
+  margin-left: 5px; 
+  font-size: 5vh;
+  color: #666; 
+}
+
+.book-card-action-button:hover {
+  color: #f00; 
+}
+.product-Poster a {
+  color: #000; /* Black color */
+  text-decoration: none; /* No underline */
+  transition: color 0.3s ease, transform 0.1s ease; /* Smooth transition for color and transform */
+}
+
+.product-Poster a:hover {
+  color: #555; /* Dark grey color on hover */
+  text-decoration: underline; /* Underline on hover */
+}
+
+.product-Poster a:active {
+  transform: scale(0.98); /* Slightly scale down the link when clicked */
+}

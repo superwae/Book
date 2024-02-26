@@ -261,7 +261,7 @@ namespace Lafatkotob.Services.BookService
             });
             return response;
         }
-        private string ConvertToFullUrl(string relativePath)
+        private static  string ConvertToFullUrl(string relativePath)
         {
             if (string.IsNullOrEmpty(relativePath))
                 return null;

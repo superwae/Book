@@ -5,6 +5,7 @@ body {
   }
   
   .app-container {
+    padding-top: 6%;
     font-family: 'Jost', sans-serif;
     display: flex;
     justify-content: center;

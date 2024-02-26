@@ -1,0 +1,14 @@
+/* book-list.component.css */
+.book-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Adjust the space between the books as needed */
+    justify-content: center;
+  }
+  
+  app-book {
+    flex: 0 1 calc(50% - 20px); /* Adjust width for two columns, subtracting the gap */
+    /* Add a max-width if you want to limit how wide each book card can be */
+    max-width: 300px;
+  }
+  

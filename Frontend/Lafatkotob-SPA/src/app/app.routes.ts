@@ -24,10 +24,19 @@ export const routes: Route[] = [
     path:'reset-password',
     loadComponent: () => import('./Auth/components/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
   },
+  
+  {
+    path: 'book-details/:id', 
+    loadComponent: () => import('./Book/components/book-details/book-details.component').then(m => m.BookDetailsComponent)
+  },
 
   {
      path: 'books/:id', 
     loadComponent: () => import('./Book/components/book/book.component').then(m => m.BookComponent)
+  },
+  {
+    path: 'books',
+    loadComponent: () => import('./Book/components/books/books.component').then(m => m.BooksComponent)
   },
 
   { path: '**', loadComponent: () => import('./Auth/components/login-register/login-register.component').then(m => m.LoginRegisterComponent)},

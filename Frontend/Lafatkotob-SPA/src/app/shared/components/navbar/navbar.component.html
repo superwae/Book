@@ -1,6 +1,6 @@
 
-  <nav class="nav" [class.affix]="isAffix">
-    <div class="container">
+<nav class="nav" [class.affix]="isAffix && !showModal" [class.hidden]="showModal">
+      <div class="container">
       <div class="logo">
         <a (click)="testClick()" routerLink="/">
           <img src="assets/images/logo.svg" alt="Your Logo" class="navbar-logo">

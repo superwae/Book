@@ -5,12 +5,13 @@ import { register } from '../Models/registerModel';
 import { login } from '../Models/LoginModel';
 import { ResetPasswordComponent } from '../components/reset-password/reset-password.component';
 import { ResetPasswordModel } from '../Models/ResetPasswordModel';
+import { AppUserModel } from '../Models/AppUserModel';
 
 @Injectable({
   providedIn: 'root'
 })
 
-export class AppUserServiceService {
+export class AppUsereService {
 
   constructor(private http :HttpClient) { }
   loginUser(userdata:login):Observable<login>{
@@ -29,4 +30,11 @@ export class AppUserServiceService {
   resetPassword(data: ResetPasswordModel): Observable<any> {
     return this.http.put('https://localhost:7139/api/AppUser/reset-password', data);
   }
+  getUserById(id: string): Observable<AppUserModel> {
+    return this.http.get<AppUserModel>(`https://localhost:7139/api/AppUser/getbyid?userId=${id}`);
+  }
+  getALlUser(): Observable<AppUserModel[]> {
+    return this.http.get<AppUserModel[]>('https://localhost:7139/api/AppUser/getall');
+  }
+  
 }

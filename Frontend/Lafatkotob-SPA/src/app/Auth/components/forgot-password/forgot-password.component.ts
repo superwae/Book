@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { AppUserServiceService } from '../../services/app-user-service.service';
+import {  AppUsereService } from '../../services/app-user.service';
 import { CommonModule } from '@angular/common';
 
 
@@ -18,7 +18,7 @@ export class ForgotPasswordComponent  {
     private fb: FormBuilder,
     private router: Router,
     private route: ActivatedRoute,
-    private AppUserServiceService: AppUserServiceService
+    private AppUserService: AppUsereService
   ) { 
     this.forgotPasswordForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
@@ -32,7 +32,7 @@ public errorMessage: string | null = null;
 
 submitForgotPassword(): void {
   if (this.forgotPasswordForm.valid) {
-    this.AppUserServiceService.forgotPassword(this.forgotPasswordForm.value.email).subscribe(
+    this.AppUserService.forgotPassword(this.forgotPasswordForm.value.email).subscribe(
       (response) => {
         // Notify user with a generic message
         this.userMessage = 'If your email address is registered with us, you will receive an email.';

@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { AppUserServiceService } from '../../services/app-user-service.service';
+import {  AppUsereService } from '../../services/app-user.service';
 
 @Component({
   selector: 'app-login-register',
@@ -20,7 +20,7 @@ export class LoginRegisterComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private AppUserServiceService: AppUserServiceService,
+    private AppUserService: AppUsereService,
     private router: Router
   ) { 
     this.router.events.subscribe(event => {
@@ -49,7 +49,7 @@ export class LoginRegisterComponent implements OnInit {
 
   login(): void {
     if (this.loginForm.valid) {
-      this.AppUserServiceService.loginUser(this.loginForm.value).subscribe({
+      this.AppUserService.loginUser(this.loginForm.value).subscribe({
         next: (data) => console.log(data),
         error: (error) => console.log(error)
       });
@@ -63,7 +63,7 @@ export class LoginRegisterComponent implements OnInit {
       let registerData = this.registerForm.value;
       console.log('Register form data:', registerData);
 
-      this.AppUserServiceService.signup(registerData, 'User').subscribe({
+      this.AppUserService.signup(registerData, 'User').subscribe({
         next: (data) => console.log(data),
         error: (error) => console.log(error)
       });

@@ -1,15 +1,22 @@
-<div *ngIf="book; else loading" class="book-container">
-  <div class="book-image">
-    <img *ngIf="book.coverImage" [src]="book.coverImage" [alt]="'Cover image of ' + book.title">
-  </div>
-  <div class="book-details">
-    <h1>{{ book.title }}</h1>
-    <p class="author">Author: {{ book.author }}</p>
-    <p class="published">Published: {{ book.publicationDate | date }}</p>
-    <p class="description">{{ book.description }}</p>
+<div class="book-card-container">
+  <div *ngIf="book" class="book-card" [routerLink]="['/book-details', book.id]">
+    <img *ngIf="book.coverImage" [src]="book.coverImage" [alt]="'Cover image of ' + book.title" class="book-card__image">
+    <div class="book-card__info">
+      <h2 class="book-card__title">{{ book.title }}</h2>
+      <p class="book-card__author">Author: {{ book.author }}</p>
+      <p class="book-card__type">{{ book.type }}</p>
+      <p *ngIf="book.type !== 'buying'" class="book-card__status">Status: {{ book.status }}</p>
+      <div class="book-card-actions">
+        <button (click)="onLikeBook(book.id,$event)" class="book-card-action-button">
+          <i class="fa fa-heart"></i>
+        </button>
+    
+        <button (click)="onOpenChat(book.userId, $event)" class="book-card-action-button">
+          <i class="fa fa-comment"></i>
+        </button>
+      </div>
   </div>
 </div>
-
 <ng-template #loading>
   <div class="loading-container">
     <p>Loading book details...</p>

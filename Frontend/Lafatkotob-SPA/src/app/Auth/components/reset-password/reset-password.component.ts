@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { AppUserServiceService } from '../../services/app-user-service.service';
+import {  AppUsereService } from '../../services/app-user.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -18,7 +18,7 @@ export class ResetPasswordComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private AppUserServiceService: AppUserServiceService,
+    private AppUserService: AppUsereService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -63,7 +63,7 @@ export class ResetPasswordComponent implements OnInit {
         confirmPassword: this.resetPasswordForm.value.confirmPassword
       };
   
-      this.AppUserServiceService.resetPassword(resetData).subscribe({
+      this.AppUserService.resetPassword(resetData).subscribe({
         next: (response) => {
           this.userMessage = 'Your password has been successfully reset.';
           this.isSuccess = true;

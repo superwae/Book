@@ -1,0 +1,95 @@
+<div *ngIf="show" class="modal-overlay">
+    <div class="modal">
+        
+        <div class="modal-image-holder">
+            <!-- Image preview with a close button to remove the image -->
+            <div *ngIf="selectedImageUrl" class="image-container">
+              <img [src]="selectedImageUrl" alt="Selected Book Image" class="image-preview"/>
+              <button class="remove-image-button" (click)="removeSelectedImage()">&times;</button>
+            </div>
+            <!-- Upload button only visible if no image is selected -->
+            <label *ngIf="!selectedImageUrl" class="upload-image-label">
+              <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden/>
+              <i class="fa fa-upload upload-icon"></i> Upload Image
+            </label>
+          </div>
+        
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Place order</h2>
+                <button class="close-button" (click)="close()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="order-type">
+                    <div class="label-row">
+                        <pre>                       Type                                                                            Condtion</pre>
+                    </div>
+                    <div class="radio-row">
+                        <div class="middle">
+                            <label>
+                                <input type="radio" name="orderType" value="sell" checked />
+                                <div class="front-end box">
+                                    <span>Trade In</span>
+                                </div>
+                            </label>
+
+                            <label>
+                                <input type="radio" name="orderType" value="buy" />
+                                <div class="back-end box">
+                                    <span>Looking For</span>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="middle">
+                            <label>
+                                <input type="radio" name="orderCondtion" value="Great" checked />
+                                <div class="front-end box">
+                                    <span>Great</span>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="orderCondtion" value="Good" />
+                                <div class="back-end box">
+                                    <span>Good</span>
+                                </div>
+                            </label>
+                            <label>
+                                <input type="radio" name="orderCondtion" value="Bad" />
+                                <div class="back-end box">
+                                    <span>Bad</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="input-row">
+                    <div class="input-group input-half">
+                        <label for="bookTitle">Title</label>
+                        <input type="text" id="bookTitle" placeholder="Enter book title">
+                    </div>
+                    <div class="input-group input-half">
+                        <label for="bookAuthor">Author</label>
+                        <input type="text" id="bookAuthor" placeholder="Enter author's name">
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="bookDescription">Description</label>
+                    <textarea id="bookDescription" rows="4" placeholder="Enter book description"></textarea>
+                </div>
+                <div class="bottom-row">
+                    <div class=" isbn-page-count">
+                        <label for="bookIsbn">ISBN</label>
+                        <input type="text" id="bookIsbn" placeholder="Enter book ISBN">
+                    </div>
+                    <div class="isbn-page-count">
+                        <label for="bookPageCount">Page Count</label>
+                        <input type="number" id="bookPageCount" placeholder="Enter number of pages">
+                    </div>
+                    <button class="post-button">Add Book</button>
+                </div>
+        </div>
+    </div>
+</div>
