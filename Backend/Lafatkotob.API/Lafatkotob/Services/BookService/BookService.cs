@@ -15,7 +15,7 @@ namespace Lafatkotob.Services.BookService
         }
 
 
-        public async Task<ServiceResponse<BookModel>> Post(BookModel model, IFormFile imageFile)
+        public async Task<ServiceResponse<BookModel>> Post(RegisterBook model, IFormFile imageFile)
         {
             var response = new ServiceResponse<BookModel>();
             var executionStrategy = _context.Database.CreateExecutionStrategy();
@@ -45,14 +45,32 @@ namespace Lafatkotob.Services.BookService
                             PartnerUserId = model.PartnerUserId,
                             CoverImage = imagePath
                         };
+                        
 
                         _context.Books.Add(book);
                         await _context.SaveChangesAsync();
+                        var BookModel = new BookModel
+                        {
+                            Id= book.Id,
+                            Title = book.Title,
+                            Author = book.Author,
+                            Description = book.Description,
+                            CoverImage = book.CoverImage,
+                            UserId = book.UserId,
+                            HistoryId = book.HistoryId,
+                            PublicationDate = book.PublicationDate,
+                            ISBN = book.ISBN,
+                            PageCount = book.PageCount,
+                            Condition = book.Condition,
+                            Status = book.Status,
+                            Type = book.Type,
+                            PartnerUserId = book.PartnerUserId
+                        };
                         await transaction.CommitAsync();
 
-                        model.CoverImage = imagePath; // Update model with image path for response
+                        BookModel.CoverImage = imagePath; // Update model with image path for response
                         response.Success = true;
-                        response.Data = model;
+                        response.Data = BookModel;
                     }
                     catch (Exception ex)
                     {

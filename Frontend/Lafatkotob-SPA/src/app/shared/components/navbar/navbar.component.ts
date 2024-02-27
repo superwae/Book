@@ -3,7 +3,7 @@ import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, Event as RouterEvent, NavigationEnd, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import {  ModaleService } from '../../Service/modal.service';
+import {  ModaleService } from '../../Service/ModalService/modal.service';
 
 @Component({
   selector: 'app-navbar',

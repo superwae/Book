@@ -19,6 +19,7 @@ body {
   
   .main {
     height: 85vh; 
+    max-height: 1000px;
     width: 80%; 
     max-width: 400px; 
     margin: auto; 
@@ -39,7 +40,7 @@ body {
   
   label {
     color: #000;
-    font-size: 2.3em;
+    font-size: 1.8em;
     justify-content: center;
     display: flex;
     margin: 20px;
@@ -50,12 +51,12 @@ body {
   
   input {
     width: 60%;
-    height: 20px;
+    height: 16px;
     background: #fff;
     justify-content: center;
     display: flex;
-    margin: 12px auto;
-    padding: 10px;
+    margin: 10px auto;
+    padding: 8px;
     border: none;
     outline: none;
     border-radius: 5px;
@@ -87,18 +88,19 @@ body {
     height: 85vh;
     background: #eee;
     border-radius: 60% / 10%;
-    transform: translateY(-12vh);
+    transform: translateY(-15vh);;
     transition: .8s ease-in-out;
   }
   
   .login label {
     color: #573b8a;
-    transform: scale(.4);
-    padding: 15px;
+    transform: scale(.6);
+    padding-top: 5px;
+    padding-bottom: 100px;
   }
   
   #chk:checked ~ .login {
-    transform: translateY(-82vh);
+    transform: translateY(-83vh);
   }
   
   #chk:checked ~ .login label {
@@ -115,10 +117,12 @@ body {
     display: block;
     color: #573b8a;
     text-decoration: none;
-    margin-top: 10px;
+    margin-top: 0px;
     cursor: pointer;
     text-align: center; 
   }
+  
+
   
   .login::after:hover {
     text-decoration: underline;

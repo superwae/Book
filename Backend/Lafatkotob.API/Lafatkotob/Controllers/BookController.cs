@@ -41,7 +41,7 @@ namespace Lafatkotob.Controllers
         [HttpPost("post")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> PostBook([FromForm] BookModel model, IFormFile imageFile)
+        public async Task<IActionResult> PostBook([FromForm] RegisterBook model, IFormFile imageFile)
         {
             if (!ModelState.IsValid)
             {

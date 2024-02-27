@@ -197,25 +197,39 @@
     background-color: #E8E8E8;
     color: #fff;
     border-radius: 10px;
-    display: flex;
     padding: 20px;
-    width: 50%;
+    width: 100%;
     max-width: 800px;
     color:black;
     overflow: hidden;
+    display: flex; 
+    flex-direction: row;
   }
+
+  .modal-top-row {
+    display: flex;
+    align-items: flex-start;
+  }
+
   .modal-content {
-    flex: 70%; /* Content takes up 70% */
+    flex: 70%;
     padding:10px;
     padding-top: 0px;
   }
+  .modal-content-right {
+    flex-grow: 2;
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
   .modal-image-holder {
     position: relative;
-    flex: 30%;
-    display: flex;
+    flex: 27%;
+    flex-grow: 1;
     justify-content: center;
     align-items: center;
-    background-color: #ddd; /* Placeholder background */
+    background-color: #ddd; 
   }
   
   .image-container {
@@ -224,7 +238,7 @@
   
   .image-preview {
     max-width: 100%;
-    max-height: 100%;
+    max-height: 200px;
     object-fit: contain;
   }
   
@@ -285,6 +299,7 @@
   .input-group select,
   .input-group input {
     width: 100%;
+    max-width: 300px;
     padding: 10px;
     margin-top: 5px;
     border-radius: 5px;
@@ -309,17 +324,6 @@
     margin-right: 0; /* Removes margin from the last input group to avoid extra spacing */
 }
 
-/* Optional: Adjust the input width to fill the available space within .input-half */
-.input-group input {
-    width: calc(100% - 20px); /* Adjust the width calculation if necessary */
-    padding: 10px; /* Maintain padding around the inputs */
-    border-radius: 5px; /* Keep the inputs rounded */
-    border: 1px solid #ccc; /* Keep a subtle border */
-}
-
-
-
-
 
 
 
@@ -328,7 +332,7 @@
     display: flex;
     justify-content: space-between;
     height: 40px;
-    margin-bottom: 0px;
+    margin-bottom: 1px;
 }
 
 .close-button {
@@ -347,7 +351,9 @@
 }
 
 .input-group input, .input-group textarea, .input-group select {
-    width: 100%;
+    width: 80%;
+    max-width: 24vw;
+    max-height: 30vh;
     padding: 10px;
     margin-top: 5px;
     border-radius: 5px;

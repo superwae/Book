@@ -288,7 +288,25 @@ namespace Lafatkotob.Services.AppUserService
             return $"{baseUrl}{relativePath}";
         }
 
-
-
+        public async Task<ServiceResponse<AppUser>> SetHistoryId(string UserId, int HistoryId)
+        {
+            var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == UserId);
+            if (user == null)
+            {
+                return new ServiceResponse<AppUser> { Success = false, Message = "User not found." };
+            }
+            user.HistoryId = HistoryId;
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return new ServiceResponse<AppUser>
+                {
+                    Success = false,
+                    Message = "Failed to update user.",
+                    Errors = result.Errors.Select(e => e.Description).ToList()
+                };
+            }
+            return new ServiceResponse<AppUser> { Success = true, Data = user };
+        }
     }
 }

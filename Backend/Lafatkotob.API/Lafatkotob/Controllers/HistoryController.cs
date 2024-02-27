@@ -16,6 +16,8 @@ namespace Lafatkotob.Controllers
         {
             _historyService = historyService;
         }
+
+
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllHistories()
         {
@@ -23,6 +25,8 @@ namespace Lafatkotob.Controllers
             if(histories == null) return BadRequest();
             return Ok(histories);
         }
+
+
         [HttpGet("getbyid")]
         public async Task<IActionResult> GetHistoryById(int historyId)
         {
@@ -30,18 +34,31 @@ namespace Lafatkotob.Controllers
             if (history == null) return BadRequest();
             return Ok(history);
         }
+
+
         [HttpPost("post")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-
-        public async Task<IActionResult> PostHistory(HistoryModel model)
+        public async Task<IActionResult> PostHistory([FromBody]string userId)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-            await _historyService.Post(model);
-            return Ok();
+
+            var result = await _historyService.Post(userId);
+
+            if (result.Success)
+            {
+                return Ok(new { HistoryId = result.Data }); 
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
         }
+
+
+
         [HttpDelete("delete")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> DeleteHistory(int historyId)
@@ -50,6 +67,8 @@ namespace Lafatkotob.Controllers
             if (history == null) return BadRequest();
             return Ok(history);
         }
+
+
         [HttpPut("update")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UpdateHistory(HistoryModel model)

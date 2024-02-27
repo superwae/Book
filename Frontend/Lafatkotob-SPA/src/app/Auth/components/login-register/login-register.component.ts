@@ -4,6 +4,8 @@ import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import {  AppUsereService } from '../../services/app-user.service';
+import { LoginResponse } from '../../Models/Loginresponse';
+
 
 @Component({
   selector: 'app-login-register',
@@ -50,7 +52,11 @@ export class LoginRegisterComponent implements OnInit {
   login(): void {
     if (this.loginForm.valid) {
       this.AppUserService.loginUser(this.loginForm.value).subscribe({
-        next: (data) => console.log(data),
+        next: (response: LoginResponse) => {
+          console.log(response);
+          localStorage.setItem('token', response.token);
+          this.router.navigate(['/books']); 
+        },
         error: (error) => console.log(error)
       });
     }

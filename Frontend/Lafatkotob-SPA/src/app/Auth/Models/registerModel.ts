@@ -1,4 +1,4 @@
-export interface register {
+export interface registerModel {
     Name: string;
     Password: string;
     ConfirmNewPassword: string;

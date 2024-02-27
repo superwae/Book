@@ -17,9 +17,9 @@ namespace Lafatkotob.Services.HistoryService
             _context = context;
         }
 
-        public async Task<ServiceResponse<HistoryModel>> Post(HistoryModel model)
+        public async Task<ServiceResponse<int>> Post(string userId)
         {
-            var response = new ServiceResponse<HistoryModel>();
+            var response = new ServiceResponse<int>();
 
             var executionStrategy = _context.Database.CreateExecutionStrategy();
             await executionStrategy.ExecuteAsync(async () =>
@@ -31,8 +31,7 @@ namespace Lafatkotob.Services.HistoryService
 
                         var History = new History
                         {
-                            Id = model.Id,
-                            UserId = model.UserId,
+                            UserId = userId,
                             Date = DateTime.Now,
 
                         };
@@ -40,10 +39,9 @@ namespace Lafatkotob.Services.HistoryService
                        
                         _context.History.Add(History);
                         await _context.SaveChangesAsync();
-
                         transaction.Commit();
                         response.Success = true;
-                        response.Data = model;
+                        response.Data = History.Id;
                     }
                     catch (Exception ex)
                     {

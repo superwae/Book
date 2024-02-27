@@ -31,7 +31,7 @@ export const routes: Route[] = [
   },
 
   {
-     path: 'books/:id', 
+     path: 'book/:id', 
     loadComponent: () => import('./Book/components/book/book.component').then(m => m.BookComponent)
   },
   {

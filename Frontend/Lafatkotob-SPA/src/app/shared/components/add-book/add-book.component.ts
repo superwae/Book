@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { BookService } from '../../../Book/Service/BookService';
 import { CommonModule } from '@angular/common';
 import { ModalComponent } from '../modal/modal.component';
-import { ModaleService } from '../../Service/modal.service';
+import { ModaleService } from '../../Service/ModalService/modal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-book',
@@ -13,11 +14,21 @@ import { ModaleService } from '../../Service/modal.service';
 })
 export class AddBookComponent   {
   showModal: boolean = false;
-  constructor(private modalService: ModaleService) {
+  constructor(private modalService: ModaleService,private router: Router) {
   }
+  shouldHideButton(): boolean {
+    
+    const currentRoute = this.router.url;
+    return ['/login', '/forgot-password', '/reset-password'].includes(currentRoute) || this.showModal;
+    }
 
   openRegisterBookModal() {
     this.showModal = true;
     this.modalService.setShowModal(true);
+    
+    }
+    closeModal() {
+      this.showModal = false;
+      this.modalService.setShowModal(false);
     }
 }

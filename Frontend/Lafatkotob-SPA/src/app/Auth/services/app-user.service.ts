@@ -1,11 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { register } from '../Models/registerModel';
 import { login } from '../Models/LoginModel';
-import { ResetPasswordComponent } from '../components/reset-password/reset-password.component';
 import { ResetPasswordModel } from '../Models/ResetPasswordModel';
 import { AppUserModel } from '../Models/AppUserModel';
+import { registerModel } from '../Models/registerModel';
+import { LoginResponse } from '../Models/Loginresponse';
+import { SetUserHistoryModel } from '../Models/SetUserHistoryModel';
 
 @Injectable({
   providedIn: 'root'
@@ -14,15 +15,15 @@ import { AppUserModel } from '../Models/AppUserModel';
 export class AppUsereService {
 
   constructor(private http :HttpClient) { }
-  loginUser(userdata:login):Observable<login>{
-    return this.http.post<login>('https://localhost:7139/api/AppUser/Login',userdata);
+  loginUser(loginData: login): Observable<LoginResponse> {
+        return this.http.post<LoginResponse>('https://localhost:7139/api/AppUser/Login',loginData);
 
   }
-  signup(userdata: register, role: string): Observable<register> {
+  signup(userdata: registerModel, role: string): Observable<registerModel> {
     // Prepare HttpParams
     const params = new HttpParams().set('role', role);
     
-    return this.http.post<register>('https://localhost:7139/api/AppUser/Register', userdata, { params });
+    return this.http.post<registerModel>('https://localhost:7139/api/AppUser/Register', userdata, { params });
   }
   forgotPassword(email: string): Observable<any> {
     return this.http.post('https://localhost:7139/api/AppUser/forgot-password', { email });
@@ -36,5 +37,9 @@ export class AppUsereService {
   getALlUser(): Observable<AppUserModel[]> {
     return this.http.get<AppUserModel[]>('https://localhost:7139/api/AppUser/getall');
   }
-  
+  updateUserHistoryId(data:SetUserHistoryModel): Observable<any> {
+    console.log(data.HistoryId, data.UserId);
+    return this.http.put('https://localhost:7139/api/AppUser/set-historyId', data );
+           
+  }
 }

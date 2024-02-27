@@ -1,7 +1,9 @@
 <app-modal [show]="showModal" (closeEvent)="showModal=false" title="Register Book">
-  <!-- modal content goes here -->
 </app-modal>
 
-<button (click)="openRegisterBookModal()" class="register-book-button">
-  <i class="fa fa-plus"></i> Place Order
-</button>
+
+<div class="box">
+  <button *ngIf="!shouldHideButton()" (click)="openRegisterBookModal()"
+  class="button button--round-l button--text-thick button--border-medium button--text-upper button--size-s button--inverted" data-text="Place Oder">
+    <span>Open</span></button>
+</div>

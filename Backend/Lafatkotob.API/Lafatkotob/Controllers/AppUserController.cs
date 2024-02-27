@@ -214,6 +214,21 @@ namespace Lafatkotob.Controllers
             }
             return BadRequest(result.Errors);
         }
+        [HttpPut]
+        [Route("set-historyId")]
+        public async Task<IActionResult> setHistoryId([FromBody] SetHistoryIdModel model)
+        {
+            if(model.UserId == null)
+            {
+                return BadRequest("User Id is required");
+            }
+            var result = await _userService.SetHistoryId(model.UserId, model.HistoryId);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
+        }
 
 
     }
