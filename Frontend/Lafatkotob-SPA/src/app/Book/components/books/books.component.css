@@ -1,14 +1,26 @@
-/* book-list.component.css */
+.book-grid-wrapper {
+  width: 45%;
+  margin: 0 auto; 
+  margin-top: 80px;
+}
+
 .book-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px; /* Adjust the space between the books as needed */
-    justify-content: center;
-  }
-  
-  app-book {
-    flex: 0 1 calc(50% - 20px); /* Adjust width for two columns, subtracting the gap */
-    /* Add a max-width if you want to limit how wide each book card can be */
-    max-width: 300px;
-  }
-  
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 5px;
+}
+
+app-book {
+  flex: 1 1 calc(50% - 10px); 
+  max-width: calc(50% - 10px);
+}
+
+
+.book-grid-wrapper .book-grid .book-card-container.custom-book-height {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 30vh;
+  height: 35vh;
+}

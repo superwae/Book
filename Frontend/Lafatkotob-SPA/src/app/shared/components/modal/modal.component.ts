@@ -59,13 +59,15 @@ export class ModalComponent implements OnInit {
       CoverImage: [null],
       UserId: [this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM], Validators.required],
       HistoryId: [historyId], 
-      PublicationDate: [new Date().toISOString(), Validators.required],
+      PublicationDate: [],
       ISBN: ['', [Validators.required, Validators.pattern(/^\d{13}$/)]],
       PageCount: [null],
       Condition: ['', Validators.required],
       Status: ['Available', Validators.required],
       Type: ['', Validators.required],
-      PartnerUserId: [this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM]]
+      PartnerUserId: [this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM]],
+      Language: ['', Validators.required],
+      AddedDate: [new Date().toISOString()]
     });
   }
 

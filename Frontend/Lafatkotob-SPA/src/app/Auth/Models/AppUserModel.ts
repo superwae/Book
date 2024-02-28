@@ -10,5 +10,6 @@ export interface AppUserModel {
     about: string;
     dthDate: Date; 
     historyId?: number; 
+    
   }
   

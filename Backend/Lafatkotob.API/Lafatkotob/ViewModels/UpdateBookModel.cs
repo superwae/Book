@@ -11,5 +11,6 @@ namespace Lafatkotob.ViewModels
         public string Condition { get; set; }
         public string Status { get; set; }
         public string Type { get; set; }
+        public string Language { get; set; }
     }
 }

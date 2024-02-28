@@ -5,7 +5,8 @@
       <h2 class="book-card__title">{{ book.title }}</h2>
       <p class="book-card__author">Author: {{ book.author }}</p>
       <p class="book-card__type">{{ book.type }}</p>
-      <p *ngIf="book.type !== 'buying'" class="book-card__status">Status: {{ book.status }}</p>
+      <p class="book-card__Language">{{ book.language }}</p>
+      <p *ngIf="book.type !== 'buy'" class="book-card__status">Status: {{ book.status }}</p>
       <div class="book-card-actions">
         <button (click)="onLikeBook(book.id,$event)" class="book-card-action-button">
           <i class="fa fa-heart"></i>

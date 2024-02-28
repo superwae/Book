@@ -18,5 +18,6 @@ namespace Lafatkotob.ViewModels
         public string Status { get; set; }
         public string Type { get; set; }
         public string PartnerUserId { get; set; }
+        public string Language { get; set; }
     }
 }

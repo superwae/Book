@@ -11,5 +11,7 @@ export interface Book {
     condition: string;
     status: string;
     type: string;
+    language : string;
+    addedDate: Date;
   }
   

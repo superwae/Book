@@ -76,12 +76,15 @@ body {
     outline: none;
     border: none;
     border-radius: 5px;
-    transition: .2s ease-in;
+    transition: .1s ease-in;
     cursor: pointer;
   }
   
   button:hover {
     background: #6d44b8;
+  }
+  button:active {
+    transform: scale(0.9); 
   }
   
   .login {

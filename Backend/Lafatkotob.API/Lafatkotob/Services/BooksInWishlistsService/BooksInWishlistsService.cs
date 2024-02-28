@@ -41,7 +41,10 @@ namespace Lafatkotob.Services.BooksInWishlistsService
                             Id = BookInWishlists.Id,
                             Title = BookInWishlists.Title,
                             Author = BookInWishlists.Author,
-                            ISBN = BookInWishlists.ISBN
+                            ISBN = BookInWishlists.ISBN,
+                            Language = BookInWishlists.Language,
+                            AddedDate = BookInWishlists.AddedDate,
+
                         };
                        
                     }
@@ -66,6 +69,8 @@ namespace Lafatkotob.Services.BooksInWishlistsService
                 Title = book.Title,
                 Author = book.Author,
                 ISBN = book.ISBN,
+                Language = book.Language,
+                AddedDate = book.AddedDate
             }).ToListAsync();
         }
         public async Task<BookInWishlistsModel> GetById(int id)
@@ -77,7 +82,10 @@ namespace Lafatkotob.Services.BooksInWishlistsService
                 Id = BookInWishList.Id,
                 Title = BookInWishList.Title,
                 Author = BookInWishList.Author,
-                ISBN = BookInWishList.ISBN
+                ISBN = BookInWishList.ISBN,
+                Language = BookInWishList.Language,
+                AddedDate = BookInWishList.AddedDate
+
             };
 
         }
@@ -95,7 +103,10 @@ namespace Lafatkotob.Services.BooksInWishlistsService
                         {
                             Title = model.Title,
                             Author = model.Author,
-                            ISBN = model.ISBN
+                            ISBN = model.ISBN,
+                            Language = model.Language,
+                            AddedDate = DateTime.Now
+                            
                         };
                        
 
@@ -144,6 +155,8 @@ namespace Lafatkotob.Services.BooksInWishlistsService
                         BookInWishlists.Author = model.Author;
                         BookInWishlists.Title = model.Title;
                         BookInWishlists.ISBN = model.ISBN;
+                        BookInWishlists.Language = model.Language;
+                        BookInWishlists.AddedDate = DateTime.Now;
 
 
                         _context.BooksInWishlists.Update(BookInWishlists);

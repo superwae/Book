@@ -53,7 +53,8 @@
 }
 
 .book-card__type,
-.book-card__status {
+.book-card__status,
+.card__Language {
  
   font-size: 0.8vw;
   color: #666;

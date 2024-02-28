@@ -391,3 +391,87 @@ body {
 .hidden {
     display: none;
   }
+
+
+  .profile-picture-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .profile-picture {
+    width: 40px; 
+    height: 40px;
+    border-radius: 50%; 
+    object-fit: cover; 
+  }
+  
+
+  .logout-button {
+    background-color: #f44336; /* Red color for the logout button */
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Creates space between the icon and the text */
+    transition: background-color 0.3s;
+  }
+  
+  .logout-button:hover {
+    background-color: #d32f2f; /* Darker shade on hover */
+  }
+  
+  .logout-button i {
+    /* Adjust icon size if necessary */
+    font-size: 20px;
+  }
+
+  .profile-dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+  
+  .profile-picture, .dropdown-profile-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 5px;
+    padding: 12px 16px;
+  }
+  
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .dropdown-content button {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+  }
+  
+  .profile-dropdown:hover .dropdown-content {
+    display: block;
+  }

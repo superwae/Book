@@ -19,6 +19,8 @@
           <p>{{ book?.description }}</p><br><br>
           <ul>
             <li *ngIf="book?.status">Status: <span>{{ book?.status }}</span></li>
+            <li *ngIf="book?.language">Language: <span>{{ book?.language }}</span></li>
+            <li *ngIf="book?.addedDate">Publisher: <span>{{ book?.addedDate }}</span></li>
             <li *ngIf="book?.isbn">ISBN: <span>{{ book?.isbn }}</span></li>
             <li *ngIf="book?.pageCount">Page Count: <span>{{ book?.pageCount }}</span></li>
             <li *ngIf="book?.condition">Condition: <span>{{ book?.condition }}</span></li>

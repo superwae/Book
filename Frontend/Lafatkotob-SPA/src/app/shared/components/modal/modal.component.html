@@ -71,19 +71,22 @@
 
 
                     <div class="input-row">
-                        <div class="input-group input-half">
+                        <div class="input-group input-third">
                             <label for="bookTitle">Title</label>
                             <input type="text" formControlName="Title" placeholder="Enter book title">
                         </div>
-                        <div class="input-group input-half">
+                        <div class="input-group input-third">
                             <label for="bookAuthor">Author</label>
                             <input type="text" formControlName="Author" placeholder="Enter author's name">
+                        </div>
+                        <div class="input-group input-third">
+                            <label for="bookLanguage">Language</label>
+                            <input type="text" formControlName="Language" placeholder="Enter book language">
                         </div>
                     </div>
                     <div class="input-group">
                         <label for="bookDescription">Description</label>
-                        <textarea formControlName="Description" rows="4"
-                            placeholder="Enter book description"></textarea>
+                        <textarea formControlName="Description" rows="4" placeholder="Enter book description"></textarea>
                     </div>
                     <div class="bottom-row">
                         <div class="isbn-page-count">
@@ -94,8 +97,13 @@
                             <label for="bookPageCount">Page Count</label>
                             <input type="number" formControlName="PageCount" placeholder="Enter number of pages">
                         </div>
+                        <div class="isbn-page-count"> 
+                            <label for="bookPublicationDate">Publication Date</label>
+                            <input type="date" formControlName="PublicationDate" placeholder="Select publication date">
+                        </div>
                         <button class="post-button" type="submit">Add Book</button>
                     </div>
+                    
                 </div>
             </div>
         </form>

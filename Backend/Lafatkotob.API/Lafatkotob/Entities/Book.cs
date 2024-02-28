@@ -21,6 +21,8 @@ public class Book
     public string Condition { get; set; }
     public string Status { get; set; }
     public string Type { get; set; }
+    public string Language { get; set; }
+    public DateTime AddedDate { get; set; }
 
     // Foreign key to the user who currently has the book or is interested in it
     [ForeignKey(nameof(PartnerUserId))]

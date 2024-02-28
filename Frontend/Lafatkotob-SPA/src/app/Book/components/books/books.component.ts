@@ -21,6 +21,8 @@ export class BooksComponent implements OnInit{
     this.bookService.getAllBooks().subscribe({
       next: (data: Book[]) => {
         this.books = data;
+        console.log('Book:', this.books[0]);
+
       },
       error: (err) => {
         console.error('Error fetching books:', err);

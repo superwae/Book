@@ -43,7 +43,10 @@ namespace Lafatkotob.Services.BookService
                             Type = model.Type,
                             Status = model.Status,
                             PartnerUserId = model.PartnerUserId,
-                            CoverImage = imagePath
+                            CoverImage = imagePath,
+                            Language = model.Language,
+                            AddedDate = DateTime.Now
+
                         };
                         
 
@@ -64,7 +67,9 @@ namespace Lafatkotob.Services.BookService
                             Condition = book.Condition,
                             Status = book.Status,
                             Type = book.Type,
-                            PartnerUserId = book.PartnerUserId
+                            PartnerUserId = book.PartnerUserId,
+                            Language = book.Language,
+                            AddedDate = DateTime.Now
                         };
                         await transaction.CommitAsync();
 
@@ -106,7 +111,9 @@ namespace Lafatkotob.Services.BookService
                 Condition = Book.Condition,
                 Type = Book.Type,
                 Status = Book.Status,
-                PartnerUserId = Book.PartnerUserId
+                PartnerUserId = Book.PartnerUserId,
+                Language = Book.Language,
+                AddedDate = DateTime.Now
             };
 
         }
@@ -130,7 +137,9 @@ namespace Lafatkotob.Services.BookService
               Condition = up.Condition,
               Status = up.Status,
               Type = up.Type,
-              PartnerUserId = up.PartnerUserId
+              PartnerUserId = up.PartnerUserId,
+              Language = up.Language,
+              AddedDate = DateTime.Now
           })
               .ToListAsync();
         }
@@ -167,7 +176,6 @@ namespace Lafatkotob.Services.BookService
                         book.Title = model.Title ?? book.Title;
                         book.Author = model.Author ?? book.Author;
                         book.Description = model.Description ?? book.Description;
-                        // For CoverImage, handle separately as it involves file processing
                         if (imageFile != null)
                         {
                             var imagePath = await SaveImageAsync(imageFile);
@@ -178,6 +186,9 @@ namespace Lafatkotob.Services.BookService
                         book.Condition = model.Condition ?? book.Condition;
                         book.Status = model.Status ?? book.Status;
                         book.Type = model.Type ?? book.Type;
+                        book.Language = model.Language;
+                        book.AddedDate = DateTime.Now;
+
 
                         _context.Books.Update(book);
                         await _context.SaveChangesAsync();
@@ -265,7 +276,9 @@ namespace Lafatkotob.Services.BookService
                             Condition = book.Condition,
                             Status = book.Status,
                             Type = book.Type,
-                            PartnerUserId = book.PartnerUserId
+                            PartnerUserId = book.PartnerUserId,
+                            Language = book.Language,
+                            AddedDate = book.AddedDate
                         };
                     }
                     catch (Exception ex)
@@ -286,6 +299,69 @@ namespace Lafatkotob.Services.BookService
 
             var baseUrl = "https://localhost:7139"; 
             return $"{baseUrl}{relativePath}";
+        }
+
+
+        public async Task<ServiceResponse<List<BookModel>>> GetBooksFilteredByGenres(List<int> genreIds)
+        {
+            var response = new ServiceResponse<List<BookModel>>();
+
+            var books =  await _context.Books
+                    .Where(b => b.BookGenres.Any(bg => genreIds.Contains(bg.GenreId)))
+                    .Select(b => new BookModel
+                    {
+                        Id = b.Id,
+                        Title = b.Title,
+                        Author = b.Author,
+                        Description = b.Description,
+                        CoverImage = ConvertToFullUrl(b.CoverImage),
+                        UserId = b.UserId,
+                        HistoryId = b.HistoryId,
+                        PublicationDate = b.PublicationDate,
+                        ISBN = b.ISBN,
+                        PageCount = b.PageCount,
+                        Condition = b.Condition,
+                        Status = b.Status,
+                        Type = b.Type,
+                        PartnerUserId = b.PartnerUserId,
+                        Language = b.Language,
+                        AddedDate = b.AddedDate
+
+                    })
+                    .ToListAsync();
+            response.Data = books;
+            response.Success = true;
+            if(books.Count == 0)
+            {
+                response.Message = "No books found for the specified genres.";
+                response.Success = false;
+                return response;
+            }
+            return response;
+        }
+
+        public async Task<ServiceResponse<List<GenreModel>>> GetGenresByBookId(int bookId)
+        {
+            var response = new ServiceResponse<List<GenreModel>>();
+            var geners= await _context.BookGenres
+                   .Where(bg => bg.BookId == bookId)
+                   .Select(bg => bg.Genre)
+                   .Select(g => new GenreModel
+                   {
+                       Id = g.Id,
+                       Name = g.Name,
+                   })
+                   .ToListAsync();
+            response.Data = geners;
+            response.Success = true;
+            if (geners.Count == 0)
+            {
+                response.Message = "No genres found for the specified book.";
+                response.Success = false;
+                return response;
+            }
+            return response;
+
         }
     }
 }

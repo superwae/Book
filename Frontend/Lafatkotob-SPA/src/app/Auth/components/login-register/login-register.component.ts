@@ -54,7 +54,6 @@ export class LoginRegisterComponent implements OnInit {
       this.AppUserService.loginUser(this.loginForm.value).subscribe({
         next: (response: LoginResponse) => {
           console.log(response);
-          localStorage.setItem('token', response.token);
           this.router.navigate(['/books']); 
         },
         error: (error) => console.log(error)

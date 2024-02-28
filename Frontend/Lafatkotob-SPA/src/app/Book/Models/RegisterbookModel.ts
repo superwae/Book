@@ -12,4 +12,5 @@ export interface RegisterBook {
     Status: string;
     Type: string;
     PartnerUserId: string;
+    Language: string;
   }

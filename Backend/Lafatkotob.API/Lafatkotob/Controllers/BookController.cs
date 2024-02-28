@@ -94,6 +94,39 @@ namespace Lafatkotob.Controllers
         }
 
 
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetBooksByGenres([FromQuery] List<int> genreIds)
+        {
+            if (genreIds == null || !genreIds.Any())
+            {
+                return BadRequest("No genre IDs provided.");
+            }
+                
+            var books = await _bookService.GetBooksFilteredByGenres(genreIds);
+            if (books == null) return BadRequest(books.Message);
+
+            return Ok(books);
+        }
+        [HttpGet("{bookId}/genres")]
+        public async Task<IActionResult> GetGenresForBook(int bookId)
+        {
+            if (bookId <= 0)
+            {
+                return BadRequest("Invalid book ID.");
+            }
+
+            var genres = await _bookService.GetGenresByBookId(bookId);
+
+            if (genres.Data == null || !genres.Data.Any())
+            {
+                return NotFound(genres.Message);
+            }
+
+            return Ok(genres);
+        }
+
+
+
 
     }
 }
