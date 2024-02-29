@@ -13,5 +13,6 @@ export interface Book {
     type: string;
     language : string;
     addedDate: Date;
+    isLikedByCurrentUser?: boolean;
   }
   

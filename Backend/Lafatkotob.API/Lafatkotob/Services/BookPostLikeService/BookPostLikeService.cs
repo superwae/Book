@@ -2,6 +2,7 @@
 using Lafatkotob.Entities;
 using Lafatkotob.ViewModels;
 using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace Lafatkotob.Services.BookPostLikeServices
 {
@@ -12,64 +13,67 @@ namespace Lafatkotob.Services.BookPostLikeServices
         {
             _context = context;
         }
-        public async Task<ServiceResponse<BookPostLikeModel>> Post(BookPostLikeModel model)
-        
+        public async Task<ServiceResponse<AddBookPostLikeModel>> Post(AddBookPostLikeModel model)
+
         {
-            var response = new ServiceResponse<BookPostLikeModel>();
+            var response = new ServiceResponse<AddBookPostLikeModel>();
             var executionStrategy = _context.Database.CreateExecutionStrategy();
             await executionStrategy.ExecuteAsync(async () =>
             {
-                using (var transaction =  _context.Database.BeginTransaction())
-              { 
-                try
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    var bookPostLike = new BookPostLike
+                    try
                     {
-                        Id = model.Id,
-                        BookId = model.BookId,
-                        UserId = model.UserId,
-                        DateLiked = DateTime.Now
-                    };
-                    _context.BookPostLikes.Add(bookPostLike);
-                    await _context.SaveChangesAsync();
-                     transaction.Commit();
+                        var bookPostLike = new BookPostLike
+                        {
+                            BookId = model.BookId,
+                            UserId = model.UserId,
+                            DateLiked = DateTime.Now
+                        };
+                        _context.BookPostLikes.Add(bookPostLike);
+                        await _context.SaveChangesAsync();
+                        transaction.Commit();
                         response.Success = true;
                         response.Data = model;
-                       
-                }
-                catch (Exception)
-                {
+
+                    }
+                    catch (Exception)
+                    {
                         transaction.Rollback();
                         response.Success = false;
                         response.Message = "Failed to create badge.";
+                    }
                 }
-              }
-        });
+            });
 
             return response;
         }
-    public async Task<BookPostLikeModel> GetById(int id)
+        public async Task<BookPostLikeModel> GetById(AddBookPostLikeModel model)
+        {
+            var bookPostLike = await _context.BookPostLikes
+                                     .Where(bpl => bpl.UserId == model.UserId && bpl.BookId == model.BookId)
+                                     .FirstOrDefaultAsync();
+
+            if (bookPostLike == null) return null;
+
+            return new BookPostLikeModel
             {
-                var bookPostLike = await _context.BookPostLikes.FindAsync(id);
-                if (bookPostLike == null) return null;
-                return new BookPostLikeModel
-                {
-                    Id = bookPostLike.Id,
-                    BookId = bookPostLike.BookId,
-                    UserId = bookPostLike.UserId,
-                    DateLiked = bookPostLike.DateLiked
-                };
-            }
-            public async Task<List<BookPostLikeModel>> GetAll()
+                Id = bookPostLike.Id,
+                BookId = bookPostLike.BookId,
+                UserId = bookPostLike.UserId,
+                DateLiked = bookPostLike.DateLiked
+            };
+        }
+        public async Task<List<BookPostLikeModel>> GetAll()
+        {
+            return await _context.BookPostLikes.Select(bookPostLike => new BookPostLikeModel
             {
-                return await _context.BookPostLikes.Select(bookPostLike => new BookPostLikeModel
-                {
-                    Id = bookPostLike.Id,
-                    BookId = bookPostLike.BookId,
-                    UserId = bookPostLike.UserId,
-                    DateLiked = bookPostLike.DateLiked
-                }).ToListAsync();
-            }
+                Id = bookPostLike.Id,
+                BookId = bookPostLike.BookId,
+                UserId = bookPostLike.UserId,
+                DateLiked = bookPostLike.DateLiked
+            }).ToListAsync();
+        }
 
         public async Task<ServiceResponse<BookPostLikeModel>> Update(BookPostLikeModel model)
         {
@@ -120,14 +124,14 @@ namespace Lafatkotob.Services.BookPostLikeServices
             return response;
         }
 
-        public async Task<ServiceResponse<BookPostLikeModel>> Delete(int id)
+        public async Task<ServiceResponse<BookPostLikeModel>> Delete(AddBookPostLikeModel model)
         {
             var response = new ServiceResponse<BookPostLikeModel>();
-            var BookPostLike = await _context.BookPostLikes.FindAsync(id);
+            var BookPostLike = _context.BookPostLikes.FirstOrDefault(bpl => bpl.UserId == model.UserId && bpl.BookId == model.BookId);
             if (BookPostLike == null)
             {
                 response.Success = false;
-                response.Message = "Badge not found.";
+                response.Message = "BookPostLike not found.";
                 return response;
             }
             var executionStrategy = _context.Database.CreateExecutionStrategy();
@@ -164,6 +168,25 @@ namespace Lafatkotob.Services.BookPostLikeServices
 
 
 
+        }
+
+        public async Task<ServiceResponse<Dictionary<int, bool>>> CheckBulkLikes(string userId, List<int> bookIds)
+        {
+            var results = new Dictionary<int, bool>();
+            var respose = new ServiceResponse<Dictionary<int, bool>> { };
+            foreach (var bookId in bookIds)
+            {
+                var isLiked = await _context.BookPostLikes.AnyAsync(bpl => bpl.UserId == userId && bpl.BookId == bookId);
+                results.Add(bookId, isLiked);
+            }
+            respose.Success = true;
+            respose.Data = results;
+            if(results.Count == 0)
+            {
+                respose.Success = false;
+                respose.Message = "No results found.";
+            }
+            return respose;
         }
     }
 }

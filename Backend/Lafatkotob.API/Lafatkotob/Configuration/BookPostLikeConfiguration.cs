@@ -13,6 +13,8 @@ namespace Lafatkotob.Configuration
 
             builder.Property(bpl => bpl.DateLiked).IsRequired();
 
+            builder.HasIndex(bpl => new { bpl.UserId, bpl.BookId }).IsUnique();
+
             // Configuring the relationship with Book
             builder.HasOne(bpl => bpl.Book)
                    .WithMany(b => b.BookPostLikes)

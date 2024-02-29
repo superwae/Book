@@ -67,8 +67,8 @@ export class AppUsereService {
   logout() {
     localStorage.removeItem('token');
     this.isAuthenticatedSubject.next(false);
-    this.router.navigate(['/login']);
-  }
+    window.location.href = '/login';
+    }
 
   private decodeToken(token: string): any {
     try {

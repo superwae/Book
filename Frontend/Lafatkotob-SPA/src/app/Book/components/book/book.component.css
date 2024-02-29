@@ -110,3 +110,6 @@
 .book-card-action-button:hover {
   color: #f00; 
 }
+.book-card-action-button.liked {
+  color: red; 
+}

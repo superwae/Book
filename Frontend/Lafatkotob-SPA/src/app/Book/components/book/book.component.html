@@ -8,7 +8,7 @@
       <p class="book-card__Language">{{ book.language }}</p>
       <p *ngIf="book.type !== 'buy'" class="book-card__status">Status: {{ book.status }}</p>
       <div class="book-card-actions">
-        <button (click)="onLikeBook(book.id,$event)" class="book-card-action-button">
+        <button (click)="onLikeBook(book.id, $event)" class="book-card-action-button" [class.liked]="book.isLikedByCurrentUser">
           <i class="fa fa-heart"></i>
         </button>
     

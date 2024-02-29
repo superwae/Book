@@ -3,6 +3,7 @@ using Lafatkotob.ViewModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lafatkotob.Controllers
 {
@@ -23,16 +24,21 @@ namespace Lafatkotob.Controllers
             return Ok(bookPostLikes);
         }
         [HttpGet("getbyid")]
-        public async Task<IActionResult> GetBookPostLikeById(int bookPostLikeId)
+        public async Task<IActionResult> GetBookPostLikeById([FromQuery] string userId, [FromQuery] int bookId)
         {
-            var bookPostLike = await _bookPostLikeService.GetById(bookPostLikeId);
+            var model = new AddBookPostLikeModel { UserId = userId, BookId = bookId };
+            var bookPostLike = await _bookPostLikeService.GetById(model);
             if (bookPostLike == null) return BadRequest();
             return Ok(bookPostLike);
         }
+
+      
+
+
         [HttpPost("post")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
-        public async Task<IActionResult> PostBookPostLike(BookPostLikeModel model)
+        public async Task<IActionResult> PostBookPostLike(AddBookPostLikeModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -44,9 +50,10 @@ namespace Lafatkotob.Controllers
         [HttpDelete("delete")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
-        public async Task<IActionResult> DeleteBookPostLike(int bookPostLikeId)
+        public async Task<IActionResult> DeleteBookPostLike([FromQuery] string userId, [FromQuery] int bookId)
         {
-            var bookPostLike = await _bookPostLikeService.Delete(bookPostLikeId);
+            var model = new AddBookPostLikeModel { UserId = userId, BookId = bookId };
+            var bookPostLike = await _bookPostLikeService.Delete(model);
             if (bookPostLike == null) return BadRequest();
             return Ok(bookPostLike);
         }
@@ -62,8 +69,18 @@ namespace Lafatkotob.Controllers
             await _bookPostLikeService.Update(model);
             return Ok();
         }
-        
 
-        
+        [HttpGet("checkBulkLikes")]
+        public async Task<IActionResult> CheckBulkLikes(string userId, [FromQuery(Name = "bookIds")] List<int> bookIds)
+        {
+            var results = await _bookPostLikeService.CheckBulkLikes(userId, bookIds);
+            if (results == null) return BadRequest();
+            return Ok(results.Data);
+        }
+
+
+
+
+
     }
 }

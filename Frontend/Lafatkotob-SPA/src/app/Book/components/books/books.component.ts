@@ -4,6 +4,8 @@ import { Book } from '../../Models/bookModel';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { BookComponent } from '../book/book.component';
+import { MyTokenPayload } from '../../../shared/Models/MyTokenPayload';
+import { jwtDecode } from 'jwt-decode';
 
 @Component({
   selector: 'app-books',
@@ -17,17 +19,37 @@ export class BooksComponent implements OnInit{
 
   constructor(private bookService: BookService) {}
 
+
   ngOnInit(): void {
     this.bookService.getAllBooks().subscribe({
-      next: (data: Book[]) => {
-        this.books = data;
-        console.log('Book:', this.books[0]);
-
+      next: (books: Book[]) => {
+        this.books = books;
+        this.checkBooksLikeStatus();
       },
       error: (err) => {
         console.error('Error fetching books:', err);
       }
     });
+  }
+  
+  checkBooksLikeStatus(): void {
+    const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+    if (userId && this.books.length > 0) {
+      const bookIds = this.books.map(book => book.id);
+      this.bookService.checkBulkLikes(userId, bookIds).subscribe(isLikedMap => {
+        this.books.forEach(book => {
+          book.isLikedByCurrentUser = !!isLikedMap[book.id];
+        });
+      });
+    }
+  }
+
+  getUserInfoFromToken(): MyTokenPayload | undefined {
+    const token = localStorage.getItem('token');
+    if (token) {
+      return jwtDecode<MyTokenPayload>(token);
+    }
+    return undefined;
   }
 }
 
