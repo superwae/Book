@@ -68,6 +68,10 @@
         <form [formGroup]="loginForm" (ngSubmit)="login()">
           <label for="chk" aria-hidden="true">Login</label>
           <input type="text" formControlName="UserName" placeholder="UserName" required>
+          <div class="error-container" *ngIf="loginForm.get('UserName')?.touched && loginForm.get('UserName')?.errors">
+            <small class="error-message" *ngIf="loginForm.get('UserName')?.errors?.['required']">User name is required.</small>
+          </div>
+
           <div>
             <input type="password" formControlName="Password" placeholder="Password" required>
             <div class="error-container" *ngIf="loginForm.get('Password')?.touched && loginForm.get('Password')?.errors">
@@ -76,7 +80,6 @@
           </div>
           <a  class="forgot-password-link" routerLink="/forgot-password">Forgot Password?</a>
           <button type="submit" [disabled]="!loginForm.valid">Login</button>
-          <!-- Forgot Password Button -->
           
           </form>
       </div>

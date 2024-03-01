@@ -1,8 +1,5 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
 import { Route, RouterModule } from '@angular/router';
-import { ForgotPasswordComponent } from './Auth/components/forgot-password/forgot-password.component';
-import { LoginRegisterComponent } from './Auth/components/login-register/login-register.component';
 
 export const routes: Route[] = [
 
@@ -23,6 +20,10 @@ export const routes: Route[] = [
   {
     path:'reset-password',
     loadComponent: () => import('./Auth/components/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+  },
+  {
+    path: 'recommendation', 
+    loadComponent: () => import('./shared/components/recommendation/recommendation.component').then(m => m.RecommendationComponent)
   },
   
   {
