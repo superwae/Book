@@ -1,0 +1,22 @@
+<div class="home-page-container">
+    <div class="big-header-container">
+      <div class="big-header">
+        <h1>Welcome to Our Book Store</h1>
+      </div>
+    </div>
+    
+    <!-- Recommendation Component Container -->
+    <div class="recommendation-container">
+      <app-recommendation></app-recommendation>
+    </div>
+    
+    <!-- Search Component Container -->
+    <div class="search-bar-container">
+      <app-search-bar (search)="handleSearch($event)"></app-search-bar>
+    </div>
+    
+    <!-- Display Books Component Container -->
+    <div class="books-display-container">
+      <app-books [books]="searchResults"></app-books>
+    </div>
+</div>

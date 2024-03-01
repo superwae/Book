@@ -124,8 +124,22 @@ namespace Lafatkotob.Controllers
 
             return Ok(genres);
         }
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchBooks([FromQuery] string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Search query is required.");
+            }
 
+            var books = await _bookService.SearchBooks(query);
+            if (books.Data == null || !books.Data.Any())
+            {
+                return NotFound(books.Message);
+            }
 
+            return Ok(books.Data);
+        }
 
 
     }

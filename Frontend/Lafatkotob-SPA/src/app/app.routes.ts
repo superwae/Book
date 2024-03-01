@@ -39,6 +39,10 @@ export const routes: Route[] = [
     path: 'books',
     loadComponent: () => import('./Book/components/books/books.component').then(m => m.BooksComponent)
   },
+  {
+    path: 'home-page',
+    loadComponent: () => import('./Home/components/home-page/home-page.component').then(m => m.HomePageComponent)
+  },
 
   { path: '**', loadComponent: () => import('./Auth/components/login-register/login-register.component').then(m => m.LoginRegisterComponent)},
 

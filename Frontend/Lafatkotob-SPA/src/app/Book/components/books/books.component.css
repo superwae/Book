@@ -1,7 +1,7 @@
 .book-grid-wrapper {
-  width: 45%;
+  width: 80%; 
   margin: 0 auto; 
-  margin-top: 80px;
+  margin-top: 40px;
 }
 
 .book-grid {
@@ -20,7 +20,6 @@ app-book {
 .book-grid-wrapper .book-grid .book-card-container.custom-book-height {
   display: flex;
   justify-content: center;
-  align-items: center;
   min-height: 30vh;
   height: 35vh;
 }

@@ -11,6 +11,7 @@ namespace Lafatkotob.Services.BookService
         Task<ServiceResponse<UpdateBookModel>> Update(int id, UpdateBookModel model, IFormFile imageFile = null);
         Task<ServiceResponse<List<BookModel>>> GetBooksFilteredByGenres(List<int> genreIds);
         Task<ServiceResponse<List<GenreModel>>> GetGenresByBookId(int bookId);
-        
-        }
+        Task<ServiceResponse<List<Book>>> SearchBooks(string query);
+
+    }
 }

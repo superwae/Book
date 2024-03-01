@@ -1,0 +1,46 @@
+:root {
+    --primary-color: #BEADFA; 
+    --primary-color-light: #E8E8E8; 
+    --primary-color-dark: #9c85f0; 
+  
+  
+    --secondary-color: #A7C6ED; 
+    --secondary-color-light: #d2e2f5; 
+    --secondary-color-dark: #2a74d2; 
+  
+  
+    --success-color: #28a745; 
+    --info-color: #17a2b8; 
+    --warning-color: #ffc107; 
+    --danger-color: #dc3545; 
+    --light-color: #f8f9fa; 
+    --dark-color: #343a40; 
+  }
+
+
+  .home-page-container {
+    background-color: var(--primary-color);
+    padding: 1rem; /* Add padding around the entire container */
+    height: 100%; /* Ensure the container takes up the entire height of the screen */
+  }
+  
+  .big-header-container {
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 4rem;
+    color: var(--dark-color);
+  }
+  
+  .recommendation-container {
+    margin-bottom: 2rem; /* Add space below the recommendation section */
+  }
+  
+  .search-bar-container {
+    margin: 2rem auto; /* Add margin to the top and bottom, auto for left and right */
+    max-width: 600px;
+  }
+  
+  .books-display-container {
+    margin: 2rem auto; /* Same here, ensure it's centered and has margin from the search bar */
+    max-width: 1200px;
+  }

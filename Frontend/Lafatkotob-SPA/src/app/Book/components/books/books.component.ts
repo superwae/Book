@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, input } from '@angular/core';
 import { BookService } from '../../Service/BookService';
 import { Book } from '../../Models/bookModel';
 import { CommonModule } from '@angular/common';
@@ -15,21 +15,24 @@ import { jwtDecode } from 'jwt-decode';
   styleUrl: './books.component.css'
 })
 export class BooksComponent implements OnInit{
-  books: Book[] = [];
+  @Input() books: Book[] = [];
 
   constructor(private bookService: BookService) {}
 
 
   ngOnInit(): void {
-    this.bookService.getAllBooks().subscribe({
-      next: (books: Book[]) => {
-        this.books = books;
-        this.checkBooksLikeStatus();
-      },
-      error: (err) => {
-        console.error('Error fetching books:', err);
-      }
-    });
+    if (!this.books || this.books.length === 0) {
+      this.bookService.getAllBooks().subscribe({
+        next: (books: Book[]) => {
+          console.log(books);
+          this.books = books;
+          this.checkBooksLikeStatus();
+        },
+        error: (err) => console.error('Error fetching books:', err)
+      });
+    } else {
+      this.checkBooksLikeStatus();
+    }
   }
   
   checkBooksLikeStatus(): void {

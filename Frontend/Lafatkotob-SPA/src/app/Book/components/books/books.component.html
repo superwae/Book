@@ -1,6 +1,7 @@
-
 <div class="book-grid-wrapper">
   <div class="book-grid">
-    <app-book class="book-card-container custom-book-height" *ngFor="let book of books" [book]="book"></app-book>
+    <ng-container *ngFor="let book of books">
+      <app-book *ngIf="book" class="book-card-container custom-book-height" [book]="book"></app-book>
+    </ng-container>
   </div>
 </div>
