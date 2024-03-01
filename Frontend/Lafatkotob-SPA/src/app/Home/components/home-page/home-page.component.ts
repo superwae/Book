@@ -4,11 +4,12 @@ import { SearchBarComponent } from '../../../shared/components/search-bar/search
 import { BooksComponent } from '../../../Book/components/books/books.component';
 import { BookService } from '../../../Book/Service/BookService';
 import { Book } from '../../../Book/Models/bookModel';
+import { MagicTextComponent } from '../magic-text/magic-text.component';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [RecommendationComponent,SearchBarComponent,BooksComponent],
+  imports: [RecommendationComponent,SearchBarComponent,BooksComponent,MagicTextComponent],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.css'
 })

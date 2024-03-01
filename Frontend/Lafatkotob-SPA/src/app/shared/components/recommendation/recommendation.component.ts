@@ -110,7 +110,7 @@ export class RecommendationComponent implements OnInit, AfterViewInit {
       let nextPercentage = prevPercentage + percentage;
 
       // Limit the movement to the right to 60%
-      nextPercentage = Math.max(nextPercentage, -30);
+      nextPercentage = Math.max(nextPercentage, -50);
 
       nextPercentage = Math.min(Math.max(nextPercentage, -100), 0);
 
@@ -141,6 +141,60 @@ export class RecommendationComponent implements OnInit, AfterViewInit {
       track.addEventListener('touchmove', handleOnMove as any);
       track.addEventListener('touchcancel', handleOnLeave as any);
     }
+    track?.classList.remove('track-animate');
   }
+  
+  scrollLeft(): void {
+    this.scrollTrack(10); 
+  }
+
+  scrollRight(): void {
+    this.scrollTrack(-10); 
+  }
+  private scrollTrack(delta: number): void {
+  const track = document.getElementById("image-track");
+  if (track) {
+    let currentPercentage = parseFloat(track.getAttribute('data-percentage') || "0");
+    currentPercentage += delta;
+
+    // Update bounds to prevent excessive scrolling
+    const maxScroll = this.calculateMaxScroll();
+    currentPercentage = Math.min(Math.max(currentPercentage, maxScroll), 0);
+
+    // Apply the transition class for animation
+    track.classList.add('track-animate');
+    track.style.transform = `translate(${currentPercentage}%, -50%)`;
+    track.setAttribute('data-percentage', `${currentPercentage}`);
+
+    // Update image positions based on new track position
+    this.updateImagePositions(currentPercentage);
+
+    // Remove the animation class after the transition is complete
+    setTimeout(() => track.classList.remove('track-animate'), 500);
+
+    // Reset 'data-mouse-down-at' to reflect the new starting point for manual dragging
+    track.removeAttribute('data-mouse-down-at');
+  }
+}
+
+  private calculateMaxScroll(): number {
+    
+    const maxScroll = -((this.books.length - 1) * 10); // Example: adjust based on your layout
+    return maxScroll;
+  }
+
+  private updateImagePositions(currentPercentage: number): void {
+    const track = document.getElementById("image-track");
+    if (track) {
+      const images = Array.from(track.getElementsByClassName("image") as HTMLCollectionOf<HTMLElement>);
+      images.forEach((image) => {
+        const initialRightOffset = parseFloat(image.getAttribute('data-initial-right-offset') || "100");
+        const adjustedPosition = initialRightOffset + currentPercentage;
+        image.style.objectPosition = `${adjustedPosition}% center`;
+      });
+    }
+  }
+  
+
 
 }
