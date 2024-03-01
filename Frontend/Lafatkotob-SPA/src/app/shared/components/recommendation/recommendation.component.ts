@@ -2,11 +2,12 @@ import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { Book } from '../../../Book/Models/bookModel';
 import { BookService } from '../../../Book/Service/BookService';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-recommendation',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule,RouterLink],
   templateUrl: './recommendation.component.html',
   styleUrls: ['./recommendation.component.css']
 })
@@ -28,6 +29,32 @@ export class RecommendationComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.initializeTrackScroll();
     this.setInitialImagePositions();
+    this.addImagePressFeedback();
+  }
+
+  private addImagePressFeedback(): void {
+    const images = document.querySelectorAll('#image-track img');
+    images.forEach(img => {
+      img.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // Prevent default to avoid any unwanted behavior
+        img.classList.add('image-pressed');
+      });
+  
+      // Ensure to remove the class on mouse up to revert the effect
+      img.addEventListener('mouseup', () => {
+        img.classList.remove('image-pressed');
+      });
+  
+      // Consider touch devices as well
+      img.addEventListener('touchstart', (e) => {
+        e.preventDefault(); // Prevent default action
+        img.classList.add('image-pressed');
+      });
+  
+      img.addEventListener('touchend', () => {
+        img.classList.remove('image-pressed');
+      });
+    });
   }
 
   private setInitialImagePositions(): void {

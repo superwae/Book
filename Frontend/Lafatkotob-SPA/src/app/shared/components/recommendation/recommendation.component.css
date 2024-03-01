@@ -1,7 +1,7 @@
 .recommendation-wrapper {
     height: 100vh;
     width: 100vw;
-    background-color: black;
+    background-color: #BEADFA;
     margin: 0rem;
     overflow: hidden;
     position: relative;
@@ -11,12 +11,18 @@
     display: flex;
     gap: 4vmin;
     position: absolute;
-    left: 50%;
+    left: 10%;
     top: 50%;
     transform: translate(0%, -50%); 
     user-select: none; 
   }
-  
+  .image-link {
+    display: inline-flex; /* or block, depending on your layout */
+    align-items: center;
+    justify-content: center;
+    text-decoration: none; /* Removes underline from links */
+    color: inherit; /* Keeps the text color unchanged */
+  }
   #image-track > .image {
     width: 40vmin;
     height: 56vmin;
@@ -74,4 +80,14 @@
     color: white;
     font-family: "Rubik", sans-serif;
     font-weight: 500;
+  }
+  #image-track > .image-link > .image {
+    width: 40vmin;
+    height: 56vmin;
+    object-fit: cover;
+    object-position: 100% center;
+  }
+  .image-pressed {
+    transform: translateY(-5px); 
+    transition: transform 0.2s ease;
   }
