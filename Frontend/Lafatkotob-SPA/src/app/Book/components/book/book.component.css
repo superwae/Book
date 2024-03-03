@@ -13,9 +13,9 @@
   padding: 10px;
   border: 1px solid #dbdbdb;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  max-width: 400px; 
-  width: 15vw;
-  height: 25vh;
+  max-width: 500px; 
+  width: 20vw;
+  height: 30vh;
   min-width: 10vw;
   min-height: 10vh;
   cursor: pointer;
