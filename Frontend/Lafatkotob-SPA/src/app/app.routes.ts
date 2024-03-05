@@ -43,6 +43,10 @@ export const routes: Route[] = [
     path: 'home-page',
     loadComponent: () => import('./Home/components/home-page/home-page.component').then(m => m.HomePageComponent)
   },
+  {
+    path:'filter',
+    loadComponent: () => import('./shared/components/filter/filter.component').then(m => m.FilterComponent)
+  },
 
   { path: '**', loadComponent: () => import('./Auth/components/login-register/login-register.component').then(m => m.LoginRegisterComponent)},
 

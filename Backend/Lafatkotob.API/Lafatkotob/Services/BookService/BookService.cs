@@ -26,7 +26,6 @@ namespace Lafatkotob.Services.BookService
                 {
                     try
                     {
-                        // Handle image saving here and get the path or URL
                         var imagePath = await SaveImageAsync(imageFile);
 
                         var book = new Book

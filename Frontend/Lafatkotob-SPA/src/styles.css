@@ -18,10 +18,14 @@
 }
 
 body, html {
-    height: 100%;
-    width: 100%;
-    margin: 0 !important;
-    overflow-x: hidden;
+  height: 100%;
+  width: 100%;
+  margin: 0 !important;
+  background-image: linear-gradient(#BEADFA, #E8E8E8, #9c85f0);
+  background-size: cover; /* Ensure background covers the whole page */
+  background-repeat: no-repeat; /* Prevent background from repeating */
+  background-attachment: fixed;
+
   }
 
   .tooltip {

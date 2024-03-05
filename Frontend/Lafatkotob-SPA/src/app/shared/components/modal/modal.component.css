@@ -17,7 +17,7 @@
   }
   
   .middle input[type="radio"]:checked + .box span {
-    color: rgb(58, 23, 23);
+    color: white;
     transform: translateY(0px);
   }
   
