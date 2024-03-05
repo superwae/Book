@@ -27,6 +27,7 @@
   
   .big-header-container {
     width: 100%;
+    margin-top: 10vh;
     text-align: center;
     padding: 20px 0; /* Adjust as needed */
   }
@@ -60,7 +61,7 @@
   
   .search-bar-container {
     margin: 2rem auto; /* Add margin to the top and bottom, auto for left and right */
-    max-width: 600px;
+    max-width: 50vw;
   }
   
   .books-display-container {

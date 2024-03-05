@@ -9,7 +9,7 @@
     <div *ngIf="showMenu" id="mainListDiv" class="main_list" [class.show_list]="navExpanded">
       <ul class="navlinks">
         <!-- Chat Icon Placeholder -->
-        <li class="icon-container chat-dropdown-trigger">
+        <li *ngIf="isLoggedIn" class="icon-container chat-dropdown-trigger">
           <a (click)="toggleChatDropdown($event)">
             <i class="fas fa-comments" appTooltip="Chat"></i>
           </a>
@@ -17,12 +17,12 @@
         </li>
 
         <!-- Notifications Icon Placeholder -->
-        <li class="icon-container notifications-dropdown-trigger">
+        <li *ngIf="isLoggedIn" class="icon-container notifications-dropdown-trigger" >
           <a (click)="toggleNotificationsDropdown($event)">
             <i class="fas fa-bell" appTooltip="Notifications"></i>
           </a>
           <!-- Notifications Dropdown Placeholder -->
-          <div *ngIf="showNotificationsDropdown" class="notifications-dropdown-content">Notifications Component
+          <div *ngIf="showNotificationsDropdown"  class="notifications-dropdown-content">Notifications Component
             Placeholder</div>
         </li>
 
@@ -37,11 +37,10 @@
 
 
         <!-- Profile Dropdown -->
-        <li *ngIf="isLoggedIn" class="user-info-container">
+        <li *ngIf="isLoggedIn; else showLoginButton" class="user-info-container">
           <div class="profile-dropdown" (click)="toggleDropdown()">
             <div class="profile-icon-container" appTooltip="Account">
               <img [src]="profilePictureUrl" alt="Profile" class="profile-picture">
-
             </div>
             <div *ngIf="showDropdown" class="dropdown-content">
               <a [routerLink]="['/profile']">
@@ -49,13 +48,22 @@
                 {{User?.name}}
               </a>
               <a [routerLink]="['/settings']">Settings</a>
-              <button class="logout-button"(click)="logout()">Logout</button>
+              <button class="logout-button" (click)="logout()">Logout</button>
             </div>
           </div>
         </li>
-
-
       </ul>
+  
+      <!-- Login Button Template -->
+      <ng-template #showLoginButton>
+        <li class="icon-container login-button">
+          <a [routerLink]="['/login']">
+            <i class="fas fa-sign-in-alt" appTooltip="Login"></i> Login
+          </a>
+        </li>
+      </ng-template>
+
+
     </div>
 
 

@@ -5,8 +5,8 @@
   
     
     <!-- Recommendation Component Container -->
-    <div class="recommendation-container">
-      <app-recommendation></app-recommendation>
+    <div class="recommendation-container" *ngIf="isLoggedIn">
+      <app-recommendation  ></app-recommendation>
     </div>
     
     <!-- Search Component Container -->
