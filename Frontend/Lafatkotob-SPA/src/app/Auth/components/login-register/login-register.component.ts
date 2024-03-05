@@ -54,7 +54,7 @@ export class LoginRegisterComponent implements OnInit {
       this.AppUserService.loginUser(this.loginForm.value).subscribe({
         next: (response: LoginResponse) => {
           console.log(response);
-          this.router.navigate(['/books']); 
+          this.router.navigate(['/home-page']); 
         },
         error: (error) => console.log(error)
       });

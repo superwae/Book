@@ -1,7 +1,6 @@
 .recommendation-wrapper {
   height: 35vh; 
-  width: 80vw; 
-  background-color: #BEADFA;
+  width: 100vw; 
   margin: 0 auto; 
   overflow: hidden;
   position: relative;

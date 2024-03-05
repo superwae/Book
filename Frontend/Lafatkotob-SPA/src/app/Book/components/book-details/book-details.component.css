@@ -101,10 +101,12 @@ ul li span {
   margin-left: 5px; 
   font-size: 5vh;
   color: #666; 
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .book-card-action-button:hover {
-  color: #f00; 
+  color: #c8c8c8; /* Change color on hover */
+  transform: scale(1.4);
 }
 .product-Poster a {
   color: #000; /* Black color */
@@ -119,4 +121,8 @@ ul li span {
 
 .product-Poster a:active {
   transform: scale(0.98); /* Slightly scale down the link when clicked */
+}
+.book-card-action-button.liked,
+.book-card-action-button.liked:hover {
+  color: red;
 }

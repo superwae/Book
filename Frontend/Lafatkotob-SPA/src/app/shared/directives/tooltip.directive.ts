@@ -63,7 +63,7 @@ export class TooltipDirective implements OnInit , OnDestroy{
     // Calculate position
     const hostPos = this.el.nativeElement.getBoundingClientRect();
     const tooltipPos = this.tooltipElement!.getBoundingClientRect();
-    const top = hostPos.bottom + window.scrollY + 10;
+    const top = hostPos.bottom  + 10;
     const left = hostPos.left + (hostPos.width - tooltipPos.width) / 2 + window.scrollX;
 
     // Apply calculated position

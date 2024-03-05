@@ -152,7 +152,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.showChatDropdown = !this.showChatDropdown;
   
-    // Close other dropdowns
     if (this.showChatDropdown) {
       this.showNotificationsDropdown = false;
       this.showEventsDropdown = false;

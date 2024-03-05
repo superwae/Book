@@ -56,7 +56,6 @@ export class BookComponent implements OnInit{
   onLikeBook(bookId: number, event: MouseEvent): void {
     event.stopPropagation();
     const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
-  
     if (!userId) {
       console.error('User must be logged in to like a book');
       return;

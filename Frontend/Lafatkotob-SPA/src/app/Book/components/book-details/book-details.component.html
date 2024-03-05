@@ -1,45 +1,50 @@
 <div class="card-wrapper">
-    <div class="card">
-      <div class="product-imgs">
-        <div class="img-display">
-          <div class="img-showcase">
-            <img *ngIf="book?.coverImage" [src]="book?.coverImage" [alt]="'Cover image of ' + book?.title">
-          </div>
+  <div class="card">
+    <!-- Image Section -->
+    <div class="product-imgs">
+      <div class="img-display">
+        <div class="img-showcase">
+          <img *ngIf="book?.coverImage" [src]="book?.coverImage" [alt]="'Cover image of ' + book?.title">
         </div>
       </div>
-      <div class="product-content">
-        <h2 class="product-title">{{ book?.title }}</h2>
-        <div class="product-detail">
-            <h2 class="product-author">Author: {{book?.author}}</h2>
-            <h3 class="product-Poster">
-              Posted by: <a [routerLink]="['/user-profile', user?.id]">{{user?.name}}</a>
-            </h3>            
-            
-          <h3 class="product-Poster" >description: </h3>
-          <p>{{ book?.description }}</p><br><br>
-          <ul>
-            <li *ngIf="book?.status">Status: <span>{{ book?.status }}</span></li>
-            <li *ngIf="book?.language">Language: <span>{{ book?.language }}</span></li>
-            <li *ngIf="book?.addedDate">Publisher: <span>{{ book?.addedDate }}</span></li>
-            <li *ngIf="book?.isbn">ISBN: <span>{{ book?.isbn }}</span></li>
-            <li *ngIf="book?.pageCount">Page Count: <span>{{ book?.pageCount }}</span></li>
-            <li *ngIf="book?.condition">Condition: <span>{{ book?.condition }}</span></li>
-            <li *ngIf="book?.type">Type: <span>{{ book?.type }}</span></li>
-            <li *ngIf="book?.publicationDate">Publication Date: <span>{{ book?.publicationDate | date:'longDate' }}</span></li>
-          </ul>
-          <div >
-            <button (click)="onLikeBook(book?.id)" class="book-card-action-button">
-              <i class="fa fa-heart"></i>
-            </button>
+    </div>
+
+    <!-- Content Section -->
+    <div class="product-content">
+      <h2 class="product-title">{{ book?.title }}</h2>
+      
+      <div class="product-detail">
+        <h2 class="product-author">Author: {{book?.author}}</h2>
         
-            <button (click)="onOpenChat(book?.userId)" class="book-card-action-button">
-              <i class="fa fa-comment"></i>
-            </button>
-          </div>
+        <h3 class="product-poster">
+          Posted by: <a [routerLink]="['/user-profile', user?.id]">{{user?.name}}</a>
+        </h3>
+        
+        <h3>Description: </h3>
+        <p>{{ book?.description }}</p>
+        
+        <ul>
+          <li *ngIf="book?.status">Status: <span>{{ book?.status }}</span></li>
+          <li *ngIf="book?.language">Language: <span>{{ book?.language }}</span></li>
+          <li *ngIf="book?.addedDate">Added Date: <span>{{ book?.addedDate | date:'longDate' }}</span></li>
+          <li *ngIf="book?.isbn">ISBN: <span>{{ book?.isbn }}</span></li>
+          <li *ngIf="book?.pageCount">Page Count: <span>{{ book?.pageCount }}</span></li>
+          <li *ngIf="book?.condition">Condition: <span>{{ book?.condition }}</span></li>
+          <li *ngIf="book?.type">Type: <span>{{ book?.type }}</span></li>
+          <li *ngIf="book?.publicationDate">Publication Date: <span>{{ book?.publicationDate | date:'longDate' }}</span></li>
+        </ul>
+
+        <!-- Action Buttons -->
+        <div>
+          <button (click)="onLikeBook(book.id, $event)" class="book-card-action-button" [class.liked]="book.isLikedByCurrentUser">
+            <i class="fa fa-heart"></i>
+          </button>
           
-          
+          <button (click)="onOpenChat(book.userId, $event)" class="book-card-action-button">
+            <i class="fa fa-comment"></i>
+          </button>
         </div>
       </div>
     </div>
   </div>
-  
+</div>

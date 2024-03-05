@@ -145,6 +145,9 @@ namespace Lafatkotob.Services.BookService
         }
 
 
+
+
+
         public async Task<ServiceResponse<List<Book>>> SearchBooks(string query)
         {
             var response = new ServiceResponse<List<Book>>();
@@ -153,6 +156,17 @@ namespace Lafatkotob.Services.BookService
             var books = await _context.Books
                 .Where(b => b.Title.ToLower().Contains(query) || b.Author.ToLower().Contains(query))
                 .ToListAsync();
+
+            string baseUrl = "https://localhost:7139";
+
+            books.ForEach(b =>
+            {
+                if (!string.IsNullOrWhiteSpace(b.CoverImage) && !b.CoverImage.StartsWith("http"))
+                {
+                    b.CoverImage = $"{baseUrl}{(b.CoverImage.StartsWith('/') ? "" : "/")}{b.CoverImage}";
+                }
+            });
+
             response.Success = true;
             response.Data = books;
             if (books.Count == 0)
@@ -163,7 +177,6 @@ namespace Lafatkotob.Services.BookService
             }
             return response;
         }
-
 
         public async Task<ServiceResponse<UpdateBookModel>> Update(int id, UpdateBookModel model, IFormFile imageFile = null)
         {
