@@ -177,6 +177,20 @@ namespace Lafatkotob.Services.BookService
             return response;
         }
 
+
+        
+
+        private string FormatCoverImageUrl(string baseUrl, string coverImagePath)
+        {
+            if (!string.IsNullOrWhiteSpace(coverImagePath) && !coverImagePath.StartsWith("http"))
+            {
+                return $"{baseUrl}{(coverImagePath.StartsWith('/') ? "" : "/")}{coverImagePath}";
+            }
+            return coverImagePath;
+        }
+
+
+
         public async Task<ServiceResponse<UpdateBookModel>> Update(int id, UpdateBookModel model, IFormFile imageFile = null)
         {
             var response = new ServiceResponse<UpdateBookModel>();

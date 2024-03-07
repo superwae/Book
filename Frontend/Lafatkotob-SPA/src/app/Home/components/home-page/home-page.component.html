@@ -13,7 +13,13 @@
     <div class="search-bar-container">
       <app-search-bar (search)="handleSearch($event)"></app-search-bar>
     </div>
+
+    <!-- Filter Component Container -->
+    <div class="filter-container">
+      <app-filter (genreSelect)="handleGenreSelect($event)"></app-filter>
+    </div>
     
+
     <!-- Display Books Component Container -->
     <div class="books-display-container">
       <app-books [books]="searchResults"></app-books>

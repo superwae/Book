@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Book } from '../Models/bookModel';
 import { RegisterBook } from '../Models/RegisterbookModel';
 import { AddBookPostLike } from '../Models/addBookPostLike';
@@ -20,11 +20,20 @@ export class BookService  {
   getBookById(id: number): Observable<Book> {
     return this.http.get<Book>(`${this.baseUrl}/${id}`);
   }
+
   registerBook(formData: FormData): Observable<any> {
     return this.http.post(`${this.baseUrl}/post`, formData);
   }
+
   searchBooks(query: string): Observable<Book[]> {
     return this.http.get<Book[]>(`${this.baseUrl}/search`, { params: { query } });
+  }
+
+  getBooksFilteredByGenres(genreIds: number[]): Observable<Book[]> {
+    return this.http.get<{data: Book[]}>(this.baseUrl + '/filter', { params: { genreIds } })
+      .pipe(
+        map(response => response.data)
+      );
   }
 
 
