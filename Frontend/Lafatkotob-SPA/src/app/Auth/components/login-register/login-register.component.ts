@@ -19,6 +19,9 @@ import { LoginResponse } from '../../Models/Loginresponse';
 export class LoginRegisterComponent implements OnInit {
   loginForm: FormGroup;
   registerForm: FormGroup;
+  loginErrorMessage: string | null = null;
+
+  selectedFile: File | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -50,36 +53,63 @@ export class LoginRegisterComponent implements OnInit {
   ngOnInit(): void {}
 
   login(): void {
-    if (this.loginForm.valid) {
-      this.AppUserService.loginUser(this.loginForm.value).subscribe({
-        next: (response: LoginResponse) => {
-          console.log(response);
-          this.router.navigate(['/home-page']); 
-        },
-        error: (error) => console.log(error)
-      });
-    }
+  this.loginErrorMessage = null; 
+  if (this.loginForm.valid) {
+    this.AppUserService.loginUser(this.loginForm.value).subscribe({
+      next: (response: LoginResponse) => {
+        console.log(response);
+        this.router.navigate(['/home-page']); 
+      },
+      error: (error) => {
+        console.error(error);
+        // Update this part based on how your API response structure for errors
+        // Assuming the API returns a simple string message for login failures
+        this.loginErrorMessage = "Invalid username or password.";
+      }
+    });
   }
+}
 
-  Register(): void {
-    this.registerForm.value.ConfirmNewEmail=this.registerForm.value.Email;
-    this.registerForm.value.Name=this.registerForm.value.UserName;
-    if (this.registerForm.valid) {
-      let registerData = this.registerForm.value;
-      console.log('Register form data:', registerData);
 
-      this.AppUserService.signup(registerData, 'User').subscribe({
-        next: (data) => console.log(data),
-        error: (error) => console.log(error)
-      });
-    }
+onFileSelected(event: Event): void {
+  const file = (event.target as HTMLInputElement).files?.[0];
+  if (file) {
+    this.selectedFile = file;
+    // Optionally: Display file name or preview the image
   }
+}
 
+Register(): void {
+  if (this.registerForm.valid) {
+    const formData = new FormData();
+
+    formData.append('Name', this.registerForm.value.Name);
+    formData.append('UserName', this.registerForm.value.UserName);
+    formData.append('Email', this.registerForm.value.Email);
+    formData.append('Password', this.registerForm.value.Password);
+    formData.append('ConfirmNewPassword', this.registerForm.value.ConfirmNewPassword);
+    formData.append('DTHDate', this.registerForm.value.DTHDate);
+    formData.append('City', this.registerForm.value.City);
+    formData.append('ProfilePictureUrl', this.registerForm.value.ProfilePictureUrl); // Assuming this is the file
+    formData.append('About', this.registerForm.value.About);
+
+    if (this.selectedFile) {
+      formData.append('imageFile', this.selectedFile, this.selectedFile.name);
+    }
+
+    this.AppUserService.signup(formData, 'User').subscribe({
+      next: (data) => console.log(data),
+      error: (error) => console.log(error)
+    });
+  }
+}
   checkPasswords(group: FormGroup) { 
     let pass = group.get('Password')?.value;
     let confirmPass = group.get('ConfirmNewPassword')?.value;
     return pass === confirmPass ? null : { notSame: true };
   }
+
+  
  
   
 }

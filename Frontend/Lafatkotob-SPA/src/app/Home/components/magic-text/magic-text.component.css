@@ -74,7 +74,7 @@ h1>.magic {
 
 h1>.magic>.magic-star {
     --size: clamp(20px, 1.5vw, 30px);
-    animation: scale 1800ms ease-in-out infinite;
+    animation: scale 1200ms ease-in-out infinite;
     display: block;
     height: var(--size);
     position: absolute;

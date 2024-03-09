@@ -40,7 +40,12 @@
         <li *ngIf="isLoggedIn; else showLoginButton" class="user-info-container">
           <div class="profile-dropdown" (click)="toggleDropdown()">
             <div class="profile-icon-container" appTooltip="Account">
-              <img [src]="profilePictureUrl" alt="Profile" class="profile-picture">
+              <ng-container *ngIf="profilePictureUrl; else defaultProfileIcon">
+                <img [src]="profilePictureUrl" alt="Profile" class="profile-picture">
+              </ng-container>
+              <ng-template #defaultProfileIcon>
+                <i class="fas fa-user-circle profile-icon"></i>
+              </ng-template>
             </div>
             <div *ngIf="showDropdown" class="dropdown-content">
               <a [routerLink]="['/profile']">
@@ -52,6 +57,7 @@
             </div>
           </div>
         </li>
+        
       </ul>
   
       <!-- Login Button Template -->

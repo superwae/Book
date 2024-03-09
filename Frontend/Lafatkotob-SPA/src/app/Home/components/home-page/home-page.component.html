@@ -1,27 +1,29 @@
 <div class="home-page-container">
-  <div class="big-header-container">
-    <app-magic-text></app-magic-text>
-  </div>
-  
-    
+
+  <div class="initial-view-container">
+    <!-- Header Component Container -->
+    <div class="big-header-container">
+      <app-magic-text></app-magic-text>
+    </div>
+
     <!-- Recommendation Component Container -->
     <div class="recommendation-container" *ngIf="isLoggedIn">
-      <app-recommendation  ></app-recommendation>
+      <app-recommendation></app-recommendation>
     </div>
-    
+
     <!-- Search Component Container -->
     <div class="search-bar-container">
       <app-search-bar (search)="handleSearch($event)"></app-search-bar>
     </div>
+  </div>
 
-    <!-- Filter Component Container -->
-    <div class="filter-container">
-      <app-filter (genreSelect)="handleGenreSelect($event)"></app-filter>
-    </div>
-    
+  <!-- Filter Component Container -->
+  <div class="filter-container">
+    <app-filter (genreSelect)="handleGenreSelect($event)"></app-filter>
+  </div>
 
-    <!-- Display Books Component Container -->
-    <div class="books-display-container">
-      <app-books [books]="searchResults"></app-books>
-    </div>
+  <!-- Display Books Component Container -->
+  <div class="books-display-container">
+    <app-books [books]="searchResults"></app-books>
+  </div>
 </div>

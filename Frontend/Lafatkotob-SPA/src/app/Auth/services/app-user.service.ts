@@ -30,10 +30,11 @@ export class AppUsereService {
       }));
   }
 
-  signup(userdata: registerModel, role: string): Observable<registerModel> {
+  signup(formData: FormData, role: string): Observable<any> {
     const params = new HttpParams().set('role', role);
-    return this.http.post<registerModel>(`${this.baseUrl}/Register`, userdata, { params });
+    return this.http.post(`${this.baseUrl}/Register`, formData, { params });
   }
+  
 
   forgotPassword(email: string): Observable<any> {
     return this.http.post(`${this.baseUrl}/forgot-password`, { email });

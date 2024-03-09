@@ -136,7 +136,7 @@ body {
   }
   .error-message {
     color: red;
-    font-size: 0.6rem; 
+    font-size: 0.8rem; 
     text-align: center;
   }
   .error-container {
@@ -152,5 +152,65 @@ body {
     margin-top: 15px; 
     padding: 5px;
     display: inline-block;
+  }
+ 
+  .file-upload-container {
+    display: flex;
+    justify-content: center; /* Center the button in the container */
+    margin: 10px auto;
+    width: 60%; /* Adjust as needed */
+  }
+  
+  .file-upload-btn {
+    background: #573b8a;
+    color: #E8E8E8;
+    padding: 8px 15px;
+    font-size: 0.8em; 
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+    display: inline-block; /* Change from block to inline-block if needed */
+    text-align: center;
+    border: 2px solid #573b8a; /* Optional: adds a border to make it more button-like */
+  }
+  
+  .file-upload-btn:hover {
+    background: #6d44b8; /* Slightly darker shade on hover */
+  }
+  
+  input[type="file"] {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+  }
+  .form-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .validation-icon {
+    color: red;
+    margin-left: 8px;
+    cursor: help;
+  }
+  
+  .validation-icon:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 100%;
+    top: 0;
+    white-space: nowrap;
+    z-index: 10;
+    background-color: #f2f2f2;
+    color: #000;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    font-size: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
   

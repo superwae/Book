@@ -57,6 +57,16 @@
               <small class="error-message"  *ngIf="registerForm.get('City')?.errors?.['required']">City is required.</small>
             </div>
           </div>
+
+          <!-- Profile Picture -->
+          <div class="file-upload-container">
+            <input type="file" id="file" (change)="onFileSelected($event)" accept="image/*" hidden>
+            <label for="file" class="file-upload-btn">Add Profile Picture</label>
+          </div>
+          
+          
+          
+          
         
           <button type="submit" [disabled]="!registerForm.valid">Sign up</button>
         </form>
@@ -77,6 +87,9 @@
             <div class="error-container" *ngIf="loginForm.get('Password')?.touched && loginForm.get('Password')?.errors">
               <small class="error-message" *ngIf="loginForm.get('Password')?.errors?.['required']">Password is required.</small>
             </div>
+          </div>
+          <div *ngIf="loginErrorMessage" class="error-message">
+            <small>{{ loginErrorMessage }}</small>
           </div>
           <a  class="forgot-password-link" routerLink="/forgot-password">Forgot Password?</a>
           <button type="submit" [disabled]="!loginForm.valid">Login</button>

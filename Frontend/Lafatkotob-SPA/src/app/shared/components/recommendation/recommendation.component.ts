@@ -2,7 +2,7 @@ import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { Book } from '../../../Book/Models/bookModel';
 import { BookService } from '../../../Book/Service/BookService';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-recommendation',
@@ -11,15 +11,18 @@ import { RouterLink } from '@angular/router';
   templateUrl: './recommendation.component.html',
   styleUrls: ['./recommendation.component.css']
 })
+
 export class RecommendationComponent implements OnInit, AfterViewInit {
   books: Book[] = [];
-
-  constructor(private bookService: BookService) { }
+  isDragging: boolean = false;
+  dragStartX: number = 0;
+  dragThreshold: number = 1;
+  significantDragOccurred: boolean = false;
+  constructor(private bookService: BookService, private router: Router) { }
 
   ngOnInit(): void {
     this.bookService.getAllBooks().subscribe({
       next: (books: Book[]) => {
-        // Adjust as necessary to match your API response structure
         this.books = books.slice(0, 10);
       },
       error: (err) => console.error('Error fetching books:', err)
@@ -36,18 +39,16 @@ export class RecommendationComponent implements OnInit, AfterViewInit {
     const images = document.querySelectorAll('#image-track img');
     images.forEach(img => {
       img.addEventListener('mousedown', (e) => {
-        e.preventDefault(); // Prevent default to avoid any unwanted behavior
+        e.preventDefault();
         img.classList.add('image-pressed');
       });
 
-      // Ensure to remove the class on mouse up to revert the effect
       img.addEventListener('mouseup', () => {
         img.classList.remove('image-pressed');
       });
 
-      // Consider touch devices as well
       img.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // Prevent default action
+        e.preventDefault();
         img.classList.add('image-pressed');
       });
 
@@ -62,8 +63,7 @@ export class RecommendationComponent implements OnInit, AfterViewInit {
     if (track) {
       const images = Array.from(track.getElementsByClassName("image") as HTMLCollectionOf<HTMLElement>);
       images.forEach((image, index) => {
-        // Set a custom attribute to store the initial right offset percentage
-        const initialRightOffset = 100 - (index * 10); // Example offset, adjust as needed
+        const initialRightOffset = 100 - (index * 10);
         image.setAttribute('data-initial-right-offset', `${initialRightOffset}%`);
         image.style.objectPosition = `${initialRightOffset}% center`;
       });
@@ -72,32 +72,38 @@ export class RecommendationComponent implements OnInit, AfterViewInit {
 
   private initializeTrackScroll(): void {
     const track = document.getElementById("image-track");
-    
+
     const handleOnDown = (e: MouseEvent | TouchEvent) => {
       const clientX = e instanceof MouseEvent ? e.clientX : e.touches[0].clientX;
+      this.dragStartX = clientX;
+      this.significantDragOccurred = false;
       if (track) track.setAttribute('data-mouse-down-at', String(clientX));
     };
 
     const handleOnUp = () => {
-      if (!track) return; // Early return if track is null
+      if (!track) return;
+      this.dragStartX = 0;
+      this.isDragging = false;
 
-      // Get the current percentage from 'data-percentage' attribute
       const currentPercentage = track.getAttribute('data-percentage') || "0";
 
-      // Update 'data-prev-percentage' with the current percentage
       track.setAttribute('data-prev-percentage', currentPercentage);
 
-      // Reset 'data-mouse-down-at' to "0"
       track.setAttribute('data-mouse-down-at', "0");
+
+      if (Math.abs(this.dragStartX - parseFloat(track.getAttribute('data-mouse-down-at') || "0")) <= this.dragThreshold) {
+        this.isDragging = false;
+      }
+
+      this.dragStartX = 0;
     };
     const handleOnLeave = () => {
-      // Call the same function as when the mouse button is released
       handleOnUp();
     };
 
-
     const handleOnMove = (e: MouseEvent | TouchEvent) => {
       if (!track) return;
+      this.isDragging = true;
 
       const mouseDownAt = parseFloat(track.getAttribute('data-mouse-down-at') || "0");
       if (mouseDownAt === 0) return;
@@ -109,7 +115,7 @@ export class RecommendationComponent implements OnInit, AfterViewInit {
       const prevPercentage = parseFloat(track.getAttribute('data-prev-percentage') || "0");
       let nextPercentage = prevPercentage + percentage;
 
-      // Limit the movement to the right to 60%
+      // Limit the movement to the right 
       nextPercentage = Math.max(nextPercentage, -50);
 
       nextPercentage = Math.min(Math.max(nextPercentage, -100), 0);
@@ -121,15 +127,16 @@ export class RecommendationComponent implements OnInit, AfterViewInit {
       const images = Array.from(track.getElementsByClassName("image") as HTMLCollectionOf<HTMLElement>);
       images.forEach((image) => {
         const initialRightOffset = parseFloat(image.getAttribute('data-initial-right-offset') || "100");
-        // Calculate the adjusted position considering the initial offset and current scroll
         const adjustedPosition = initialRightOffset + nextPercentage;
         image.style.objectPosition = `${adjustedPosition}% center`;
+
+
+        const movementX = Math.abs(clientX - this.dragStartX);
+        if (movementX > this.dragThreshold) {
+          this.significantDragOccurred = true;
+        }
       });
     };
-
-
-
-
 
     if (track) {
       track.addEventListener('mousedown', handleOnDown);
@@ -143,43 +150,39 @@ export class RecommendationComponent implements OnInit, AfterViewInit {
     }
     track?.classList.remove('track-animate');
   }
-  
+
   scrollLeft(): void {
-    this.scrollTrack(10); 
+    this.scrollTrack(10);
   }
 
   scrollRight(): void {
-    this.scrollTrack(-10); 
+    this.scrollTrack(-10);
   }
+
   private scrollTrack(delta: number): void {
-  const track = document.getElementById("image-track");
-  if (track) {
-    let currentPercentage = parseFloat(track.getAttribute('data-percentage') || "0");
-    currentPercentage += delta;
+    const track = document.getElementById("image-track");
+    if (track) {
+      let currentPercentage = parseFloat(track.getAttribute('data-percentage') || "0");
+      currentPercentage += delta;
 
-    // Update bounds to prevent excessive scrolling
-    const maxScroll = this.calculateMaxScroll();
-    currentPercentage = Math.min(Math.max(currentPercentage, maxScroll), 0);
+      const maxScroll = this.calculateMaxScroll();
+      currentPercentage = Math.min(Math.max(currentPercentage, maxScroll), 0);
 
-    // Apply the transition class for animation
-    track.classList.add('track-animate');
-    track.style.transform = `translate(${currentPercentage}%, -50%)`;
-    track.setAttribute('data-percentage', `${currentPercentage}`);
+      track.classList.add('track-animate');
+      track.style.transform = `translate(${currentPercentage}%, -50%)`;
+      track.setAttribute('data-percentage', `${currentPercentage}`);
 
-    // Update image positions based on new track position
-    this.updateImagePositions(currentPercentage);
+      this.updateImagePositions(currentPercentage);
 
-    // Remove the animation class after the transition is complete
-    setTimeout(() => track.classList.remove('track-animate'), 500);
+      setTimeout(() => track.classList.remove('track-animate'), 500);
 
-    // Reset 'data-mouse-down-at' to reflect the new starting point for manual dragging
-    track.removeAttribute('data-mouse-down-at');
+      track.removeAttribute('data-mouse-down-at');
+    }
   }
-}
 
   private calculateMaxScroll(): number {
-    
-    const maxScroll = -((this.books.length - 1) * 10); // Example: adjust based on your layout
+
+    const maxScroll = -((this.books.length - 1) * 10);
     return maxScroll;
   }
 
@@ -194,7 +197,15 @@ export class RecommendationComponent implements OnInit, AfterViewInit {
       });
     }
   }
-  
 
+  handleImageClick(event: MouseEvent, book: Book): void {
+    if (this.significantDragOccurred) {
+      event.preventDefault();
+      event.stopPropagation();
+    } else {
+      this.router.navigate(['/book-details', book.id]);
+    }
+    this.significantDragOccurred = false;
+  }
 
 }

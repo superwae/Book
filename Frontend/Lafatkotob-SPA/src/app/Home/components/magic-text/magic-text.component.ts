@@ -30,11 +30,11 @@ export class MagicTextComponent implements AfterViewInit {
       stars.forEach((star: HTMLElement) => {
         this.setPosition(star);
       });
-    }, 1700); 
+    }, 1300); 
   }
   private setPosition(star: HTMLElement): void {
-  const left = this.rand(0, 100); // Ensures stars stay within the horizontal view
-  const top = this.rand(0, 100); // Adjust vertical range to keep stars within view
+  const left = this.rand(0, 100);
+  const top = this.rand(0, 100); 
 
   this.renderer.setStyle(star, 'left', `${left}%`);
   this.renderer.setStyle(star, 'top', `${top}%`);
