@@ -30,6 +30,10 @@ export const routes: Route[] = [
     path: 'book-details/:id', 
     loadComponent: () => import('./Book/components/book-details/book-details.component').then(m => m.BookDetailsComponent)
   },
+  {
+    path: 'sidebar',
+    loadComponent: () => import('./shared/components/sidebar/sidebar.component').then(m => m.SidebarComponent)
+  },
 
   {
      path: 'book/:id', 
