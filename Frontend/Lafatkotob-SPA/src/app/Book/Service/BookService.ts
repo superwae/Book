@@ -21,6 +21,11 @@ export class BookService  {
     return this.http.get<Book>(`${this.baseUrl}/${id}`);
   }
 
+  getBooksByUserName(username: string): Observable<Book[]> {
+    const params = new HttpParams().set('username', username);
+    return this.http.get<Book[]>(`${this.baseUrl}/GetBooksByUserName`, { params });
+  }
+  
   registerBook(formData: FormData): Observable<any> {
     return this.http.post(`${this.baseUrl}/post`, formData);
   }

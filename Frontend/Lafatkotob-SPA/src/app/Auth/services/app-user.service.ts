@@ -8,6 +8,7 @@ import { registerModel } from '../Models/registerModel';
 import { LoginResponse } from '../Models/Loginresponse';
 import { SetUserHistoryModel } from '../Models/SetUserHistoryModel';
 import { Route, Router } from '@angular/router';
+import { MyTokenPayload } from '../../shared/Models/MyTokenPayload';
 
 @Injectable({
   providedIn: 'root'
@@ -89,11 +90,18 @@ export class AppUsereService {
     const currentTime = Math.floor(Date.now() / 1000); 
     return payload.exp < currentTime;
   }
+
   private getUserFromLocalStorage(): AppUserModel | null {
     const user = localStorage.getItem('currentUser');
     return user ? JSON.parse(user) : null;
   }
-
+    getUserInfoFromToken(): MyTokenPayload | null {
+    const token = localStorage.getItem('token');
+    if (!token || this.isTokenExpired(this.decodeToken(token))) {
+        return null;
+    }
+    return this.decodeToken(token); 
+}
  
 
 }

@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { BooksComponent } from '../../../Book/components/books/books.component';
 import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.component';
+import { Book } from '../../../Book/Models/bookModel';
+
 
 @Component({
   selector: 'app-user-profile',
@@ -9,6 +11,13 @@ import { SidebarComponent } from '../../../shared/components/sidebar/sidebar.com
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
 })
-export class UserProfileComponent {
+export class UserProfileComponent implements OnInit {
+  userBooks: Book[] = [];
+  
+  constructor() {}
 
+  ngOnInit(): void {
+    
 }
+}
+

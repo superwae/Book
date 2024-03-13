@@ -38,10 +38,12 @@ export class SidebarComponent implements OnInit {
     const sidebar2 = document.querySelector('.s-sidebar__trigger');
 
     if (sidebar) {
-      sidebar.setAttribute('style', `margin-top: ${navbarHeight - 70}px;`);
+      setTimeout(() => this.adjustSidebarPosition(), 100);
+      sidebar.setAttribute('style', `margin-top: ${navbarHeight - 65}px;`);
     }
     if (sidebar2) {
-      sidebar2.setAttribute('style', `margin-top: ${navbarHeight - 70}px;`);
+      setTimeout(() => this.adjustSidebarPosition(), 100);
+      sidebar2.setAttribute('style', `margin-top: ${navbarHeight - 65}px;`);
     }
   }
 }

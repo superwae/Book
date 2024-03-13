@@ -1,2 +1,6 @@
-<app-sidebar></app-sidebar>
-<app-books> </app-books>
+<div class="page-container">
+    <div class="sidebar"><app-sidebar></app-sidebar>></div>
+    <div class="main-content">
+        <app-books [books]="userBooks"></app-books>
+    </div>
+</div>

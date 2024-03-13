@@ -32,16 +32,16 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showEventsDropdown: boolean = false;
   private hideDropdownTimeout?: any;
   private subscription: Subscription = new Subscription();
-  private authSubscription: Subscription = new Subscription(); 
-
+  private authSubscription: Subscription = new Subscription();
   isProfilePage: boolean = false;
-  constructor(
-    private router: Router,
-    private modalService: ModaleService,
-    private appUserService: AppUsereService
-  ) 
-  {
 
+
+  constructor
+    (
+      private router: Router,
+      private modalService: ModaleService,
+      private appUserService: AppUsereService
+    ) {
     this.router.events.pipe(
       filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
@@ -51,15 +51,22 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.router.events.pipe(
       filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
-      // Check if the current route is the profile page
-      this.isProfilePage = event.urlAfterRedirects.includes('/user');
+      if (event.urlAfterRedirects.startsWith('/user')) {
+        this.isProfilePage = true
+        this.transformNavbar();
+      } else {
+        this.reverseNavbarTransformation();
+        this.isProfilePage = false;
+
+      }
     });
   }
 
 
-  
+
 
   ngOnInit() {
+
     this.subscription.add(this.modalService.showModal$.subscribe(visible => {
       this.showModal = visible;
     }));
@@ -101,9 +108,13 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    this.isAffix = window.pageYOffset > 50;
+    if (this.isProfilePage) {
+      this.isAffix = true;
+    } else {
+      this.isAffix = window.pageYOffset > 50;
+    }
   }
-  
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const chatDropdownElement = document.querySelector('.chat-dropdown-content');
@@ -164,18 +175,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
   toggleChatDropdown(event: MouseEvent): void {
     event.stopPropagation();
     this.showChatDropdown = !this.showChatDropdown;
-  
+
     if (this.showChatDropdown) {
       this.showNotificationsDropdown = false;
       this.showEventsDropdown = false;
       this.showDropdown = false;
     }
   }
-  
+
   toggleNotificationsDropdown(event: MouseEvent): void {
     event.stopPropagation();
     this.showNotificationsDropdown = !this.showNotificationsDropdown;
-  
+
     // Close other dropdowns
     if (this.showNotificationsDropdown) {
       this.showChatDropdown = false;
@@ -183,11 +194,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.showDropdown = false;
     }
   }
-  
+
   toggleEventsDropdown(event: MouseEvent): void {
     event.stopPropagation();
     this.showEventsDropdown = !this.showEventsDropdown;
-  
+
     // Close other dropdowns
     if (this.showEventsDropdown) {
       this.showChatDropdown = false;
@@ -195,8 +206,20 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.showDropdown = false;
     }
   }
-  
-  
+
+  transformNavbar() {
+
+    const navbarElement = document.querySelector('.nav');
+    if (navbarElement) {
+      navbarElement.classList.add('affix');
+    }
+  }
+  reverseNavbarTransformation() {
+    const navbarElement = document.querySelector('.nav');
+    if (navbarElement) {
+      navbarElement.classList.remove('affix');
+    }
+  }
 
   logout() {
     this.isLoggedIn = false;

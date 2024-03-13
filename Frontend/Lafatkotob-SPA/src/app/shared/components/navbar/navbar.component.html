@@ -1,4 +1,4 @@
-<nav class="nav" [ngClass]="{'small-nav': isProfilePage}" [class.affix]="isAffix && !showModal" [class.hidden]="showModal">
+<nav class="nav" [class.affix]="isAffix && !showModal" [class.hidden]="showModal">
   <div class="container">
     <div class="logo" appTooltip="Home">
       <a (click)="testClick()" routerLink="/home-page">
