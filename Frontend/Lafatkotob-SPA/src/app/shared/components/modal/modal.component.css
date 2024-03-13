@@ -13,7 +13,7 @@
   }
   
   .middle input[type="radio"]:checked + .box {
-    background-color: #44737a;
+    background-color: #9c85f0;
   }
   
   .middle input[type="radio"]:checked + .box span {
@@ -30,7 +30,7 @@
     margin-right: 0 ; 
   }
   .middle .box:hover {
-    background-color: #007e90;
+    background-color: #BEADFA;
     color: white;
   }
   
@@ -62,7 +62,7 @@
     transition: all 300ms ease;
     font-size: 0.8em;
     user-select: none;
-    color: #007e90;
+    color: #000;
   }
   
   .middle .box span:before {
@@ -163,7 +163,7 @@
     
     .post-button {
         padding: 10px 20px;
-        background-color: #00b4d8;
+        background-color: #5F6099;
         color: #fff;
         border: none;
         border-radius: 5px;
@@ -175,7 +175,7 @@
     }
     
     .post-button:hover {
-        background-color: #0096c7;
+        background-color:#BEADFA ;
     }
     
   
@@ -257,14 +257,14 @@
   .upload-image-label {
     display: inline-block;
     padding: 10px 20px;
-    background: rgba(0, 0, 0, 0.7);
+    background: #5F6099;
     color: white;
     cursor: pointer;
     transition: background 0.3s ease;
   }
   
   .upload-image-label:hover {
-    background: rgba(0, 0, 0, 0.9);
+    background: #BEADFA;
   }
   
   .upload-icon {

@@ -34,6 +34,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   private authSubscription: Subscription = new Subscription();
   isProfilePage: boolean = false;
+  prevScrollpos = window.pageYOffset;
 
 
   constructor
@@ -108,11 +109,20 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    if (this.isProfilePage) {
-      this.isAffix = true;
+    const currentScrollPos = window.pageYOffset;
+    if (this.prevScrollpos > currentScrollPos) 
+    {
+      this.isAffix = true; // Show navbar when scrolling up
+      this.showMenu=true;
+
     } else {
-      this.isAffix = window.pageYOffset > 50;
+      this.isAffix = false; 
+      this.showMenu = false;
+
     }
+    
+    this.prevScrollpos = currentScrollPos;
+  
   }
 
   @HostListener('document:click', ['$event'])
