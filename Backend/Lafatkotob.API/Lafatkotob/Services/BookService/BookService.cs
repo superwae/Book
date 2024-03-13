@@ -47,13 +47,13 @@ namespace Lafatkotob.Services.BookService
                             AddedDate = DateTime.Now
 
                         };
-                        
+
 
                         _context.Books.Add(book);
                         await _context.SaveChangesAsync();
                         var BookModel = new BookModel
                         {
-                            Id= book.Id,
+                            Id = book.Id,
                             Title = book.Title,
                             Author = book.Author,
                             Description = book.Description,
@@ -117,6 +117,36 @@ namespace Lafatkotob.Services.BookService
 
         }
 
+        public async Task<List<BookModel>> GetBooksByUserName(string username)
+        {
+            var userid = _context.Users.Where(u => u.UserName == username).Select(u => u.Id).FirstOrDefault();
+            var books = await _context.Books
+                .Where(b => b.UserId == userid)
+                .Select(b => new BookModel
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Author = b.Author,
+                    Description = b.Description,
+                    CoverImage = ConvertToFullUrl(b.CoverImage),
+                    UserId = b.UserId,
+                    HistoryId = b.HistoryId,
+                    PublicationDate = b.PublicationDate,
+                    ISBN = b.ISBN,
+                    PageCount = b.PageCount,
+                    Condition = b.Condition,
+                    Status = b.Status,
+                    Type = b.Type,
+                    PartnerUserId = b.PartnerUserId,
+                    Language = b.Language,
+                    AddedDate = DateTime.Now
+                })
+                .ToListAsync();
+
+            return books;
+        }
+
+
         public async Task<List<BookModel>> GetAll()
         {
 
@@ -178,7 +208,7 @@ namespace Lafatkotob.Services.BookService
         }
 
 
-        
+
 
         private string FormatCoverImageUrl(string baseUrl, string coverImagePath)
         {
@@ -238,7 +268,7 @@ namespace Lafatkotob.Services.BookService
                         await transaction.CommitAsync();
 
                         response.Success = true;
-                        response.Data = model; 
+                        response.Data = model;
                     }
                     catch (Exception ex)
                     {
@@ -335,12 +365,12 @@ namespace Lafatkotob.Services.BookService
             });
             return response;
         }
-        private static  string ConvertToFullUrl(string relativePath)
+        private static string ConvertToFullUrl(string relativePath)
         {
             if (string.IsNullOrEmpty(relativePath))
                 return null;
 
-            var baseUrl = "https://localhost:7139"; 
+            var baseUrl = "https://localhost:7139";
             return $"{baseUrl}{relativePath}";
         }
 
@@ -349,7 +379,7 @@ namespace Lafatkotob.Services.BookService
         {
             var response = new ServiceResponse<List<BookModel>>();
 
-            var books =  await _context.Books
+            var books = await _context.Books
                     .Where(b => b.BookGenres.Any(bg => genreIds.Contains(bg.GenreId)))
                     .Select(b => new BookModel
                     {
@@ -374,7 +404,7 @@ namespace Lafatkotob.Services.BookService
                     .ToListAsync();
             response.Data = books;
             response.Success = true;
-            if(books.Count == 0)
+            if (books.Count == 0)
             {
                 response.Message = "No books found for the specified genres.";
                 response.Success = false;
@@ -386,7 +416,7 @@ namespace Lafatkotob.Services.BookService
         public async Task<ServiceResponse<List<GenreModel>>> GetGenresByBookId(int bookId)
         {
             var response = new ServiceResponse<List<GenreModel>>();
-            var geners= await _context.BookGenres
+            var geners = await _context.BookGenres
                    .Where(bg => bg.BookId == bookId)
                    .Select(bg => bg.Genre)
                    .Select(g => new GenreModel

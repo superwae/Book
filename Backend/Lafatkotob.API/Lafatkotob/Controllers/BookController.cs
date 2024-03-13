@@ -14,7 +14,7 @@ namespace Lafatkotob.Controllers
     public class BookController : Controller
     {
         private readonly IBookService _bookService;
-     
+
         public BookController(IBookService bookService)
         {
             _bookService = bookService;
@@ -25,7 +25,7 @@ namespace Lafatkotob.Controllers
         public async Task<IActionResult> GetAllBooks()
         {
             var books = await _bookService.GetAll();
-            if(books == null) return BadRequest();
+            if (books == null) return BadRequest();
             return Ok(books);
         }
 
@@ -36,6 +36,14 @@ namespace Lafatkotob.Controllers
             var book = await _bookService.GetById(bookId);
             if (book == null) return NotFound();
             return Ok(book);
+        }
+
+        [HttpGet("GetBooksByUserName")]
+        public async Task<IActionResult> GetBooksByUserId([FromQuery] string username)
+        {
+            var books = await _bookService.GetBooksByUserName(username);
+            if (books == null || !books.Any()) return NotFound("No books found for the given user.");
+            return Ok(books);
         }
 
 
@@ -66,16 +74,16 @@ namespace Lafatkotob.Controllers
 
         public async Task<IActionResult> DeleteBook(int bookId)
         {
-           
+
             var book = await _bookService.Delete(bookId);
-                if (book == null) return BadRequest();
+            if (book == null) return BadRequest();
             return Ok(book);
         }
 
         [HttpPut("update/{bookId}"), DisableRequestSizeLimit]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [Consumes("multipart/form-data")] 
-        public async Task<IActionResult> UpdateBook(int bookId, [FromForm] UpdateBookModel model,  IFormFile imageFile)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateBook(int bookId, [FromForm] UpdateBookModel model, IFormFile imageFile)
         {
             if (!ModelState.IsValid)
             {
@@ -102,7 +110,7 @@ namespace Lafatkotob.Controllers
             {
                 return BadRequest("No genre IDs provided.");
             }
-                
+
             var books = await _bookService.GetBooksFilteredByGenres(genreIds);
             if (books == null) return BadRequest(books.Message);
 
@@ -141,7 +149,7 @@ namespace Lafatkotob.Controllers
 
             return Ok(books.Data);
         }
-        
+
 
 
 
