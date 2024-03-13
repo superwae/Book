@@ -32,19 +32,32 @@ export class NavbarComponent implements OnInit, OnDestroy {
   showEventsDropdown: boolean = false;
   private hideDropdownTimeout?: any;
   private subscription: Subscription = new Subscription();
-  private authSubscription: Subscription = new Subscription(); // Add this line
+  private authSubscription: Subscription = new Subscription(); 
 
+  isProfilePage: boolean = false;
   constructor(
     private router: Router,
     private modalService: ModaleService,
     private appUserService: AppUsereService
-  ) {
+  ) 
+  {
+
     this.router.events.pipe(
       filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       this.showMenu = event.urlAfterRedirects !== '/login';
     });
+
+    this.router.events.pipe(
+      filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      // Check if the current route is the profile page
+      this.isProfilePage = event.urlAfterRedirects.includes('/user');
+    });
   }
+
+
+  
 
   ngOnInit() {
     this.subscription.add(this.modalService.showModal$.subscribe(visible => {

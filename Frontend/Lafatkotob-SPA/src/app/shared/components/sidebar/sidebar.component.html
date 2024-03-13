@@ -1,18 +1,40 @@
-<!-- Sidebar -->
 <div class="s-layout__sidebar">
-    <a class="s-sidebar__trigger" href="#0">
-       <i class="fa fa-bars"></i>
-    </a>
-  
-    <nav class="s-sidebar__nav">
-       <ul>
-          <li>
-             <a class="s-sidebar__nav-link" href="#0">
-                <i class="fa fa-home"></i><em>Home</em>
-             </a>
-          </li>
-          <!-- Additional links -->
-       </ul>
-    </nav>
-  </div>
-  
+   <a class="s-sidebar__trigger" href="#0">
+      <i class="fa fa-bars"></i>
+   </a>
+ 
+   <nav class="s-sidebar__nav">
+      <ul>
+         <li>
+            <a class="s-sidebar__nav-link" [routerLink]="['/user', username, 'dashboard']">
+               <i class="fa fa-home"></i><em>Dashboard</em>
+            </a>
+         </li>
+         <li>
+            <a class="s-sidebar__nav-link"[routerLink]="['/user', username, 'Events']">
+               <i class="fa fa-calendar"></i><em>Events</em>
+            </a>
+         </li>
+         <li>
+            <a class="s-sidebar__nav-link"[routerLink]="['/user', username, 'Wishlist']">
+               <i class="fa fa-heart"></i><em>My Wishlist</em>
+            </a>
+         </li>
+         <li>
+            <a class="s-sidebar__nav-link" [routerLink]="['/user', username, 'Notifications']">
+               <i class="fa fa-bell"></i><em>Notifications</em>
+            </a>
+         </li>
+         <li>
+            <a class="s-sidebar__nav-link" [routerLink]="['/user', username, 'Messages']">
+               <i class="fa fa-envelope"></i><em>Messages</em>
+            </a>
+         </li>
+         <li>
+            <a class="s-sidebar__nav-link" [routerLink]="['/user', username, 'Settings']">
+               <i class="fa fa-cog"></i><em>Settings</em>
+            </a>
+         </li>
+      </ul>
+   </nav>
+</div>
