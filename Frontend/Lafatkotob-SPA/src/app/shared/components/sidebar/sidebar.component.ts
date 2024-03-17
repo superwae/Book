@@ -1,20 +1,35 @@
 import { Component, HostListener, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ModaleService } from '../../Service/ModalService/modal.service';
+import { Subscription } from 'rxjs';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink,CommonModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
 export class SidebarComponent implements OnInit {
-
+show: boolean = true;
   username: string = "";
-
-  constructor(private route: ActivatedRoute) { }
+  private subscription: Subscription = new Subscription();
+  constructor(
+    private route: ActivatedRoute,
+    private modalService:ModaleService
+    ) { }
 
   ngOnInit(): void {
+
+    this.subscription.add(this.modalService.showModal$.subscribe(visible => {
+      if (!visible) {
+        this.show = true;
+      } else {
+        this.show = false;
+      }
+    }));
+
     this.adjustSidebarPosition();
     
     if (this.route.parent) {

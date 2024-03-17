@@ -83,15 +83,18 @@ Register(): void {
   if (this.registerForm.valid) {
     const formData = new FormData();
 
-    formData.append('Name', this.registerForm.value.Name);
+    formData.append('Name', this.registerForm.value.UserName);
     formData.append('UserName', this.registerForm.value.UserName);
     formData.append('Email', this.registerForm.value.Email);
     formData.append('Password', this.registerForm.value.Password);
     formData.append('ConfirmNewPassword', this.registerForm.value.ConfirmNewPassword);
     formData.append('DTHDate', this.registerForm.value.DTHDate);
     formData.append('City', this.registerForm.value.City);
-    formData.append('ProfilePictureUrl', this.registerForm.value.ProfilePictureUrl); // Assuming this is the file
+    formData.append('ProfilePictureUrl', this.registerForm.value.ProfilePictureUrl); 
     formData.append('About', this.registerForm.value.About);
+
+    formData.append('ConfirmNewEmail', this.registerForm.value.Email);
+
 
     if (this.selectedFile) {
       formData.append('imageFile', this.selectedFile, this.selectedFile.name);

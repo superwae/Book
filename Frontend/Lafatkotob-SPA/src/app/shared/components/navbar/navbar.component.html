@@ -1,5 +1,5 @@
-<nav class="nav" [class.affix]="isAffix && !showModal" [class.hidden]="showModal">
-  <div class="container">
+<nav class="nav" [class.affix]="isAffix && !showModal" [class.hidden]="!show" *ngIf="showMenu">
+    <div class="container">
     <div class="logo" appTooltip="Home">
       <a (click)="testClick()" routerLink="/home-page">
         <img src="assets/images/4.svg" alt="Your Logo" class="navbar-logo">

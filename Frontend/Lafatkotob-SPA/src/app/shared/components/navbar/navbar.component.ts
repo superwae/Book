@@ -34,8 +34,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private subscription: Subscription = new Subscription();
   private authSubscription: Subscription = new Subscription();
   isProfilePage: boolean = false;
-
-
+  private lastScrollPos = 0;
+  show: boolean=true;
   constructor
     (
       private router: Router,
@@ -69,6 +69,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
     this.subscription.add(this.modalService.showModal$.subscribe(visible => {
       this.showModal = visible;
+      if (!visible) {
+        this.show = true;
+      } else {
+        this.show = false;
+        this.showModal = visible;
+      }
     }));
 
     // Correctly subscribe to authentication state changes
@@ -108,11 +114,21 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    if (this.isProfilePage) {
-      this.isAffix = true;
-    } else {
-      this.isAffix = window.pageYOffset > 50;
+    const currentScrollPos = window.pageYOffset;
+    if (!this.isProfilePage) {
+      if (this.lastScrollPos < currentScrollPos && currentScrollPos > 50) {
+        // Scrolling down
+        this.isAffix = false; // Hide navbar
+        this.show = false;
+      } else {
+        // Scrolling up
+        this.isAffix = true; // Show navbar
+        this.show = true;
+
+      }
     }
+
+    this.lastScrollPos = currentScrollPos;
   }
 
   @HostListener('document:click', ['$event'])

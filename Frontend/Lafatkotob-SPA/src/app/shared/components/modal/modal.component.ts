@@ -88,39 +88,36 @@ export class ModalComponent implements OnInit {
       const file = files[0];
       this.selectedImage = file;
 
-      // Optionally, read and convert the file to a base64 string if your API requires so
       const reader = new FileReader();
       reader.onload = (e: ProgressEvent<FileReader>) => {
         this.selectedImageUrl = e.target?.result as string;
-        // If your API expects a base64 string, assign it to the form control
-        // this.bookForm.get('coverImage').setValue(this.selectedImageUrl);
+
       };
       reader.readAsDataURL(file);
     }
   }
 
   async register() {
+    console.log('out');
     if (this.bookForm.valid && this.selectedImage) {
-      // Check if historyId is null
+      console.log('in');
       if (this.bookForm.value.HistoryId == null) {
         // Call HistoryService to create a new history
+        console.log('in');
         console.log(this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM]);
   
         this.historyService.postHistory(this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM]!).subscribe({
           next: (history) => {
-            // Update the user with the new historyId
             const userId = this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM];
             if (userId && history.historyId ) {
               const data: SetUserHistoryModel = {
                 UserId: userId,
                 HistoryId: history.historyId
-            }; // Ensure userId is found and history.HistoryId is available
+            }; 
               this.userService.updateUserHistoryId(data).subscribe({
                 next: () => {
-                  // Update the form with the new historyId
                   this.bookForm.patchValue({ historyId: history.historyId });
                   console.log('User updated with new history ID', history.historyId);
-                  // Proceed with the registration process
                     this.proceedWithRegistration();
                 },
                 error: (error) => {

@@ -1,7 +1,13 @@
-<div class="book-grid-wrapper">
+<div class="book-grid-wrapper" *ngIf="books && books.length > 0; else noBooksTemplate">
   <div class="book-grid">
     <ng-container *ngFor="let book of books">
-      <app-book *ngIf="book" class="book-card-container custom-book-height" [book]="book"></app-book>
+      <app-book class="book-card-container custom-book-height" [book]="book"></app-book>
     </ng-container>
   </div>
 </div>
+
+<ng-template #noBooksTemplate>
+  <div class="no-books-found">
+    No books found.
+  </div>
+</ng-template>

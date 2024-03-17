@@ -20,12 +20,14 @@
     display: flex;
     width: 100%;
     min-height: 100vh;
+    
  }
  
  .s-layout__content {
     display: flex;
     justify-content: center;
     align-items: center;
+    
     flex: 1;
  }
  
@@ -38,6 +40,8 @@
     width: 100%;
     height: 4em;
     background: #192b3c;
+    transition: transform 0.5s ease-in-out;
+
  }
  
  .s-sidebar__trigger > i {
@@ -156,5 +160,7 @@
        top: 1.3em;
     }
  }
- 
+ .hidden {
+   transform: translateX(-100%);
+}
  

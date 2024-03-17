@@ -23,3 +23,14 @@ app-book {
   min-height: 30vh;
   height: 35vh;
 }
+
+.no-books-found {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40vh; 
+  font-size: 24px; 
+  color: #6c757d; 
+  font-weight: bold;
+  text-align: center;
+}
