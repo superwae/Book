@@ -30,7 +30,7 @@ namespace Lafatkotob.Controllers
             return Ok(userEvent);
         }
         [HttpPost("post")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles = "Premium")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme,Roles = "Premium,Admin")]
         public async Task<IActionResult> PostUserEvent(UserEventModel model)
         {
             if (!ModelState.IsValid)
@@ -41,7 +41,7 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium,Admin")]
         public async Task<IActionResult> DeleteUserEvent(int userEventId)
         {
             var userEvent = await _userEventService.Delete(userEventId);
@@ -49,7 +49,7 @@ namespace Lafatkotob.Controllers
             return Ok(userEvent);
         }
         [HttpPut("update")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium,Admin")]
         public async Task<IActionResult> UpdateUserEvent(UserEventModel model)
         {
             if (!ModelState.IsValid)

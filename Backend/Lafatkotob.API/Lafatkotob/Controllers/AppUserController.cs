@@ -169,6 +169,7 @@ namespace Lafatkotob.Controllers
             var userIdClaim = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return Ok(new { UserName = userName, UserId = userIdClaim });
         }
+
         [HttpPost]
         [Route("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordModel model)
@@ -190,6 +191,7 @@ namespace Lafatkotob.Controllers
             }
             return Ok(new { Message = "Please check your email to reset your password." });
         }
+
         [HttpPut]
         [Route("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel model)

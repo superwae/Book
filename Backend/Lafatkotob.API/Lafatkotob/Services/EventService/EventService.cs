@@ -36,7 +36,8 @@ namespace Lafatkotob.Services.EventService
                             Description = model.Description,
                             DateScheduled = model.DateScheduled,
                             Location = model.Location,
-                            HostUserId = model.HostUserId
+                            HostUserId = model.HostUserId,
+                            attendances = 0
                         };
                        
                         _context.Events.Add(Event);
@@ -72,8 +73,29 @@ namespace Lafatkotob.Services.EventService
                 Description = eventEntity.Description,
                 DateScheduled = eventEntity.DateScheduled,
                 Location = eventEntity.Location,
-                HostUserId = eventEntity.HostUserId
+                HostUserId = eventEntity.HostUserId,
+                attendances = eventEntity.attendances
             };
+        }
+
+        public async Task<List<EventModel>> GetEventsByUserId(string userId)
+        {
+            var eventModels = await _context.UserEvents
+                .Where(ue => ue.UserId == userId)
+                .Select(ue => new EventModel
+                {
+                    Id = ue.Event.Id,
+                    EventName = ue.Event.EventName,
+                    Description = ue.Event.Description,
+                    DateScheduled = ue.Event.DateScheduled,
+                    Location = ue.Event.Location,
+                    HostUserId = ue.Event.HostUserId,
+                    attendances = ue.Event.attendances
+
+                })
+                .ToListAsync();
+
+            return eventModels;
         }
 
         public async Task<List<EventModel>> GetAll()
@@ -86,7 +108,9 @@ namespace Lafatkotob.Services.EventService
                     Description = e.Description,
                     DateScheduled = e.DateScheduled,
                     Location = e.Location,
-                    HostUserId = e.HostUserId
+                    HostUserId = e.HostUserId,
+                    attendances = e.attendances
+
                 })
                 .ToListAsync();
         }
@@ -122,6 +146,7 @@ namespace Lafatkotob.Services.EventService
                         Event.DateScheduled = model.DateScheduled;
                         Event.EventName = model.EventName;
                         Event.HostUserId = model.HostUserId;
+                        Event.attendances = model.attendances;
 
 
                         _context.Events.Update(Event);
@@ -175,7 +200,8 @@ namespace Lafatkotob.Services.EventService
                             Description = Event.Description,
                             DateScheduled = Event.DateScheduled,
                             Location = Event.Location,
-                            HostUserId = Event.HostUserId
+                            HostUserId = Event.HostUserId,
+                            attendances = Event.attendances
                         };
                         
                     }

@@ -1,4 +1,5 @@
-﻿using Lafatkotob.Services.BadgeService;
+﻿using Lafatkotob.Entities;
+using Lafatkotob.Services.BadgeService;
 using Lafatkotob.Services.EventService;
 using Lafatkotob.ViewModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -31,8 +32,23 @@ namespace Lafatkotob.Controllers
             if (Event == null) return BadRequest();
             return Ok(Event);
         }
+
+        [HttpGet("user/{userId}/events")]
+        public async Task<ActionResult<List<EventModel>>> GetUserEvents(string userId)
+        {
+            var events = await _EventService.GetEventsByUserId(userId);
+
+            if (events == null || !events.Any())
+            {
+                return NotFound("No events found for the given user.");
+            }
+
+            return Ok(events);
+        }
+
+
         [HttpPost("post")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium,Admin")]
 
         public async Task<IActionResult> PostEvent(EventModel model)
         {
@@ -44,7 +60,7 @@ namespace Lafatkotob.Controllers
             return Ok();
         }
         [HttpDelete("delete")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium,Admin")]
 
         public async Task<IActionResult> DeleteEvent(int EventId)
         {
@@ -54,7 +70,7 @@ namespace Lafatkotob.Controllers
         }
         [HttpPut("update")]
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium,Admin")]
 
         public async Task<IActionResult> UpdateEvent(EventModel model)
         {

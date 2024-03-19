@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ModaleService } from '../../Service/ModalService/modal.service';
 import { Subscription } from 'rxjs';
@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.css'
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit ,OnDestroy {
 show: boolean = true;
   username: string = "";
   private subscription: Subscription = new Subscription();
@@ -37,6 +37,9 @@ show: boolean = true;
         this.username = params['username'];
       });
     }
+  }
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
   }
 
   @HostListener('window:scroll', ['$event'])

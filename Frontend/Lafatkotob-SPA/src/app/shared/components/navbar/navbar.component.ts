@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, Event as RouterEvent, NavigationEnd, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -15,7 +15,8 @@ import { TooltipDirective } from '../../directives/tooltip.directive';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
   standalone: true,
-  imports: [CommonModule, RouterLink, TooltipDirective]
+  imports: [CommonModule, RouterLink, TooltipDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   isAffix: boolean = false;
@@ -61,9 +62,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
       }
     });
   }
-
-
-
 
   ngOnInit() {
 
@@ -112,7 +110,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
-  @HostListener('window:scroll', [])
+  @HostListener('window:scroll', ['$event'])
   onWindowScroll() {
     const currentScrollPos = window.pageYOffset;
     if (!this.isProfilePage) {

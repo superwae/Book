@@ -14,6 +14,8 @@ namespace Lafatkotob.Entities
         public DateTime DateScheduled { get; set; }
         public string Location { get; set; }
 
+        public int attendances { get; set; }
+
         [ForeignKey(nameof(AppUser))]
         public string HostUserId { get; set; }
 

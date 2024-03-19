@@ -11,5 +11,6 @@ namespace Lafatkotob.ViewModels
         public DateTime DateScheduled { get; set; }
         public string Location { get; set; }
         public string HostUserId { get; set; }
+        public int attendances { get; set; }
     }
 }
