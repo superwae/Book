@@ -29,6 +29,17 @@ namespace Lafatkotob.Controllers
             if (wishlist == null) return BadRequest();
             return Ok(wishlist);
         }
+
+        //HttpGet("{userId}/wishlist")]
+        //
+        [HttpGet("getbyidUser")]
+        public async Task<IActionResult> GetUserWishlist(string userId)
+        {
+            var wishlist = await _wishlistService.GetByUserId(userId);
+            if (wishlist == null) return NotFound();
+            return Ok(wishlist);
+        }
+
         [HttpPost("post")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> PostWishlist(WishlistModel model)

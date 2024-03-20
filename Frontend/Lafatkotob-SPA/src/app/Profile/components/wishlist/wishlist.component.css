@@ -1,39 +1,72 @@
-/* Basic style for wishlist container */
 body {
 	font-family: Arial, sans-serif;
+	display: flex;
+	align-items: center;
+	height: 100vh;
+	margin: 15px;
+	padding: 15px;
+	box-sizing: border-box;
 }
 
-.event-container {
+.book-container {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
+	justify-content: center;
 }
 
-.event-card {
+.book-card {
 	background-color: #f2f2f2;
 	border-radius: 5px;
 	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-	margin-bottom: 20px;
 	padding: 20px;
-	width: 31%;
+	flex-basis: 100%;
+	margin-bottom: 20px;
 }
 
-.event-date {
+.book-title {
 	color: #4a4a4a;
 	font-size: 1.5rem;
 	font-weight: bold;
 	margin-bottom: 10px;
+
 }
 
-.event-location {
+.book-author {
 	color: #4a4a4a;
 	font-size: 1.2rem;
 	font-weight: bold;
 	margin-bottom: 10px;
 }
 
-.event-by {
+.book-status {
 	color: #7a7a7a;
 	font-size: 1rem;
 	margin-bottom: 0;
+}
+.page-container {
+  display: grid;
+  grid-template-rows: auto 1fr; 
+  grid-template-columns: 200px 1fr;
+  height: 100vh;
+}
+
+.navbar {
+  grid-column: 1 / -1; 
+  z-index: 2; 
+}
+
+.sidebar {
+  grid-row: 2 / 3; 
+  z-index: 1;
+  background-color:#E8E8E8 ;
+
+}
+
+.main-content {
+  grid-row: 2 / 3; 
+  overflow-y: auto; 
+  background-color:#E8E8E8 ;
+  margin-top: 15vh;
+  padding: 7vh;
+  grid-column: 2 / 3;
 }

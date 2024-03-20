@@ -34,7 +34,7 @@ namespace Lafatkotob.Services.WishListService
                             UserId = model.UserId,
                             DateAdded = model.DateAdded
                         };
-                       
+
                         _context.Wishlists.Add(Wishlist);
                         await _context.SaveChangesAsync();
 
@@ -53,6 +53,7 @@ namespace Lafatkotob.Services.WishListService
 
             return response;
         }
+
 
         public async Task<ServiceResponse<WishlistModel>> GetById(int id)
         {
@@ -75,6 +76,42 @@ namespace Lafatkotob.Services.WishListService
 
             return response;
         }
+
+        public async Task<ServiceResponse<List<BookInWishlistsModel>>> GetByUserId(string userId)
+        {
+            var books = await _context.Wishlists
+                             .Where(wl => wl.UserId == userId)
+                             .SelectMany(w => w.WishedBooks)
+                             .Select(wb => wb.BooksInWishlists)
+                             .ToListAsync();
+            var response = new ServiceResponse<List<BookInWishlistsModel>>();
+            if (books != null)
+            {
+                response.Success = true;
+                response.Data = books.Select(biw => new BookInWishlistsModel
+                {
+                    Id = biw.Id,
+                    Author = biw.Author,
+                    ISBN = biw.ISBN,
+                    Title = biw.Title,
+                    Language=biw.Language,
+                    AddedDate = biw.AddedDate
+
+
+                }).ToList();
+
+
+            }
+            else
+            {
+                response.Success = false;
+                response.Message = "No books found in wishlist.";
+                response.Data = null;
+            }
+
+            return response;
+        }
+
 
         public async Task<ServiceResponse<List<WishlistModel>>> GetAll()
         {
