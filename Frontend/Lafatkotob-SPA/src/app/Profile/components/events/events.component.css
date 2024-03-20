@@ -1,0 +1,103 @@
+.page-event {
+    padding-top: 20vh;
+    padding-bottom: 20px;
+    font-family: "Varela Round", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .event-block {
+    position: relative;
+  display: flex;
+  overflow: hidden;
+  align-items: flex-start;
+  background-color: #fff;
+  padding: 10px;
+  border: 1px solid #dbdbdb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 250px; 
+  min-width: 30vw;
+  min-height: 30vh;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
+  }
+  
+  .upcoming-event-list {
+    color: #000;
+  }
+  
+  .sec-1,
+  .sec-2,
+  .sec-3 {
+    padding: 15px;
+  }
+  
+  .sec-1 table {
+    width: 100%;
+  }
+  
+  .sec-1 .month {
+    font-size:20px;
+    width: 5vh;
+    margin: 3vh 0;
+    background-color: #3cbfaf;
+    height: 3px;
+  }
+  
+  .sec-1 .date {
+    font-size: 24px;
+    font-weight: bolder;
+    line-height: normal;
+  }
+  
+  .sec-1 .title {
+    font-size: 20px;
+    padding-left: 10px;
+    vertical-align: top;
+    font-size: 30px;
+  }
+  
+  .sec-2 img {
+    width: 100%;
+    border-radius: 10px;
+  }
+  
+  .sec-3 .title {
+    font-size: 20px;
+  }
+  
+  .venue table,
+  .time table {
+    width: 100%;
+  }
+  
+  .venue table td i,
+  .time table td i {
+    padding-right: 5px;
+    justify-content: first baseline;
+  }
+  
+  .group-of-btn {
+    display: flex;
+    justify-content: center;
+  }
+  
+
+
+  
+  @media (max-width: 576px) {
+    .event-block {
+      width: 90%;
+    }
+  }
+  
+  @media (max-width: 360px) {
+    .page-heading {
+      font-size: 20px;
+    }
+  }
+  .bading {
+    padding: 10px;
+    padding-top: 0px;
+  }

@@ -50,7 +50,10 @@ export const routes: Route[] = [
     path: 'home-page',
     loadComponent: () => import('./Home/components/home-page/home-page.component').then(m => m.HomePageComponent)
   },
-
+  {
+    path:'user/:username/events',
+    loadComponent: () => import('./Profile/components/events/events.component').then(m => m.EventsComponent)
+  },
 
   { path: '**', loadComponent: () => import('./Auth/components/login-register/login-register.component').then(m => m.LoginRegisterComponent)},
 
