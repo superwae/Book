@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { BookService } from '../../Service/BookService';
 import { Book } from '../../Models/bookModel';
 import { CommonModule } from '@angular/common';
@@ -6,7 +6,6 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BookComponent } from '../book/book.component';
 import { MyTokenPayload } from '../../../shared/Models/MyTokenPayload';
 import { jwtDecode } from 'jwt-decode';
-import { timeout } from 'rxjs';
 
 @Component({
   selector: 'app-books',

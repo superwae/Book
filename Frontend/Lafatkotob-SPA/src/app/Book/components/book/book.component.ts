@@ -33,7 +33,7 @@ export class BookComponent implements OnInit{
     if (bookId) {
       this.bookService.getBookById(bookId).subscribe({
           next: (data) => {
-              this.book = data; // Make sure this line successfully assigns data to this.book
+              this.book = data; 
               if (userId) {
                   this.BookPostLike = { bookId: +bookId, userId: userId , dateLiked: new Date()};
                   this.bookService.checkBookLike(this.BookPostLike).subscribe(isLiked => {
@@ -46,13 +46,9 @@ export class BookComponent implements OnInit{
           }
       });
   }
-  
-
-    
+      
     
   }
-
-
   onLikeBook(bookId: number, event: MouseEvent): void {
     event.stopPropagation();
     const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
@@ -95,7 +91,6 @@ export class BookComponent implements OnInit{
       });
     }
     
-  
     // Toggle the like status
     this.book.isLikedByCurrentUser = !this.book.isLikedByCurrentUser;
   }

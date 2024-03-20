@@ -46,19 +46,28 @@ namespace Lafatkotob.Controllers
             return Ok(events);
         }
 
-
         [HttpPost("post")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium,Admin")]
-
-        public async Task<IActionResult> PostEvent(EventModel model)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> PostEvent([FromForm] EventModel model, IFormFile imageFile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-            await _EventService.Post(model);
-            return Ok();
+            if (imageFile != null && !imageFile.ContentType.StartsWith("image/"))
+            {
+                return BadRequest("Only image files are allowed.");
+            }
+            var result = await _EventService.Post(model, imageFile);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
         }
+
+
         [HttpDelete("delete")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium,Admin")]
 
@@ -68,18 +77,25 @@ namespace Lafatkotob.Controllers
             if (Event == null) return BadRequest();
             return Ok(Event);
         }
-        [HttpPut("update")]
-
+        [HttpPut("update/{eventId}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium,Admin")]
-
-        public async Task<IActionResult> UpdateEvent(EventModel model)
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> UpdateEvent(int eventId, [FromForm] EventModel model, IFormFile imageFile)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-            await _EventService.Update(model);
-            return Ok();
+            if (imageFile != null && !imageFile.ContentType.StartsWith("image/"))
+            {
+                return BadRequest("Only image files are allowed.");
+            }
+            var result = await _EventService.Update(eventId, model, imageFile);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
         }
 
     }

@@ -18,7 +18,7 @@ namespace Lafatkotob.Services.EventService
             _context = context;
         }
 
-        public async Task<ServiceResponse<EventModel>> Post(EventModel model)
+        public async Task<ServiceResponse<EventModel>> Post(EventModel model, IFormFile imageFile)
         {
             var response = new ServiceResponse<EventModel>();
 
@@ -29,12 +29,17 @@ namespace Lafatkotob.Services.EventService
                 {
                     try
                     {
+                        if (imageFile != null && imageFile.Length > 0)
+                        {
+                            model.ImagePath = await SaveImageAsync(imageFile);
 
+                        }
                         var Event = new Event
                         {
                             EventName = model.EventName,
                             Description = model.Description,
                             DateScheduled = model.DateScheduled,
+                            ImagePath = model.ImagePath,
                             Location = model.Location,
                             HostUserId = model.HostUserId,
                             attendances = 0
@@ -115,7 +120,7 @@ namespace Lafatkotob.Services.EventService
                 .ToListAsync();
         }
 
-        public async Task<ServiceResponse<EventModel>> Update(EventModel model)
+        public async Task<ServiceResponse<EventModel>> Update(int eventId, EventModel model, IFormFile imageFile)
         {
             var response = new ServiceResponse<EventModel>();
 
@@ -133,6 +138,11 @@ namespace Lafatkotob.Services.EventService
                 response.Message = "Event not found.";
                 return response;
             }
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var imagePath = await SaveImageAsync(imageFile); 
+                Event.ImagePath = imagePath; 
+            }
 
             var executionStrategy = _context.Database.CreateExecutionStrategy();
             await executionStrategy.ExecuteAsync(async () =>
@@ -147,6 +157,7 @@ namespace Lafatkotob.Services.EventService
                         Event.EventName = model.EventName;
                         Event.HostUserId = model.HostUserId;
                         Event.attendances = model.attendances;
+                        Event.ImagePath = model.ImagePath;
 
 
                         _context.Events.Update(Event);
@@ -215,6 +226,33 @@ namespace Lafatkotob.Services.EventService
             });
 
             return response;
+        }
+        private async Task<string> SaveImageAsync(IFormFile imageFile)
+        {
+            if (imageFile == null || imageFile.Length == 0)
+            {
+                throw new ArgumentException("The file is empty or null.", nameof(imageFile));
+            }
+
+            // Ensure the uploads directory exists
+            var uploadsFolderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+            if (!Directory.Exists(uploadsFolderPath))
+            {
+                Directory.CreateDirectory(uploadsFolderPath);
+            }
+
+            // Generate a unique filename for the image to avoid name conflicts
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+            var filePath = Path.Combine(uploadsFolderPath, fileName);
+
+            // Save the file
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+
+            var imageUrl = $"/uploads/{fileName}";
+            return imageUrl;
         }
     }
 }
