@@ -1,0 +1,17 @@
+.event-details-container {
+    /* Styles for your event details */
+    max-width: 750px;
+    margin: auto;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .event-details-image {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .event-info {
+    margin-top: 20px;
+  }
+  

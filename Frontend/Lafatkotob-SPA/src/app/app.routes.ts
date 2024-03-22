@@ -1,44 +1,59 @@
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
+import { UserProfileComponent } from './Profile/components/user-profile/user-profile.component';
+import { EventsComponent } from './Event/components/events/events.component';
+import { BooksComponent } from './Book/components/books/books.component';
 
 export const routes: Route[] = [
 
   { path: '', pathMatch: 'full', redirectTo: 'home-page' },
 
 
- /* { path: 'user/:username', component: UserProfileComponent, children: [
-      { path: 'dashboard', component: DashboardComponent },
-      { path: 'events', component: EventsComponent },
-      { path: 'wishlist', component: WishlistComponent },
-      { path: 'notifications', component: NotificationsComponent },
-      { path: 'messages', component: MessagesComponent },
-      { path: 'settings', component: SettingsComponent }
-    ]
-  },*/
   {
-    path:'user/:username',
-    loadComponent: () => import('./Profile/components/user-profile/user-profile.component').then(m => m.UserProfileComponent),
+    path: 'user/:username',
+    component: UserProfileComponent,
+    children: [
+      { path: '', redirectTo: 'books', pathMatch: 'full' },
+      { path: '', pathMatch: 'full', redirectTo: 'books' },
+      { path: 'books', component: BooksComponent },
+      { path: 'events', component: EventsComponent },
+    ]
   },
 
-  { 
-    path: 'login', 
+
+  {
+    path: 'event/:id',
+    loadComponent: () => import('./Event/components/event/event.component').then(m => m.EventComponent),
+  },
+  {
+    path: 'events',
+    loadComponent: () => import('./Event/components/events/events.component').then(m => m.EventsComponent),
+  },
+  {
+    path: 'event-details/:id',
+    loadComponent: () => import('./Event/components/event-details/event-details.component').then(m => m.EventDetailsComponent),
+  },
+
+
+  {
+    path: 'login',
     loadComponent: () => import('./Auth/components/login-register/login-register.component').then(m => m.LoginRegisterComponent)
   },
 
   {
-    path:'forgot-password',
+    path: 'forgot-password',
     loadComponent: () => import('./Auth/components/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
-      
+
   },
-  
+
 
   {
-    path:'reset-password',
+    path: 'reset-password',
     loadComponent: () => import('./Auth/components/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
   },
-  
+
   {
-    path: 'book-details/:id', 
+    path: 'book-details/:id',
     loadComponent: () => import('./Book/components/book-details/book-details.component').then(m => m.BookDetailsComponent)
   },
   {
@@ -47,18 +62,18 @@ export const routes: Route[] = [
   },
 
   {
-    path: 'home-page',
+    path: 'home',
     loadComponent: () => import('./Home/components/home-page/home-page.component').then(m => m.HomePageComponent)
   },
 
 
-  { path: '**', loadComponent: () => import('./Auth/components/login-register/login-register.component').then(m => m.LoginRegisterComponent)},
+  { path: '**', loadComponent: () => import('./Auth/components/login-register/login-register.component').then(m => m.LoginRegisterComponent) },
 
- 
+
 ];
 @NgModule({
-    imports: [RouterModule.forRoot(routes)],
-    exports: [RouterModule],
-    
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule],
+
 })
 export class AppRoutingModule { }

@@ -52,7 +52,6 @@
  
  .s-sidebar__nav {
     position: fixed;
-    margin-top: 10vh; 
     top: 65px;
     left: -15em;
     overflow: hidden;

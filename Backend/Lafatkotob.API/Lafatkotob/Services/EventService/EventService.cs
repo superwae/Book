@@ -79,6 +79,7 @@ namespace Lafatkotob.Services.EventService
                 DateScheduled = eventEntity.DateScheduled,
                 Location = eventEntity.Location,
                 HostUserId = eventEntity.HostUserId,
+                ImagePath = ConvertToFullUrl(eventEntity.ImagePath),
                 attendances = eventEntity.attendances
             };
         }
@@ -95,6 +96,7 @@ namespace Lafatkotob.Services.EventService
                     DateScheduled = ue.Event.DateScheduled,
                     Location = ue.Event.Location,
                     HostUserId = ue.Event.HostUserId,
+                    ImagePath = ConvertToFullUrl(ue.Event.ImagePath),
                     attendances = ue.Event.attendances
 
                 })
@@ -114,6 +116,7 @@ namespace Lafatkotob.Services.EventService
                     DateScheduled = e.DateScheduled,
                     Location = e.Location,
                     HostUserId = e.HostUserId,
+                    ImagePath = ConvertToFullUrl(e.ImagePath),
                     attendances = e.attendances
 
                 })
@@ -254,5 +257,14 @@ namespace Lafatkotob.Services.EventService
             var imageUrl = $"/uploads/{fileName}";
             return imageUrl;
         }
+        private static string ConvertToFullUrl(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath))
+                return null;
+
+            var baseUrl = "https://localhost:7139";
+            return $"{baseUrl}{relativePath}";
+        }
+
     }
 }

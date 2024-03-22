@@ -1,46 +1,29 @@
 <div class="page-event">
-    <div class="container">
-      <div class="upcoming-event-list">
-        <!-- Single Event Block Start -->
-        <div class="event-block">
-          <div class="row">
-            <div class="col-lg-2 sec-1">
-              <table>
-                <tr>
-                  <td>
-                    <div class="month">{{ event.dateScheduled | date: 'MMM' | uppercase }}</div>
-                    <div class="month-date-devider"></div>
-                    <div class="date">{{ event.dateScheduled | date: 'dd' }}</div>
-                  </td>
-                  <td class="title">{{ event.eventName }}</td>
-                </tr>
-              </table>
+  <div class="container">
+    <div class="upcoming-event-list">
+      <div class="event-block" *ngIf="event"  [routerLink]="['/event-details', event.id]">
+        <div class="row">
+          <div class="col-lg-2 sec-1">
+            <div class="month">{{ event.dateScheduled | date: 'MMM' | lowercase }}</div>
+            <div class="month-date-devider"></div>
+            <div class="date">{{ event.dateScheduled | date: 'dd' }}</div>
+            <div class="title">{{ event.eventName }}</div>
+          </div>
+          <div class="col-lg-5 sec-2">
+            <img *ngIf="event.imagePath" [src]="event.imagePath" [alt]="'Cover image of ' + event.eventName" class="event__image">
+          </div>
+          <div class="col-lg-5 sec-3">
+            <div class="bading">
+              <div class="venue">
+                <i class="fa fa-map-marker"></i> {{ event.location }}
+              </div>
             </div>
-            <div class="col-lg-5 sec-3">
-              <div class="bading">
-                <div class="title">{{ event.eventName }}</div>
-              </div>
-              <div class="bading">
-                <div class="venue">
-                  <i class="fa fa-map-marker"> {{ event.location }}</i>                 
-                </div>
-              </div>
-              <div class="time">
-                <table>
-                  <tr>
-                    <td><i class="fa fa-clock-o"></i></td>
-                    <td>
-                      <div>{{ event.dateScheduled| date: 'fullDate' }}</div>
-                      <div class="dim-color"></div>
-                    </td>
-                  </tr>
-                </table>
-              </div>
+            <div class="time">
+              <div><i class="fa fa-clock-o"></i> {{ event.dateScheduled | date: 'fullDate' }}</div>
             </div>
           </div>
         </div>
-        <!-- Single Event Block End -->
       </div>
     </div>
   </div>
-  
+</div>

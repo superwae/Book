@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { EventModel } from '../Models/EventModels'; 
@@ -16,20 +16,23 @@ export class EventService {
   }
 
   getEventById(id: number): Observable<EventModel> {
-    return this.http.get<EventModel>(`${this.baseUrl}/getbyid?id=${id}`);
-  }
+    return this.http.get<EventModel>(`${this.baseUrl}/getbyid?EventId=${id}`);
+  }  
 
-  getEventsByUserId(userId: string): Observable<EventModel[]> {
-    return this.http.get<EventModel[]>(`${this.baseUrl}/user/${userId}/events`);
+  getEventsByUserName(username: string): Observable<EventModel[]> {
+    const params = new HttpParams().set('username', username);
+    return this.http.get<EventModel[]>(`${this.baseUrl}/getbyusername`, { params });
   }
   
-  postEvent(eventData: EventModel): Observable<any> {
+  
+  postEvent(eventData: FormData): Observable<any> {
     return this.http.post(`${this.baseUrl}/post`, eventData);
   }
 
-  updateEvent(eventData: EventModel): Observable<any> {
-    return this.http.put(`${this.baseUrl}/update`, eventData);
+  updateEvent(eventId: number, eventData: FormData): Observable<any> {
+    return this.http.put(`${this.baseUrl}/update/${eventId}`, eventData);
   }
+  
 
   deleteEvent(eventId: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/delete?eventId=${eventId}`);

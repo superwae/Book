@@ -1,4 +1,4 @@
-export interface Event {
+export interface EventModel {
     id: number;
     eventName: string;
     description: string;
@@ -6,5 +6,6 @@ export interface Event {
     location: string;
     hostUserId: string;
     attendances: number;
+    imagePath: string;
   }
   

@@ -14,7 +14,7 @@ import { EventModel } from '../../Models/EventModels';
   styleUrls: ['./event.component.css']
 })
 export class EventComponent implements OnInit {
-  @Input() event!: EventModel;
+  @Input() event: EventModel|null = null;
  
   constructor(
     private route: ActivatedRoute,

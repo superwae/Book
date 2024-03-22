@@ -15,7 +15,8 @@ namespace Lafatkotob.Controllers
         public ConversationController(IConversationService conversationService)
         {
                 _conversationService = conversationService;
-              }
+        }
+
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllConversations()
         {
@@ -23,6 +24,7 @@ namespace Lafatkotob.Controllers
             if(conversations == null) return BadRequest();
             return Ok(conversations);
         }
+
         [HttpGet("getbyid")]
         public async Task<IActionResult> GetConversationById(int conversationId)
         {
@@ -30,6 +32,7 @@ namespace Lafatkotob.Controllers
             if (conversation == null) return BadRequest();
             return Ok(conversation);
         }
+
         [HttpPost("post")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
@@ -42,6 +45,7 @@ namespace Lafatkotob.Controllers
             await _conversationService.Post(model);
             return Ok();
         }
+
         [HttpDelete("delete")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
@@ -51,9 +55,9 @@ namespace Lafatkotob.Controllers
             if (conversation == null) return BadRequest();
             return Ok(conversation);
         }
+
         [HttpPut("update")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-
         public async Task<IActionResult> UpdateConversation(ConversationModel model)
         {
             if (!ModelState.IsValid)

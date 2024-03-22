@@ -1,1 +1,10 @@
-<p>event-details works!</p>
+<div *ngIf="event" class="event-details-container">
+    <h2>{{ event.eventName }}</h2>
+    <img *ngIf="event.imagePath" [src]="event.imagePath" [alt]="event.eventName" class="event-details-image">
+    <p>{{ event.description }}</p>
+    <div class="event-info">
+      <p><i class="fa fa-map-marker"></i> {{ event.location }}</p>
+      <p><i class="fa fa-clock-o"></i> {{ event.dateScheduled | date: 'fullDate' }}</p>
+    </div>
+  </div>
+  

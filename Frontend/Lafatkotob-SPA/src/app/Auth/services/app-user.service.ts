@@ -27,6 +27,7 @@ export class AppUsereService {
       .pipe(map(response => {
         localStorage.setItem('token', response.token);
         this.isAuthenticatedSubject.next(true);
+        window.location.href = '/home';
         return response;
       }));
   }
@@ -69,7 +70,7 @@ export class AppUsereService {
   logout() {
     localStorage.removeItem('token');
     this.isAuthenticatedSubject.next(false);
-    window.location.href = '/login';
+    window.location.href = '/home';
     }
 
   private decodeToken(token: string): any {

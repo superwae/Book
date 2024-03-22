@@ -109,7 +109,7 @@
 }
 
 .book-card-action-button:hover {
-  color: #c8c8c8; /* Change color on hover */
+  color: #c8c8c8; 
   transform: scale(1.4);
 }
 

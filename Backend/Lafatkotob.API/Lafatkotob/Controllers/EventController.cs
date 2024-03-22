@@ -4,6 +4,7 @@ using Lafatkotob.Services.EventService;
 using Lafatkotob.ViewModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.Design;
 
@@ -14,10 +15,14 @@ namespace Lafatkotob.Controllers
     public class EventController : Controller
     {
         private readonly IEventService _EventService;
-        public EventController(IEventService EventService)
+        private readonly UserManager<AppUser> _userManager;
+
+        public EventController(IEventService EventService, UserManager<AppUser> userManager)
         {
             _EventService = EventService;
+            _userManager = userManager;
         }
+
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllEvent()
         {
@@ -25,6 +30,7 @@ namespace Lafatkotob.Controllers
             if (badges == null) return BadRequest();
             return Ok(badges);
         }
+
         [HttpGet("getbyid")]
         public async Task<IActionResult> GetEventById(int EventId)
         {
@@ -33,10 +39,15 @@ namespace Lafatkotob.Controllers
             return Ok(Event);
         }
 
-        [HttpGet("user/{userId}/events")]
-        public async Task<ActionResult<List<EventModel>>> GetUserEvents(string userId)
+        [HttpGet("getbyusername")]
+        public async Task<ActionResult<List<EventModel>>> GetUserEvents(string username)
         {
-            var events = await _EventService.GetEventsByUserId(userId);
+            var user = await _userManager.FindByNameAsync(username);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+            var events = await _EventService.GetEventsByUserId(user.Id);
 
             if (events == null || !events.Any())
             {
@@ -70,13 +81,13 @@ namespace Lafatkotob.Controllers
 
         [HttpDelete("delete")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium,Admin")]
-
         public async Task<IActionResult> DeleteEvent(int EventId)
         {
             var Event = await _EventService.Delete(EventId);
             if (Event == null) return BadRequest();
             return Ok(Event);
         }
+
         [HttpPut("update/{eventId}")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Premium,Admin")]
         [Consumes("multipart/form-data")]

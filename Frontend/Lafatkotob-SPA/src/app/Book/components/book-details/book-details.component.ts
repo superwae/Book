@@ -3,7 +3,6 @@ import { Book } from '../../Models/bookModel';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { BookService } from '../../Service/BookService';
 import { CommonModule } from '@angular/common';
-import {  AppUsereService } from '../../../Auth/services/app-user.service';
 import { AppUserModel } from '../../../Auth/Models/AppUserModel';
 import { jwtDecode } from 'jwt-decode';
 import { AddBookPostLike } from '../../Models/addBookPostLike';
@@ -25,7 +24,6 @@ export class BookDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private bookService: BookService,
-    private userService: AppUsereService
     )
     {
     

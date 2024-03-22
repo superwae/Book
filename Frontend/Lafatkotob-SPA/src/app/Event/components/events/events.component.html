@@ -1,1 +1,13 @@
-<p>events works!</p>
+<div class="page-events">
+    <div class="container">
+      <div class="upcoming-event-list">
+        <ng-container *ngIf="events && events.length > 0; else noEventsTemplate">
+          <app-event *ngFor="let event of events" [event]="event"></app-event>
+        </ng-container>
+        <ng-template #noEventsTemplate>
+          <div class="no-events">No upcoming events found.</div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+  

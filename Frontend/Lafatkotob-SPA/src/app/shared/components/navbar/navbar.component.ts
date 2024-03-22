@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Router, Event as RouterEvent, NavigationEnd, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
@@ -39,10 +39,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   show: boolean=true;
   constructor
     (
+      private cdr: ChangeDetectorRef,
       private router: Router,
       private modalService: ModaleService,
       private appUserService: AppUsereService
-    ) {
+    ) 
+    {
     this.router.events.pipe(
       filter((event: RouterEvent): event is NavigationEnd => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
@@ -64,9 +66,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-
     this.subscription.add(this.modalService.showModal$.subscribe(visible => {
-      this.showModal = visible;
       if (!visible) {
         this.show = true;
       } else {
@@ -97,6 +97,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
       next: (userData: AppUserModel) => {
         this.User = userData;
         this.profilePictureUrl = userData.profilePicture;
+        console.log('User profilePictureUrl:', userData.profilePicture);
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error fetching user data:', error);
