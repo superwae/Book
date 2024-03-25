@@ -42,7 +42,7 @@
     font-size:20px;
     width: 5vh;
     margin: 3vh 0;
-    background-color: #3cbfaf;
+    background-color: #9c85f0;
     height: 3px;
   }
 
@@ -64,8 +64,8 @@
     border-radius: 10px;
   }
   .event__image {
-    width: 45%; 
-    height: 95%; 
+    width: 150px; 
+    height: 150px; 
     max-width: 600px;
     max-height: 600px;
     object-fit: cover;

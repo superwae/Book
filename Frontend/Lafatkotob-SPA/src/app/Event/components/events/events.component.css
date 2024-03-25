@@ -1,16 +1,19 @@
 .container {
   width: 100%;
-  max-width: 1200px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 0 15px;
 }
 .upcoming-event-list {
   color: #000;
   display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 5vh;
-
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 1vh;
+  justify-content: space-between; /* يوزع العناصر بالتساوي على السطر */
+}
+.app-event {
+  width: calc(70% - 9.5px); /* عرض كل عنصر يشغل 50% من عرض السطر مع مسافة بين العناصر */
 }
 .no-events {
   text-align: center;
