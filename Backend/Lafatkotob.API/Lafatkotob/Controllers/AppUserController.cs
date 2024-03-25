@@ -241,9 +241,10 @@ namespace Lafatkotob.Controllers
             return Ok(result.Data);
         }
 
+
         [HttpPost("RegisterWithPreferences")]
         [Consumes("multipart/form-data")]
-        public async Task<IActionResult> RegisterWithPreferences([FromQuery] string role, [FromForm] RegisterModel model,  IFormFile imageFile,  List<int> genreIds)
+        public async Task<IActionResult> RegisterWithPreferences([FromQuery] string role, [FromForm] RegisterModel model,   [FromForm(Name = "genreIds")] List<int> genreIds ,IFormFile imageFile)
         {
             if (!ModelState.IsValid)
             {

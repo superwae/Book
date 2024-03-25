@@ -151,6 +151,12 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+});
+
+
 
 builder.Services.AddCors(options =>
 {
@@ -175,6 +181,7 @@ app.MapControllerRoute(
 using (var scope = app.Services.CreateScope())
 {
     await Rolesinitialization.SeedRoles(scope.ServiceProvider);
+    await GenresInitialization.SeedGenres(scope.ServiceProvider);
 }
 
 // Configure the HTTP request pipeline.

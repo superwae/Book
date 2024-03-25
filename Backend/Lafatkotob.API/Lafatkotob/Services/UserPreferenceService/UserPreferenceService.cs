@@ -140,7 +140,9 @@ namespace Lafatkotob.Services.UserPreferenceService
             var preferencesToAdd = genreIds.Select(genreId => new UserPreference
             {
                 UserId = userId,
-                GenreId = genreId
+                GenreId = genreId,
+                PreferredAuthor="test"
+                
             }).ToList();
 
             var executionStrategy = _context.Database.CreateExecutionStrategy();

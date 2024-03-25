@@ -1,9 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Genre } from '../../Models/Genre';
 import { UserPreference } from '../../Models/UserPreference';
 import { GenreService } from '../../services/GenreService/genre.service';
 import { AppUsereService } from '../../services/appUserService/app-user.service';
+import { registerModel } from '../../Models/registerModel';
+import { Router } from '@angular/router';
+import { LoginResponse } from '../../Models/Loginresponse';
 
 @Component({
   selector: 'app-user-preference',
@@ -12,12 +15,11 @@ import { AppUsereService } from '../../services/appUserService/app-user.service'
   templateUrl: './user-preference.component.html',
   styleUrl: './user-preference.component.css'
 })
-export class UserPreferenceComponent {
+export class UserPreferenceComponent implements OnInit {
 
-  constructor(
-    private userPreferenceService: GenreService,
-    private appUserService: AppUsereService
-    ) { }
+  userDetails: registerModel | null = null;
+  selectedImage: File | null = null;
+  selectedImageUrl: string | null = null;
 
   genres: Genre[] = [
     { id: 1, name: 'History', selected: false },
@@ -58,9 +60,44 @@ export class UserPreferenceComponent {
     { id: 36, name: 'Poetry', selected: false },
     { id: 37, name: 'Sports', selected: false },
     { id: 38, name: 'Comics', selected: false },
-
-
   ];
+
+  constructor(
+    private userPreferenceService: GenreService,
+    private AppUserService: AppUsereService,
+    private router: Router,
+  ) { }
+
+  ngOnInit(): void {
+    this.userPreferenceService.userDetails$.subscribe(details => {
+      this.userDetails = details;
+    });
+  }
+
+  onFileSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const files = target.files;
+  
+    if (files && files.length) {
+      const file = files[0];
+  
+      if (!file.type.startsWith('image/')) {
+        console.error('The selected file is not an image.');
+        return;
+      }
+      this.selectedImage = file;
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.selectedImageUrl = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+  
+  removeSelectedImage(): void {
+    this.selectedImage = null;
+    this.selectedImageUrl = null;
+  }
 
   toggleGenreSelection(genre: Genre): void {
     genre.selected = !genre.selected;
@@ -71,22 +108,42 @@ export class UserPreferenceComponent {
   }
 
   confirmSelection(): void {
-    const userInfo = this.appUserService.getUserInfoFromToken();
-    if (!userInfo) {
-      console.error('User not logged in or token expired');
+    if (!this.userDetails) {
+      console.error('User details are undefined.');
       return;
     }
+    
+    const genreIds = this.selectedGenres.map(genre => genre.id);
+    const formData = new FormData();
+    Object.entries(this.userDetails).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+ 
+    if (this.selectedImage) {
+      formData.append('imageFile', this.selectedImage, this.selectedImage.name);
+    }
 
-    const preferences = this.selectedGenres.map(genre => ({
-      userId: userInfo.sub, // 'sub' usually contains the user ID, adjust according to your token's payload
-      genreId: genre.id,
-      preferredAuthor: '' // Adjust this as needed
-    }));
 
-    this.userPreferenceService.postUserPreferences(preferences).subscribe({
-      next: () => console.log('Preferences saved successfully'),
-      error: err => console.error('Failed to save preferences', err)
+    this.userPreferenceService.registerWithPreferences(formData, genreIds).subscribe({
+      next: () => {
+        console.log('User registered and preferences saved successfully');
+        this.loginAfterRegistration(this.userDetails!.UserName, this.userDetails!.Password);
+      },
+      error: err => console.error('Failed to register user and save preferences', err)
     });
   }
-}
 
+  private loginAfterRegistration(username: string, password: string): void {
+    const loginData = { UserName: username, Password: password };
+    this.AppUserService.loginUser(loginData).subscribe({
+      next: (response: LoginResponse) => {
+        console.log('User logged in successfully:', response);
+        this.router.navigateByUrl('/home');
+      },
+      error: (error) => {
+        console.error('Failed to log in:', error);
+      }
+    });
+  }
+
+}

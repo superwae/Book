@@ -29,11 +29,8 @@ namespace Lafatkotob.ViewModel
         [Required]
         public string City { get; set; }
         public string About { get; set; }
-        
-     
-
-        
+       
 
 
-    }
+}
 }

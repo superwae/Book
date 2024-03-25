@@ -1,5 +1,18 @@
 <div class="container">
 <div class="user-preferences-container">
+  <div class="user-preference-image-selection">
+    <!-- Image preview with a close button to remove the image -->
+    <div *ngIf="selectedImageUrl" class="image-container">
+      <img [src]="selectedImageUrl" alt="Selected Image" class="image-preview" />
+      <button class="remove-image-button" (click)="removeSelectedImage()">&times;</button>
+    </div>
+  
+    <!-- Upload button only visible if no image is selected -->
+    <label *ngIf="!selectedImageUrl" class="upload-image-label">
+      <input type="file" (change)="onFileSelected($event)" accept="image/*" hidden />
+      <i class="fa fa-upload upload-icon"></i> Upload Image
+    </label>
+  </div>
     <div class="message">
       Please select at least 3 genres.
     </div>

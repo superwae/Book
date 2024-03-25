@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import {  AppUsereService } from '../../services/appUserService/app-user.service';
 import { LoginResponse } from '../../Models/Loginresponse';
+import { GenreService } from '../../services/GenreService/genre.service';
+import { registerModel } from '../../Models/registerModel';
 
 
 @Component({
@@ -20,13 +22,15 @@ export class LoginRegisterComponent implements OnInit {
   loginForm: FormGroup;
   registerForm: FormGroup;
   loginErrorMessage: string | null = null;
+  userDetails: registerModel | null = null;
 
   selectedFile: File | null = null;
 
   constructor(
     private fb: FormBuilder,
     private AppUserService: AppUsereService,
-    private router: Router
+    private router: Router,
+    private userPreferences: GenreService
   ) { 
     this.router.events.subscribe(event => {
       console.log(event);
@@ -45,7 +49,6 @@ export class LoginRegisterComponent implements OnInit {
       ConfirmNewEmail: [''],
       DTHDate: ['', [Validators.required]],
       City: ['', [Validators.required]],
-      ProfilePictureUrl: ['test'],
       About: ['test']
     }, { validators: this.checkPasswords });
   }
@@ -78,30 +81,27 @@ onFileSelected(event: Event): void {
 
 Register(): void {
   if (this.registerForm.valid) {
-    const formData = new FormData();
 
-    formData.append('Name', this.registerForm.value.UserName);
-    formData.append('UserName', this.registerForm.value.UserName);
-    formData.append('Email', this.registerForm.value.Email);
-    formData.append('Password', this.registerForm.value.Password);
-    formData.append('ConfirmNewPassword', this.registerForm.value.ConfirmNewPassword);
-    formData.append('DTHDate', this.registerForm.value.DTHDate);
-    formData.append('City', this.registerForm.value.City);
-    formData.append('ProfilePictureUrl', this.registerForm.value.ProfilePictureUrl); 
-    formData.append('About', this.registerForm.value.About);
-    formData.append('ConfirmNewEmail', this.registerForm.value.Email);
+    const userDetails: registerModel = {
+      Name: this.registerForm.value.UserName, 
+      UserName: this.registerForm.value.UserName,
+      Email: this.registerForm.value.Email,
+      Password: this.registerForm.value.Password,
+      ConfirmNewPassword: this.registerForm.value.ConfirmNewPassword,
+      DthDate: this.registerForm.value.DTHDate, 
+      City: this.registerForm.value.City,
+      About: this.registerForm.value.About,
+      ConfirmNewEmail: this.registerForm.value.Email,
+      ProfilePictureUrl: "test", 
+    };
 
 
-    if (this.selectedFile) {
-      formData.append('imageFile', this.selectedFile, this.selectedFile.name);
-    }
-    const userDetails = formData;
+    // Now pass the userDetails object to the userPreferences service
+    this.userPreferences.setUserDetails(userDetails);
 
-    this.router.navigate(['/user-preferences'], { state: { userDetails } });
-    this.AppUserService.signup(formData, 'User').subscribe({
-      next: (data) => console.log(data),
-      error: (error) => console.log(error)
-    });
+    // Navigate to the userPreferences component
+    this.router.navigate(['/userPreferences']);
+ 
   }
 }
   checkPasswords(group: FormGroup) { 
@@ -109,8 +109,5 @@ Register(): void {
     let confirmPass = group.get('ConfirmNewPassword')?.value;
     return pass === confirmPass ? null : { notSame: true };
   }
-
-  
- 
   
 }
