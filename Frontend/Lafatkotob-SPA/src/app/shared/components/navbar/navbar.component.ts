@@ -4,7 +4,7 @@ import { Router, Event as RouterEvent, NavigationEnd, RouterLink } from '@angula
 import { Subscription } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { ModaleService } from '../../Service/ModalService/modal.service';
-import { AppUsereService } from '../../../Auth/services/app-user.service';
+import { AppUsereService } from '../../../Auth/services/appUserService/app-user.service';
 import { AppUserModel } from '../../../Auth/Models/AppUserModel';
 import { MyTokenPayload } from '../../Models/MyTokenPayload';
 import { jwtDecode } from 'jwt-decode';

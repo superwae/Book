@@ -89,43 +89,95 @@ namespace Lafatkotob.Services.UserPreferenceService
                 .ToListAsync();
         }
 
-        public async Task<ServiceResponse<UserPreferenceModel>> Post(UserPreferenceModel model)
+        public async Task<ServiceResponse<List<UserPreferenceModel>>> PostBatch(List<UserPreferenceModel> models)
         {
-            var response = new ServiceResponse<UserPreferenceModel>();
+            var response = new ServiceResponse<List<UserPreferenceModel>>();
+            var userPreferences = new List<UserPreference>();
 
             var executionStrategy = _context.Database.CreateExecutionStrategy();
             await executionStrategy.ExecuteAsync(async () =>
             {
-                using (var transaction = _context.Database.BeginTransaction())
+                using (var transaction = await _context.Database.BeginTransactionAsync())
                 {
                     try
                     {
-
-                        var UserPreference = new UserPreference
+                        foreach (var model in models)
                         {
-                            UserId = model.UserId,
-                            GenreId = model.GenreId,
-                            PreferredAuthor = model.PreferredAuthor
-                        };
-                        
-                        _context.UserPreferences.Add(UserPreference);
+                            var userPreference = new UserPreference
+                            {
+                                UserId = model.UserId,
+                                GenreId = model.GenreId,
+                                PreferredAuthor = model.PreferredAuthor
+                            };
+
+                            userPreferences.Add(userPreference);
+                        }
+
+                        _context.UserPreferences.AddRange(userPreferences);
                         await _context.SaveChangesAsync();
 
-                        transaction.Commit();
+                        await transaction.CommitAsync();
                         response.Success = true;
-                        response.Data = model;
+                        response.Data = models; 
                     }
                     catch (Exception ex)
                     {
-                        transaction.Rollback();
+                        await transaction.RollbackAsync();
                         response.Success = false;
-                        response.Message = "Failed to create UserPreference.";
+                        response.Message = "Failed to create UserPreferences. " + ex.Message;
                     }
                 }
             });
 
             return response;
         }
+
+
+
+        public async Task<ServiceResponse<List<UserPreferenceModel>>> SaveUserPreferences(string userId, List<int> genreIds)
+        {
+            var response = new ServiceResponse<List<UserPreferenceModel>>();
+            var preferencesToAdd = genreIds.Select(genreId => new UserPreference
+            {
+                UserId = userId,
+                GenreId = genreId
+            }).ToList();
+
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        _context.UserPreferences.AddRange(preferencesToAdd);
+                        await _context.SaveChangesAsync();
+
+                        var preferencesModel = preferencesToAdd.Select(p => new UserPreferenceModel
+                        {
+                            UserId = p.UserId,
+                            GenreId = p.GenreId,
+                            PreferredAuthor = ""
+                        }).ToList();
+
+                        await transaction.CommitAsync();
+                        response.Success = true;
+                        response.Data = preferencesModel;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to create user preferences due to: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
+        }
+
+
+
 
         public async Task<ServiceResponse<UserPreferenceModel>> Update(UserPreferenceModel model)
         {

@@ -5,7 +5,7 @@ import { BooksComponent } from '../../../Book/components/books/books.component';
 import { BookService } from '../../../Book/Service/BookService';
 import { Book } from '../../../Book/Models/bookModel';
 import { MagicTextComponent } from '../magic-text/magic-text.component';
-import { AppUsereService } from '../../../Auth/services/app-user.service';
+import { AppUsereService } from '../../../Auth/services/appUserService/app-user.service';
 import { CommonModule } from '@angular/common';
 import { FilterComponent } from '../../../shared/components/filter/filter.component';
 

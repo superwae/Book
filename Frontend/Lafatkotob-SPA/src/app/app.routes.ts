@@ -34,6 +34,11 @@ export const routes: Route[] = [
     loadComponent: () => import('./Event/components/event-details/event-details.component').then(m => m.EventDetailsComponent),
   },
 
+  {
+    path:'userPreferences',
+    loadComponent: () => import('./Auth/components/user-preference/user-preference.component').then(m => m.UserPreferenceComponent)
+  },
+
 
   {
     path: 'login',

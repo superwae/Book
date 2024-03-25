@@ -16,6 +16,7 @@ namespace Lafatkotob.Controllers
         {
             _userPreferenceService = userPreferenceService;
         }
+
         [HttpGet("getall")]
         public async Task<IActionResult> GetAllUserPreferences()
         {
@@ -23,6 +24,7 @@ namespace Lafatkotob.Controllers
             if(userPreferences == null) return BadRequest();
             return Ok(userPreferences);
         }
+
         [HttpGet("getbyid")]
         public async Task<IActionResult> GetUserPreferenceById(int userPreferenceId)
         {
@@ -30,16 +32,29 @@ namespace Lafatkotob.Controllers
             if (userPreference == null) return BadRequest();
             return Ok(userPreference);
         }
+
         [HttpPost("post")]
-        public async Task<IActionResult> PostUserPreference(UserPreferenceModel model)
+        public async Task<IActionResult> PostUserPreferences([FromBody] List<UserPreferenceModel> models)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
-            await _userPreferenceService.Post(model);
-            return Ok();
+
+            var response = await _userPreferenceService.PostBatch(models);
+            if (response.Success)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(response.Message);
+            }
         }
+
+
+
+
         [HttpDelete("delete")]
         public async Task<IActionResult> DeleteUserPreference(int userPreferenceId)
         {
@@ -47,6 +62,7 @@ namespace Lafatkotob.Controllers
             if (userPreference == null) return BadRequest();
             return Ok(userPreference);
         }
+
         [HttpPut("update")]
         public async Task<IActionResult> UpdateUserPreference(UserPreferenceModel model)
         {

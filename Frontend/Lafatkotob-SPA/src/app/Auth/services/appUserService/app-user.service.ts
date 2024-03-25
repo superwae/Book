@@ -1,14 +1,14 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, map, pipe } from 'rxjs';
-import { login } from '../Models/LoginModel';
-import { ResetPasswordModel } from '../Models/ResetPasswordModel';
-import { AppUserModel } from '../Models/AppUserModel';
-import { registerModel } from '../Models/registerModel';
-import { LoginResponse } from '../Models/Loginresponse';
-import { SetUserHistoryModel } from '../Models/SetUserHistoryModel';
+import { login } from '../../Models/LoginModel';
+import { ResetPasswordModel } from '../../Models/ResetPasswordModel';
+import { AppUserModel } from '../../Models/AppUserModel';
+import { registerModel } from '../../Models/registerModel';
+import { LoginResponse } from '../../Models/Loginresponse';
+import { SetUserHistoryModel } from '../../Models/SetUserHistoryModel';
 import { Route, Router } from '@angular/router';
-import { MyTokenPayload } from '../../shared/Models/MyTokenPayload';
+import { MyTokenPayload } from '../../../shared/Models/MyTokenPayload';
 
 @Injectable({
   providedIn: 'root'

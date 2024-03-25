@@ -1,6 +1,7 @@
 ﻿using Lafatkotob.Entities;
 using Lafatkotob.Services.AppUserService;
 using Lafatkotob.Services.EmailService;
+using Lafatkotob.Services.UserPreferenceService;
 using Lafatkotob.ViewModel;
 using Lafatkotob.ViewModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,12 +22,20 @@ namespace Lafatkotob.Controllers
         private readonly IUserService _userService;
         private readonly UserManager<AppUser> _userManager;
         private readonly IEmailService _emailService;
+        private readonly IUserPreferenceService _userPreferenceService;
 
-        public AppUserController(IUserService userService, IEmailService emailService, UserManager<AppUser>userManager)
+        public AppUserController
+            (
+            IUserService userService,
+            IEmailService emailService,
+            UserManager<AppUser>userManager,
+            IUserPreferenceService userPreferenceService
+            )
         {
             _userService = userService;
             _emailService = emailService;
             _userManager = userManager;
+            _userPreferenceService = userPreferenceService;
         }
 
         [HttpPost("Login")]
@@ -231,6 +240,50 @@ namespace Lafatkotob.Controllers
             }
             return Ok(result.Data);
         }
+
+        [HttpPost("RegisterWithPreferences")]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> RegisterWithPreferences([FromQuery] string role, [FromForm] RegisterModel model,  IFormFile imageFile,  List<int> genreIds)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (imageFile != null && !imageFile.ContentType.StartsWith("image/"))
+            {
+                return BadRequest("Only image files are allowed.");
+            }
+
+            var userResult = await _userService.RegisterUser(model, role, imageFile);
+            if (!userResult.Success)
+            {
+                return BadRequest(userResult.Message);
+            }
+
+            // Step 2: Save User Preferences
+            var preferenceResult = await _userPreferenceService.SaveUserPreferences(userResult.Data.Id, genreIds);
+            if (!preferenceResult.Success)
+            {
+                return BadRequest(preferenceResult.Message);
+            }
+
+            // Step 3: Send Email Confirmation 
+            var token = await _userManager.GenerateEmailConfirmationTokenAsync(userResult.Data);
+            var confirmationLink = Url.Action("ConfirmEmail", "Account",
+                                        new { userId = userResult.Data.Id, token = token },
+                                        protocol: Request.Scheme);
+
+            string subject = "Confirm Your Account";
+            string body = $@"Hello {userResult.Data.UserName},<br><br>
+                    Please confirm your account by clicking the link below:<br>
+                    <a href='{confirmationLink}'>Confirm Your Account</a><br><br>
+                    Thank you.";
+
+            await _emailService.SendEmailAsync(userResult.Data.Email, subject, body);
+
+            return Ok(new { user = userResult.Data, preferences = preferenceResult.Data });
+        }
+
 
 
     }

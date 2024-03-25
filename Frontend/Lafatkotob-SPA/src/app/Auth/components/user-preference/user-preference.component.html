@@ -1,0 +1,15 @@
+<div class="container">
+<div class="user-preferences-container">
+    <div class="message">
+      Please select at least 3 genres.
+    </div>
+    <div class="genres-container">
+      <button type="button" class="genre-button" *ngFor="let genre of genres" [class.selected]="genre.selected" (click)="toggleGenreSelection(genre)">
+        {{ genre.name }}
+      </button>
+    </div>
+    <button type="button" class="confirm-button" [disabled]="selectedGenres.length < 3" (click)="confirmSelection()">
+      Confirm
+    </button>
+  </div>
+</div>

@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Router, RouterLink, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import {  AppUsereService } from '../../services/app-user.service';
+import {  AppUsereService } from '../../services/appUserService/app-user.service';
 import { LoginResponse } from '../../Models/Loginresponse';
 
 
@@ -61,8 +61,6 @@ export class LoginRegisterComponent implements OnInit {
       },
       error: (error) => {
         console.error(error);
-        // Update this part based on how your API response structure for errors
-        // Assuming the API returns a simple string message for login failures
         this.loginErrorMessage = "Invalid username or password.";
       }
     });
@@ -91,14 +89,15 @@ Register(): void {
     formData.append('City', this.registerForm.value.City);
     formData.append('ProfilePictureUrl', this.registerForm.value.ProfilePictureUrl); 
     formData.append('About', this.registerForm.value.About);
-
     formData.append('ConfirmNewEmail', this.registerForm.value.Email);
 
 
     if (this.selectedFile) {
       formData.append('imageFile', this.selectedFile, this.selectedFile.name);
     }
+    const userDetails = formData;
 
+    this.router.navigate(['/user-preferences'], { state: { userDetails } });
     this.AppUserService.signup(formData, 'User').subscribe({
       next: (data) => console.log(data),
       error: (error) => console.log(error)
