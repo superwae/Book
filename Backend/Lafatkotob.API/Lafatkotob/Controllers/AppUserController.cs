@@ -282,7 +282,7 @@ namespace Lafatkotob.Controllers
 
             await _emailService.SendEmailAsync(userResult.Data.Email, subject, body);
 
-            return Ok(new { user = userResult.Data, preferences = preferenceResult.Data });
+            return Ok();
         }
 
 
