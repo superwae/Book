@@ -82,6 +82,9 @@ export class ModalComponent implements OnInit {
   }
 
   async register() {
+    console.log(this.bookForm.value);
+console.log(this.bookForm.valid);
+console.log(this.bookForm.errors);
     if (this.bookForm.valid) {
      
       if (this.bookForm.value.HistoryId == null) {
@@ -149,21 +152,50 @@ export class ModalComponent implements OnInit {
     this.closeEvent.emit();
     this.resetForm();
   }
+  closeEvent2():void {
+    this.close();
+  }
+  onAddAnotherBook(): void {
+    this.showGenreSelection = false;
+    this.show = true;
+    this.resetForm(); 
+   
+  }
+  onClosePopup(): void {
+    this.showGenreSelection = false;
+    this.show = false; 
+  this.modalService.setShowModal(false); 
+  this.closeEvent.emit();
+    
+  }
 
   resetForm() {
+    const userId = this.bookForm.get('UserId')?.value;
+  const historyId = this.bookForm.get('HistoryId')?.value;
+  const PartnerUserId= this.bookForm.get('PartnerUserId')?.value;
     this.bookForm.reset({
       Title: '',
       Author: '',
       Description: '',
       CoverImage: null,
-      PublicationDate: new Date().toISOString(),
+      PublicationDate: '',
       ISBN: '',
-      PageCount: null,
-      Status: 'Available',
+      PageCount: '',
+      Condition: '',
+      Status: 'Available', // Assuming you want a default status
+      Type: '',
+      PartnerUserId: '',
+      Language: '',
+      AddedDate: new Date().toISOString(), // or any other default value
     });
-    
-  }
+    this.bookForm.patchValue({
+      UserId: userId,
+      HistoryId: historyId,
+      PartnerUserId: PartnerUserId
+
+    });
   
+}
 }
 
 

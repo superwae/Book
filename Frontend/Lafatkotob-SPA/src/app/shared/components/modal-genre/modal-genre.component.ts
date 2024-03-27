@@ -22,7 +22,8 @@
     selectedImage: File | null = null;
     selectedImageUrl: string | null = null;
     showModal: boolean = true;
-    @Output() closeEvent = new EventEmitter<void>();
+    @Output() closeEvent2 = new EventEmitter<void>();
+    @Output() addAnotherBookEvent = new EventEmitter<void>();
     @Input() registrationData: any;
 
     allOptions: DropdownOption[] = [
@@ -142,22 +143,29 @@
     toggleModal(): void {
       this.showModal = !this.showModal;
     }
-
-    close() {
-      this.finish2 = false;
-      this.modalService.setShowModal(false);
-      this.closeEvent.emit();
-    }
-
     showConfirmationPopup(): void {
       this.finish = true;
     }
+    close() {
+      this.finish2 = false;
+      this.showModal = false;
+      this.modalService.setShowModal(false);
+      this.closeEvent2.emit();
+    }
+
+   
     addAnotherBook(): void {
+      this.finish2 = false;
+      this.showModal = false;
+      this.modalService.setShowModal(false);
+      this.addAnotherBookEvent.emit();
     }
 
     closePopup(): void {
-    
-    }
+      this.finish2 = false;
+      this.showModal = false;
+      this.modalService.setShowModal(false);
+      this.closeEvent2.emit();    }
 
   }
 

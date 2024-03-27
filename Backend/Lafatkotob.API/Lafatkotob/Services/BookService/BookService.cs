@@ -93,7 +93,7 @@ namespace Lafatkotob.Services.BookService
 
             await executionStrategy.ExecuteAsync(async () =>
             {
-                using (var transaction = await _context.Database.BeginTransactionAsync())
+                using ( var transaction = await _context.Database.BeginTransactionAsync())
                 {
                     try
                     {

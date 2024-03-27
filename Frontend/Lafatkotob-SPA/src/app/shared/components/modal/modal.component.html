@@ -98,7 +98,13 @@
     </div>
 
     <ng-template #genreSelection>
-        <app-modal-genre [registrationData]="registrationData" (closeEvent)="handleGenreModalClose()"></app-modal-genre>
-        
+        <app-modal-genre
+  [registrationData]="registrationData"
+  (closeEvent2)="onClosePopup()"
+  (addAnotherBookEvent)="onAddAnotherBook()"
+></app-modal-genre>
+
+
+
     </ng-template>
 </div>

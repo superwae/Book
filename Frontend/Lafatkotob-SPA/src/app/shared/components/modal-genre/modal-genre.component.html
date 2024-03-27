@@ -1,4 +1,4 @@
-<div *ngIf="finish2">
+
   <div class="modal-overlay" [class.show]="showModal">
     <div *ngIf="!finish; else genreSelection" class="modal">
 
@@ -54,9 +54,8 @@
     <ng-template #genreSelection>
       <div class="confirmation-popup">
         <p>Book added successfully!</p>
-        <button (click)="addAnotherBook()">Add Another Book</button>
+        <button class="addbook"(click)="addAnotherBook()">Add Another Book</button>
         <button (click)="closePopup()">Close</button>
       </div>
     </ng-template>
   </div>
-</div>

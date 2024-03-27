@@ -203,3 +203,47 @@
     font-size: 2.5rem;
     cursor: pointer;
   }
+
+  .confirmation-popup {
+    background-color: #fff;
+    border-radius: 8px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    padding: 20px; 
+    width: 300px; 
+    margin: 100px auto; 
+    text-align: center; 
+  }
+  
+  .confirmation-popup p {
+    margin-bottom: 20px; 
+  }
+  
+  .confirmation-popup button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px; 
+    cursor: pointer; 
+    margin: 0 10px; 
+    transition: background-color 0.3s; 
+  }
+  
+  .confirmation-popup button:hover {
+    opacity: 0.8; 
+  }
+  
+
+  .confirmation-popup button:first-child {
+    background-color: #9c85f0; 
+    color: white; 
+  }
+  .addbook{
+    background-color:#9c85f0 ;
+  }
+  .addbook:hover{
+    background-color: #BEADFA;
+  }
+  
+  .confirmation-popup button:last-child {
+    background-color: #f3f3f3; 
+    color: #333; 
+  }
