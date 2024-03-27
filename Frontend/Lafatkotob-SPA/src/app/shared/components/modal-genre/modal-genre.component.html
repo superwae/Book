@@ -1,21 +1,53 @@
+
+
+
 <div class="content-center">
-    <div class="container">
-      <p class="select-genre-message">Please select book genres</p> <!-- Added paragraph -->
-      <div class="dropdown-add-wrapper">
-        <select [(ngModel)]="currentSelection" (ngModelChange)="onOptionSelected($event)">
-          <option *ngFor="let option of allOptions" [ngValue]="option">{{ option.name }}</option>
-        </select>
-        <button (click)="addLabel()" class="add-btn">Add</button>
+  <div class="container">
+    <!-- First Main Row -->
+    <div class="row top-row">
+      <!-- Left Column -->
+      <div class="left-col">
+        <!-- First Row in Left Column for Text -->
+        <div class="text-section">
+          <p class="select-genre-message">Please select book genres</p>
+        </div>
+        <!-- Second Row in Left Column for Dropdown -->
+        <div class="dropdown-section">
+          <div class="dropdown-add-wrapper">
+            <select [(ngModel)]="currentSelection" (ngModelChange)="onOptionSelected($event)">
+              <option *ngFor="let option of allOptions" [ngValue]="option">{{ option.name }}</option>
+            </select>
+            <button (click)="addLabel()" class="add-btn">Add</button>
+          </div>
+        </div>
+          <div class="labels-wrapper">
+            <div *ngFor="let label of labels; let i = index" class="label">
+              {{ label.name }}
+              <button (click)="removeLabel(i)" class="remove-btn">X</button>
+            </div>
+          </div>
+        
       </div>
-  
-      <div class="labels-wrapper">
-        <div *ngFor="let label of labels; let i = index" class="label">
-          {{ label.name }}
-          <button (click)="removeLabel(i)" class="remove-btn">X</button>
+      <!-- Right Column for Image -->
+      <div class="right-col">
+        <div class="modal-image-holder">
+            <!-- Image preview with a close button to remove the image -->
+        <div *ngIf="selectedImageUrl" class="image-container">
+          <img [src]="selectedImageUrl" alt="Selected Book Image" class="image-preview" />
+          <button class="remove-image-button" (click)="removeSelectedImage()">&times;</button>
+        </div>
+        <!-- Upload button only visible if no image is selected -->
+        <label *ngIf="!selectedImageUrl" class="upload-image-label">
+          <input formControlName="CoverImage" type="file" (change)="onFileSelected($event)" accept="image/*" hidden />
+          <i class="fa fa-upload upload-icon"></i> Upload Image
+        </label>
         </div>
       </div>
-  
+    </div>
+
+    <!-- Second Main Row for Submit Button -->
+    <div class="row bottom-row">
       <button (click)="saveSelections()" class="submit-btn">Submit</button>
     </div>
   </div>
-  
+</div>

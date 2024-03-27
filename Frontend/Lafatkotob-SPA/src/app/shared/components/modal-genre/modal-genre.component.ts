@@ -1,13 +1,13 @@
 import { Component } from '@angular/core';
 import { DropDownSearchComponent } from '../drop-down-search/drop-down-search.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DropdownOption } from '../../Models/DropDownOption';
 
 @Component({
   selector: 'app-modal-genre',
   standalone: true,
-  imports: [DropDownSearchComponent,FormsModule,CommonModule],
+  imports: [DropDownSearchComponent,FormsModule,CommonModule,ReactiveFormsModule],
   templateUrl: './modal-genre.component.html',
   styleUrl: './modal-genre.component.css'
 })
@@ -16,6 +16,8 @@ export class ModalGenreComponent {
   
   currentSelection: DropdownOption | null = null; 
   labels: DropdownOption[] = [];
+  selectedImage: File | null = null;
+  selectedImageUrl: string | null = null;
 
   allOptions: DropdownOption[] = [
     { id: 1, name: 'History' },
@@ -89,6 +91,28 @@ export class ModalGenreComponent {
   onOptionSelected(option: DropdownOption): void {
     this.currentSelection = option;
   }
+
+  onFileSelected(event: Event) {
+    const target = event.target as HTMLInputElement;
+    const files = target.files;
+
+    if (files && files.length) {
+      const file = files[0];
+      this.selectedImage = file;
+
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        this.selectedImageUrl = e.target?.result as string;
+
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+  removeSelectedImage() {
+    this.selectedImage = null;
+    this.selectedImageUrl = null;
+  }
+
 }
 
 
