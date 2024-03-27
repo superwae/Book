@@ -25,6 +25,16 @@ export const routes: Route[] = [
     path: 'event/:id',
     loadComponent: () => import('./Event/components/event/event.component').then(m => m.EventComponent),
   },
+
+
+  {
+    path:'dropdown',
+    loadComponent: () => import('./shared/components/drop-down-search/drop-down-search.component').then(m => m.DropDownSearchComponent)
+  },
+  {
+    path:'modalgenre',
+    loadComponent: () => import('./shared/components/modal-genre/modal-genre.component').then(m => m.ModalGenreComponent)
+  },
   {
     path: 'events',
     loadComponent: () => import('./Event/components/events/events.component').then(m => m.EventsComponent),

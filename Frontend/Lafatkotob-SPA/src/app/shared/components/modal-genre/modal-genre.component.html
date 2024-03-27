@@ -1,0 +1,21 @@
+<div class="content-center">
+    <div class="container">
+      <p class="select-genre-message">Please select book genres</p> <!-- Added paragraph -->
+      <div class="dropdown-add-wrapper">
+        <select [(ngModel)]="currentSelection" (ngModelChange)="onOptionSelected($event)">
+          <option *ngFor="let option of allOptions" [ngValue]="option">{{ option.name }}</option>
+        </select>
+        <button (click)="addLabel()" class="add-btn">Add</button>
+      </div>
+  
+      <div class="labels-wrapper">
+        <div *ngFor="let label of labels; let i = index" class="label">
+          {{ label.name }}
+          <button (click)="removeLabel(i)" class="remove-btn">X</button>
+        </div>
+      </div>
+  
+      <button (click)="saveSelections()" class="submit-btn">Submit</button>
+    </div>
+  </div>
+  
