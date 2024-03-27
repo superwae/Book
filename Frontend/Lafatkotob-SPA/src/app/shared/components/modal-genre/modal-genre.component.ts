@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { DropDownSearchComponent } from '../drop-down-search/drop-down-search.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -18,6 +18,8 @@ export class ModalGenreComponent {
   labels: DropdownOption[] = [];
   selectedImage: File | null = null;
   selectedImageUrl: string | null = null;
+  showModal: boolean = true;
+  @Output() closeEvent = new EventEmitter<void>();
 
   allOptions: DropdownOption[] = [
     { id: 1, name: 'History' },
@@ -111,6 +113,15 @@ export class ModalGenreComponent {
   removeSelectedImage() {
     this.selectedImage = null;
     this.selectedImageUrl = null;
+  }
+
+  toggleModal(): void {
+    this.showModal = !this.showModal;
+  }
+
+  close() {
+    this.showModal = false;
+    this.closeEvent.emit();
   }
 
 }

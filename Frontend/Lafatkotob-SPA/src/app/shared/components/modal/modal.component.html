@@ -2,19 +2,7 @@
     <div class="modal">
         <form [formGroup]="bookForm" (ngSubmit)="register()">
             <div class="modal-top-row">
-                <div class="modal-image-holder">
-                    <!-- Image preview with a close button to remove the image -->
-                    <div *ngIf="selectedImageUrl" class="image-container">
-                        <img [src]="selectedImageUrl" alt="Selected Book Image" class="image-preview" />
-                        <button class="remove-image-button" (click)="removeSelectedImage()">&times;</button>
-                    </div>
-                    <!-- Upload button only visible if no image is selected -->
-                    <label *ngIf="!selectedImageUrl" class="upload-image-label">
-                        <input formControlName="CoverImage" type="file" (change)="onFileSelected($event)"
-                            accept="image/*" hidden />
-                        <i class="fa fa-upload upload-icon"></i> Upload Image
-                    </label>
-                </div>
+               
 
                 <div class="modal-content-right">
                     <div class="modal-header">
@@ -24,7 +12,7 @@
                     <div class="modal-body">
                         <div class="order-type">
                             <div class="label-row">
-                                <pre>                Type                                                                  Condition</pre>
+                                <pre>Type                                                                        Condition</pre>
                             </div>
                             <div class="radio-row">
                                 <div class="middle">

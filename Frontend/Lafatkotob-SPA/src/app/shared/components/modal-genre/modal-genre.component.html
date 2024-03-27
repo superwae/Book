@@ -1,8 +1,13 @@
 
 
-
+<div class="modal-overlay" [class.show]="showModal">
+  
 <div class="content-center">
   <div class="container">
+    <div class="modal-header">
+      <h2>Place order</h2>
+      <button class="close-button" (click)="close()">&times;</button>
+  </div>
     <!-- First Main Row -->
     <div class="row top-row">
       <!-- Left Column -->
@@ -19,11 +24,11 @@
             </select>
             <button (click)="addLabel()" class="add-btn">Add</button>
           </div>
-        </div>
+      </div>
           <div class="labels-wrapper">
             <div *ngFor="let label of labels; let i = index" class="label">
               {{ label.name }}
-              <button (click)="removeLabel(i)" class="remove-btn">X</button>
+              <button (click)="removeLabel(i)" class="remove-btn">x</button>
             </div>
           </div>
         
@@ -50,4 +55,5 @@
       <button (click)="saveSelections()" class="submit-btn">Submit</button>
     </div>
   </div>
+</div>
 </div>

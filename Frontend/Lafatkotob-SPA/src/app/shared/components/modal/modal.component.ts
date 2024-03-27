@@ -21,6 +21,7 @@ export class ModalComponent implements OnInit {
   @Input() title: string = '';
   @Input() show: boolean = false;
   @Output() closeEvent = new EventEmitter<void>();
+  
   selectedImage: File | null = null;
   selectedImageUrl: string | null = null;
   bookForm!: FormGroup;
@@ -98,13 +99,9 @@ export class ModalComponent implements OnInit {
   }
 
   async register() {
-    console.log('out');
     if (this.bookForm.valid && this.selectedImage) {
-      console.log('in');
       if (this.bookForm.value.HistoryId == null) {
         // Call HistoryService to create a new history
-        console.log('in');
-        console.log(this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM]);
   
         this.historyService.postHistory(this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM]!).subscribe({
           next: (history) => {
