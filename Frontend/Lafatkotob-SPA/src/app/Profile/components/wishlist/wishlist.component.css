@@ -38,10 +38,20 @@ body {
 	margin-bottom: 10px;
 }
 
-.book-status {
+.book-ISBN {
 	color: #7a7a7a;
 	font-size: 1rem;
-	margin-bottom: 0;
+	margin-bottom: 10px;
+}
+.book-language {
+	color: #7a7a7a;
+	font-size: 1rem;
+	margin-bottom: 10px;
+}
+.book-addedDate{
+	color: #7a7a7a;
+	font-size: 1rem;
+	margin-bottom: 10px;
 }
 .page-container {
   display: grid;

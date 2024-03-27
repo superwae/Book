@@ -79,35 +79,36 @@ namespace Lafatkotob.Services.WishListService
 
         public async Task<ServiceResponse<List<BookInWishlistsModel>>> GetByUserId(string userId)
         {
-            var books = await _context.Wishlists
-                             .Where(wl => wl.UserId == userId)
-                             .SelectMany(w => w.WishedBooks)
-                             .Select(wb => wb.BooksInWishlists)
-                             .ToListAsync();
-            var response = new ServiceResponse<List<BookInWishlistsModel>>();
-            if (books != null)
+            var wishlist = await _context.Wishlists.FirstOrDefaultAsync(wl => wl.UserId == userId);
+
+            var books = await _context.WishedBooks
+                             .Where(wl => wl.WishlistId == wishlist.Id)
+                              .Select(wb => new BookInWishlistsModel
+                              {
+                                  Id = wb.BooksInWishlists.Id,
+                                  Title = wb.BooksInWishlists.Title,
+                                  Author = wb.BooksInWishlists.Author,
+                                  ISBN = wb.BooksInWishlists.ISBN,
+                                  Language = wb.BooksInWishlists.Language,
+                                  AddedDate = wb.BooksInWishlists.AddedDate
+
+
+
+                              }).ToListAsync();
+           
+            var response = new ServiceResponse<List<BookInWishlistsModel>>
             {
-                response.Success = true;
-                response.Data = books.Select(biw => new BookInWishlistsModel
-                {
-                    Id = biw.Id,
-                    Author = biw.Author,
-                    ISBN = biw.ISBN,
-                    Title = biw.Title,
-                    Language=biw.Language,
-                    AddedDate = biw.AddedDate
-
-
-                }).ToList();
-
-
-            }
-            else
+                Data = books
+            };
+            if (response.Data.Count == 0)
             {
+                response.Message = "No books found in wishlist";
                 response.Success = false;
-                response.Message = "No books found in wishlist.";
-                response.Data = null;
+                return response;
+
             }
+            response.Success = true;
+            
 
             return response;
         }

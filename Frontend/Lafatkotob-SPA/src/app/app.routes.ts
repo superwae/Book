@@ -1,6 +1,7 @@
 import { WhisllistComponent } from './Profile/components/wishlist/wishlist.component';
 import { NgModule } from '@angular/core';
 import { Route, RouterModule } from '@angular/router';
+import { UserProfileComponent } from './Profile/components/user-profile/user-profile.component';
 
 export const routes: Route[] = [
 
@@ -18,7 +19,8 @@ export const routes: Route[] = [
   },*/
   {
     path:'user/:username',
-    loadComponent: () => import('./Profile/components/user-profile/user-profile.component').then(m => m.UserProfileComponent),
+   component:UserProfileComponent,
+   children:[{path:'wishlist',component:WhisllistComponent}]
   },
   {
   path: 'user/:username/wishlist',

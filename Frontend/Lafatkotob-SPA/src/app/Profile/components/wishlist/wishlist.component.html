@@ -1,23 +1,21 @@
-
 <div class="page-container">
-   <div class="sidebar"></div>
+   
     <div class="main-content">
-        <div class="book-container">
-            <div class="book-card">
-                <div class="book-title">Re:Zero - Starting Life in Another World</div>
-                <div class="book-author">ahmad</div>
-                <div class="book-status">In Stock</div>
-            </div>
-            <div class="book-card">
-                <div class="book-title">Galaxy in Flames</div>
-                <div class="book-author">hamde</div>
-                <div class="book-status">In Stock</div>
-            </div>
-            <div class="book-card">
-                <div class="book-title">The Art of Indifference</div>
-                <div class="book-author">mahmod</div>
-                <div class="book-status">In Stock</div>
+        
+        <div *ngFor="let book of Books" >
+            
+            <div class="book-container" >
+            
+                <div class="book-card">
+                    <div class="book-title">{{book.title}}</div> 
+                    <div class="book-author">{{book.author}}</div>
+                    <div class="book-isbn">{{book.isbn}}</div>
+                    <div class="book-language">{{book.language}}</div>
+                    <div class="book-addedDate">{{book.addedDate}}</div>
+                </div>
+               
             </div>
         </div>
+        
     </div>
 </div>

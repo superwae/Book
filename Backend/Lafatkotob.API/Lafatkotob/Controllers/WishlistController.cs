@@ -37,7 +37,7 @@ namespace Lafatkotob.Controllers
         {
             var wishlist = await _wishlistService.GetByUserId(userId);
             if (wishlist == null) return NotFound();
-            return Ok(wishlist);
+            return Ok(wishlist.Data);
         }
 
         [HttpPost("post")]
