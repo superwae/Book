@@ -9,11 +9,12 @@ import { AppUsereService } from '../../../Auth/services/appUserService/app-user.
 import { AppUserModel } from '../../../Auth/Models/AppUserModel';
 import { HistoryService } from '../../Service/HistoryService/history.service';
 import { SetUserHistoryModel } from '../../../Auth/Models/SetUserHistoryModel';
+import { ModalGenreComponent } from '../modal-genre/modal-genre.component';
 
 @Component({
   selector: 'app-modal',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,ModalGenreComponent],
   templateUrl: './modal.component.html',
   styleUrls: ['./modal.component.css']
 })
@@ -21,16 +22,15 @@ export class ModalComponent implements OnInit {
   @Input() title: string = '';
   @Input() show: boolean = false;
   @Output() closeEvent = new EventEmitter<void>();
-  
-  selectedImage: File | null = null;
-  selectedImageUrl: string | null = null;
   bookForm!: FormGroup;
+  showGenreSelection: boolean = false;
+  registrationData: any;
+  showModalGenre: boolean = false;
   private readonly NAME_IDENTIFIER_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier';
 
   constructor(
     private modalService: ModaleService,
      private fb: FormBuilder, 
-     private bookService: BookService,
      private userService:AppUsereService,
      private historyService: HistoryService
      
@@ -81,27 +81,10 @@ export class ModalComponent implements OnInit {
     return undefined;
   }
 
-  onFileSelected(event: Event) {
-    const target = event.target as HTMLInputElement;
-    const files = target.files;
-
-    if (files && files.length) {
-      const file = files[0];
-      this.selectedImage = file;
-
-      const reader = new FileReader();
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        this.selectedImageUrl = e.target?.result as string;
-
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
   async register() {
-    if (this.bookForm.valid && this.selectedImage) {
+    if (this.bookForm.valid) {
+     
       if (this.bookForm.value.HistoryId == null) {
-        // Call HistoryService to create a new history
   
         this.historyService.postHistory(this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM]!).subscribe({
           next: (history) => {
@@ -119,71 +102,54 @@ export class ModalComponent implements OnInit {
                 },
                 error: (error) => {
                   console.error('Error updating user with new history ID', error);
-                  // Handle error, maybe notify the user
                 }
               });
             } else {
               console.error('History ID not found in response or User ID not found');
-              // Handle error, maybe notify the user
             }
           },
           error: (error) => {
             console.error('Error creating history', error);
-            // Handle error, maybe notify the user
           }
         });
       } else {
-        // If historyId is not null, proceed with the registration
         this.proceedWithRegistration();
       }
     } else {
       console.error('Form is not valid');
-      // Handle form errors, maybe display error messages to user
     }
   }
   
   
   async  proceedWithRegistration() {
+
+  
+  
     const formData = new FormData();
   
   
-    // Append all form fields to formData
     Object.keys(this.bookForm.value).forEach(key => {
-      if (key !== 'coverImage') { 
         formData.append(key, this.bookForm.value[key]);
-      }
     });
-  
-    // Append the file to formData if selectedImage is not null
-    if (this.selectedImage) {
-      formData.append('imageFile', this.selectedImage, this.selectedImage.name);
-    }
-    console.log("Final form values before submission:", this.bookForm.value);
-    // Call the service method to submit the formData
-    this.bookService.registerBook(formData).subscribe({
-      next: (response) => {
-        console.log('Book registered successfully', response);
-        this.resetForm();
-      },
-      error: (error) => {
-        console.error('Error registering book', error);
-        // Handle error, you may want to log specific error details here as well
-      }
-    });
+    this.registrationData = formData; 
+    this.showGenreSelection = true;
   }
   
 
-
+  handleProceedToGenreSelection(data: any) {
+    this.registrationData = data;
+    this.showModalGenre = true;
+  }
+  handleGenreModalClose() {
+    this.showModalGenre = false;
+  }
   close() {
     this.show = false;
     this.modalService.setShowModal(false);
     this.closeEvent.emit();
     this.resetForm();
   }
-  removeSelectedImage() {
-    this.selectedImage = null;
-    this.selectedImageUrl = null;
-  }
+
   resetForm() {
     this.bookForm.reset({
       Title: '',
@@ -195,8 +161,6 @@ export class ModalComponent implements OnInit {
       PageCount: null,
       Status: 'Available',
     });
-    this.selectedImage = null;
-    this.selectedImageUrl = null;
     
   }
   

@@ -1,99 +1,104 @@
 <div *ngIf="show" class="modal-overlay">
-    <div class="modal">
-        <form [formGroup]="bookForm" (ngSubmit)="register()">
-            <div class="modal-top-row">
-               
+    <div *ngIf="!showGenreSelection; else genreSelection" class="modal">
+        <div class="modal">
+            <form [formGroup]="bookForm" (ngSubmit)="register()">
+                <div class="modal-top-row">
 
-                <div class="modal-content-right">
-                    <div class="modal-header">
-                        <h2>Place order</h2>
-                        <button class="close-button" (click)="close()">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="order-type">
-                            <div class="label-row">
-                                <pre>Type                                                                        Condition</pre>
-                            </div>
-                            <div class="radio-row">
-                                <div class="middle">
-                                    <!-- Group name for radio buttons should be unique -->
-                                    <label>
-                                        <input type="radio" formControlName="Type" value="sell" />
-                                        <div class="front-end box">
-                                            <span>Trade In</span>
-                                        </div>
-                                    </label>
-                                    <label>
-                                        <input type="radio" formControlName="Type" value="buy" />
-                                        <div class="back-end box">
-                                            <span>Looking For</span>
-                                        </div>
-                                    </label>
+
+                    <div class="modal-content-right">
+                        <div class="modal-header">
+                            <h2>Place order</h2>
+                            <button class="close-button" (click)="close()">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="order-type">
+                                <div class="label-row">
+                                    <pre>Type                                                                                         Condition</pre>
                                 </div>
-                                <div class="middle">
-                                    <!-- Group name for radio buttons should be unique -->
-                                    <label>
-                                        <input type="radio" formControlName="Condition" value="Great" />
-                                        <div class="front-end box">
-                                            <span>Great</span>
-                                        </div>
-                                    </label>
-                                    <label>
-                                        <input type="radio" formControlName="Condition" value="Good" />
-                                        <div class="back-end box">
-                                            <span>Good</span>
-                                        </div>
-                                    </label>
-                                    <label>
-                                        <input type="radio" formControlName="Condition" value="Bad" />
-                                        <div class="back-end box">
-                                            <span>Bad</span>
-                                        </div>
-                                    </label>
+                                <div class="radio-row">
+                                    <div class="middle">
+                                        <!-- Group name for radio buttons should be unique -->
+                                        <label>
+                                            <input type="radio" formControlName="Type" value="sell" />
+                                            <div class="front-end box">
+                                                <span>Trade In</span>
+                                            </div>
+                                        </label>
+                                        <label>
+                                            <input type="radio" formControlName="Type" value="buy" />
+                                            <div class="back-end box">
+                                                <span>Looking For</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    <div class="middle">
+                                        <!-- Group name for radio buttons should be unique -->
+                                        <label>
+                                            <input type="radio" formControlName="Condition" value="Great" />
+                                            <div class="front-end box">
+                                                <span>Great</span>
+                                            </div>
+                                        </label>
+                                        <label>
+                                            <input type="radio" formControlName="Condition" value="Good" />
+                                            <div class="back-end box">
+                                                <span>Good</span>
+                                            </div>
+                                        </label>
+                                        <label>
+                                            <input type="radio" formControlName="Condition" value="Bad" />
+                                            <div class="back-end box">
+                                                <span>Bad</span>
+                                            </div>
+                                        </label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        <div class="input-row">
+                            <div class="input-group input-third">
+                                <label for="bookTitle">Title</label>
+                                <input type="text" formControlName="Title" placeholder="Enter book title">
+                            </div>
+                            <div class="input-group input-third">
+                                <label for="bookAuthor">Author</label>
+                                <input type="text" formControlName="Author" placeholder="Enter author's name">
+                            </div>
+                            <div class="input-group input-third">
+                                <label for="bookLanguage">Language</label>
+                                <input type="text" formControlName="Language" placeholder="Enter book language">
+                            </div>
+                        </div>
+                        <div class="input-group">
+                            <label for="bookDescription">Description</label>
+                            <textarea formControlName="Description" rows="4"
+                                placeholder="Enter book description"></textarea>
+                        </div>
+                        <div class="bottom-row">
+                            <div class="isbn-page-count">
+                                <label for="bookIsbn">ISBN</label>
+                                <input type="text" formControlName="ISBN" placeholder="Enter book ISBN">
+                            </div>
+                            <div class="isbn-page-count">
+                                <label for="bookPageCount">Page Count</label>
+                                <input type="number" formControlName="PageCount" placeholder="Enter number of pages">
+                            </div>
+                            <div class="isbn-page-count">
+                                <label for="bookPublicationDate">Publication Date</label>
+                                <input type="date" formControlName="PublicationDate"
+                                    placeholder="Select publication date">
+                            </div>
+                            <button class="post-button" type="submit">Continue</button>
+                        </div>
 
-
-
-
-                    <div class="input-row">
-                        <div class="input-group input-third">
-                            <label for="bookTitle">Title</label>
-                            <input type="text" formControlName="Title" placeholder="Enter book title">
-                        </div>
-                        <div class="input-group input-third">
-                            <label for="bookAuthor">Author</label>
-                            <input type="text" formControlName="Author" placeholder="Enter author's name">
-                        </div>
-                        <div class="input-group input-third">
-                            <label for="bookLanguage">Language</label>
-                            <input type="text" formControlName="Language" placeholder="Enter book language">
-                        </div>
                     </div>
-                    <div class="input-group">
-                        <label for="bookDescription">Description</label>
-                        <textarea formControlName="Description" rows="4" placeholder="Enter book description"></textarea>
-                    </div>
-                    <div class="bottom-row">
-                        <div class="isbn-page-count">
-                            <label for="bookIsbn">ISBN</label>
-                            <input type="text" formControlName="ISBN" placeholder="Enter book ISBN">
-                        </div>
-                        <div class="isbn-page-count">
-                            <label for="bookPageCount">Page Count</label>
-                            <input type="number" formControlName="PageCount" placeholder="Enter number of pages">
-                        </div>
-                        <div class="isbn-page-count"> 
-                            <label for="bookPublicationDate">Publication Date</label>
-                            <input type="date" formControlName="PublicationDate" placeholder="Select publication date">
-                        </div>
-                        <button class="post-button" type="submit">Add Book</button>
-                    </div>
-                    
                 </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
+
+    <ng-template #genreSelection>
+        <app-modal-genre [registrationData]="registrationData" (closeEvent)="handleGenreModalClose()"></app-modal-genre>
+        
+    </ng-template>
 </div>

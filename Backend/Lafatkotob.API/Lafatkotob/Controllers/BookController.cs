@@ -68,8 +68,32 @@ namespace Lafatkotob.Controllers
             return Ok(result.Data);
         }
 
+        [HttpPost("PostBookWithGenres")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> RegisterBookWithGenres([FromForm] RegisterBookWithGenres model, IFormFile imageFile)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+            if (imageFile != null && !imageFile.ContentType.StartsWith("image/"))
+            {
+                return BadRequest("Only image files are allowed.");
+            }
 
-        [HttpDelete("delete")]
+            // The model now includes GenreIds, make sure your service layer knows how to handle it.
+            var result = await _bookService.RegisterBookWithGenres(model, imageFile);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
+        }
+    
+
+
+    [HttpDelete("delete")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 
         public async Task<IActionResult> DeleteBook(int bookId)

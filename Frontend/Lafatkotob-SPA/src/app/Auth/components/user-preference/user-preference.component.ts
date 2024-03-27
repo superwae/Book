@@ -103,7 +103,7 @@ export class UserPreferenceComponent implements OnInit {
     genre.selected = !genre.selected;
   }
 
-  get selectedGenres(): Genre[] {
+  get GenreIds(): Genre[] {
     return this.genres.filter(genre => genre.selected);
   }
 
@@ -113,7 +113,7 @@ export class UserPreferenceComponent implements OnInit {
       return;
     }
     
-    const genreIds = this.selectedGenres.map(genre => genre.id);
+    const genreIds = this.GenreIds.map(genre => genre.id);
     const formData = new FormData();
     Object.entries(this.userDetails).forEach(([key, value]) => {
       formData.append(key, value);

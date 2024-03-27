@@ -22,15 +22,10 @@ export class GenreService {
 
   registerWithPreferences(formData: FormData, selectedGenres: number[]): Observable<any> {
 
-
-    // Append selected genres as an array to formData
     selectedGenres.forEach((genreId, index) => {
-      formData.append(`genreIds`, genreId.toString());
+      formData.append(`GenreIds`, genreId.toString());
     });
-    console.log("user details : " ,formData);
-    console.log("selected genres : " ,selectedGenres);
     const params = new HttpParams().set('role', "User");
-    console.log("params : " ,params);
     return this.http.post(`${this.baseUrl}/AppUser/RegisterWithPreferences`, formData, { params });
   }
 

@@ -1,9 +1,7 @@
 ﻿using Lafatkotob.Entities;
 using Lafatkotob.ViewModels;
 using Microsoft.EntityFrameworkCore;
-using System.Net.NetworkInformation;
-using System.Security.Claims;
-
+using System.Text.Json;
 namespace Lafatkotob.Services.BookService
 {
     public class BookService : IBookService
@@ -88,7 +86,68 @@ namespace Lafatkotob.Services.BookService
             return response;
         }
 
+        public async Task<ServiceResponse<RegisterBookWithGenres>> RegisterBookWithGenres(RegisterBookWithGenres model, IFormFile imageFile)
+        {
+            var response = new ServiceResponse<RegisterBookWithGenres>();
+            var executionStrategy = _context.Database.CreateExecutionStrategy();
 
+            await executionStrategy.ExecuteAsync(async () =>
+            {
+                using (var transaction = await _context.Database.BeginTransactionAsync())
+                {
+                    try
+                    {
+                        var imagePath = await SaveImageAsync(imageFile);
+
+                        var book = new Book
+                        {
+                            Title = model.Title,
+                            Author = model.Author,
+                            Description = model.Description,
+                            UserId = model.UserId,
+                            HistoryId = model.HistoryId,
+                            PublicationDate = model.PublicationDate,
+                            ISBN = model.ISBN,
+                            PageCount = model.PageCount,
+                            Condition = model.Condition,
+                            Type = model.Type,
+                            Status = model.Status,
+                            PartnerUserId = model.PartnerUserId,
+                            CoverImage = imagePath,
+                            Language = model.Language,
+                            AddedDate = DateTime.Now
+                        };
+
+                        _context.Books.Add(book);
+                        await _context.SaveChangesAsync();
+                        List<int> genreIds = JsonSerializer.Deserialize<List<int>>(model.GenreIds);
+                        foreach (var genreId in genreIds) 
+                        {
+                            var bookGenre = new BookGenre
+                            {
+                                BookId = book.Id,
+                                GenreId = genreId
+                            };
+                            _context.BookGenres.Add(bookGenre);
+                        }
+
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        
+                        response.Success = true;
+                        response.Data = model;
+                    }
+                    catch (Exception ex)
+                    {
+                        await transaction.RollbackAsync();
+                        response.Success = false;
+                        response.Message = $"Failed to create book: {ex.Message}";
+                    }
+                }
+            });
+
+            return response;
+        }
 
         public async Task<BookModel> GetById(int id)
         {

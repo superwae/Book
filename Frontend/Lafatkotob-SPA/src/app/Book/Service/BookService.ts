@@ -30,6 +30,13 @@ export class BookService  {
     return this.http.post(`${this.baseUrl}/post`, formData);
   }
 
+
+  registerBookWithGenres(formData: FormData): Observable<any> {
+
+    return this.http.post(`${this.baseUrl}/PostBookWithGenres`, formData);
+  }
+  
+
   searchBooks(query: string): Observable<Book[]> {
     return this.http.get<Book[]>(`${this.baseUrl}/search`, { params: { query } });
   }

@@ -180,9 +180,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0.3s;
   }
   
   .modal-overlay.show {
