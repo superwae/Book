@@ -166,10 +166,7 @@ namespace Lafatkotob.Controllers
             }
 
             var books = await _bookService.SearchBooks(query);
-            if (books.Data == null || !books.Data.Any())
-            {
-                return NotFound(books.Message);
-            }
+
 
             return Ok(books.Data);
         }

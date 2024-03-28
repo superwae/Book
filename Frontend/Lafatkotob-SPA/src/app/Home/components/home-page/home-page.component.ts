@@ -32,13 +32,11 @@ export class HomePageComponent implements OnInit {
 
   handleSearch(query: string): void {
     if(query) {
-      // Handle search with a query
       this.bookService.searchBooks(query).subscribe({
-        next: (books) => this.searchResults = books,
+        next: (books) => this.searchResults = books ,
         error: (err) => console.error('Error fetching search results:', err)
       });
     } else {
-      // Load all books or reset to initial state if query is empty
       this.loadAllBooks();
     }
   }
@@ -58,9 +56,6 @@ export class HomePageComponent implements OnInit {
   }
 
   private loadAllBooks(): void {
-    this.bookService.getAllBooks().subscribe({
-      next: (books) => this.searchResults = books,
-      error: (err) => console.error('Error loading books:', err)
-    });
-  }
-}
+    this.bookService.refreshBooks();
+
+}}

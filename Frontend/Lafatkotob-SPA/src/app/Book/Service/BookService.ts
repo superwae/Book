@@ -50,13 +50,20 @@ export class BookService  {
   
 
   searchBooks(query: string): Observable<Book[]> {
-    return this.http.get<Book[]>(`${this.baseUrl}/search`, { params: { query } });
+    return this.http.get<Book[]>(`${this.baseUrl}/search`, { params: { query } }).pipe(
+      tap(books => {
+        this.booksSubject.next(books);
+      })
+    );
   }
 
   getBooksFilteredByGenres(genreIds: number[]): Observable<Book[]> {
     return this.http.get<{data: Book[]}>(this.baseUrl + '/filter', { params: { genreIds } })
       .pipe(
-        map(response => response.data)
+        map(response => response.data),
+        tap(books => {
+          this.booksSubject.next(books);
+        })
       );
   }
 

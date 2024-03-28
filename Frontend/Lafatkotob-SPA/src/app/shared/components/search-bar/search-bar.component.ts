@@ -15,7 +15,7 @@ export class SearchBarComponent {
   constructor() { }
 
   onSearch(event: Event): void {
-    event.preventDefault(); // 
+    event.preventDefault(); 
     const value = this.searchControl.value;
     this.search.emit(value ?? '');
   }
