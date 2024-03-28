@@ -19,23 +19,16 @@ export class EventsComponent implements OnInit{
   ngOnInit(): void {
     this.route.parent!.paramMap.subscribe(params => {
       const username = params.get('username');
-      console.log("username: ", username);
   
       if (username) {
-        this.eventService.getEventsByUserName(username).subscribe({
-          next: (events: EventModel[]) => {
-            this.events = events;
-          },
-          error: (err) => console.error('Error fetching events:', err),
-        });
+        this.eventService.getEventsByUserName(username).subscribe();
       } else {
-        this.eventService.getAllEvents().subscribe({
-          next: (events: EventModel[]) => {
-            this.events = events;
-          },
-          error: (err) => console.error('Error fetching events:', err)
-        });
+        this.eventService.getAllEvents().subscribe();
       }
+    });
+
+    this.eventService.events$.subscribe(events => {
+      this.events = events;
     });
   }
 }

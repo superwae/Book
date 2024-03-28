@@ -133,7 +133,8 @@ namespace Lafatkotob.Services.BookService
 
                         await _context.SaveChangesAsync();
                         await transaction.CommitAsync();
-                        
+                        model.CoverImage=ConvertToFullUrl(imagePath);
+                        model.Id = book.Id;
                         response.Success = true;
                         response.Data = model;
                     }

@@ -13,26 +13,26 @@
                         <div class="modal-body">
                             <div class="order-type">
                                 <div class="label-row">
-                                    <pre>Type                                                                                         Condition</pre>
+                                    <pre>Type                                                                             Condition</pre>
                                 </div>
                                 <div class="radio-row">
                                     <div class="middle">
-                                        <!-- Group name for radio buttons should be unique -->
+                                        <!-- Radio group for Type -->
                                         <label>
-                                            <input type="radio" formControlName="Type" value="sell" />
+                                            <input type="radio" formControlName="Type" value="sell" (change)="onTypeChange($event)" />
                                             <div class="front-end box">
                                                 <span>Trade In</span>
                                             </div>
                                         </label>
                                         <label>
-                                            <input type="radio" formControlName="Type" value="buy" />
+                                            <input type="radio" formControlName="Type" value="buy" (change)="onTypeChange($event)" />
                                             <div class="back-end box">
                                                 <span>Looking For</span>
                                             </div>
                                         </label>
                                     </div>
                                     <div class="middle">
-                                        <!-- Group name for radio buttons should be unique -->
+                                        <!-- Radio group for Condition, with the "All" option conditionally shown -->
                                         <label>
                                             <input type="radio" formControlName="Condition" value="Great" />
                                             <div class="front-end box">
@@ -51,7 +51,15 @@
                                                 <span>Bad</span>
                                             </div>
                                         </label>
+                                        <!-- The "All" option is conditionally shown based on the type selection -->
+                                        <label *ngIf="isLookingFor">
+                                            <input type="radio" formControlName="Condition" value="Any" />
+                                            <div class="back-end box">
+                                                <span>Any</span>
+                                            </div>
+                                        </label>
                                     </div>
+                                    
                                 </div>
                             </div>
                         </div>

@@ -1,14 +1,16 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { BehaviorSubject, Observable, map, tap } from 'rxjs';
 import { Book } from '../Models/bookModel';
-import { RegisterBook } from '../Models/RegisterbookModel';
 import { AddBookPostLike } from '../Models/addBookPostLike';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BookService  {
+  private booksSubject = new BehaviorSubject<Book[]>([]);
+  books$ = this.booksSubject.asObservable();
+
   private baseUrl = 'https://localhost:7139/api/Book'; 
 
   constructor(private http: HttpClient) { }
@@ -27,13 +29,23 @@ export class BookService  {
   }
   
   registerBook(formData: FormData): Observable<any> {
-    return this.http.post(`${this.baseUrl}/post`, formData);
+    return this.http.post<Book>(`${this.baseUrl}/post`, formData).pipe(
+      tap(book => {
+        const currentBooks = this.booksSubject.getValue();
+        this.booksSubject.next([...currentBooks, book]);
+      })
+    );
   }
 
 
   registerBookWithGenres(formData: FormData): Observable<any> {
-
-    return this.http.post(`${this.baseUrl}/PostBookWithGenres`, formData);
+    return this.http.post<Book>(`${this.baseUrl}/PostBookWithGenres`, formData).pipe(
+      tap(book => {
+        const currentBooks = this.booksSubject.getValue();
+        this.booksSubject.next([...currentBooks, book]);
+        
+      })
+    );
   }
   
 
@@ -48,7 +60,17 @@ export class BookService  {
       );
   }
 
-
+  refreshBooks(): void {
+    this.getAllBooks().subscribe(books => {
+      this.booksSubject.next(books);
+    });
+  }
+  refreshBooksByUserName(username: string): void {
+    this.getBooksByUserName(username).subscribe(books => {
+      this.booksSubject.next(books);
+    });
+  }
+  
 
 
 checkBookLike(data: AddBookPostLike): Observable<any> {

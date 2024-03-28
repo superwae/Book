@@ -26,6 +26,7 @@ export class ModalComponent implements OnInit {
   showGenreSelection: boolean = false;
   registrationData: any;
   showModalGenre: boolean = false;
+  isLookingFor:boolean = false;
   private readonly NAME_IDENTIFIER_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier';
 
   constructor(
@@ -122,7 +123,10 @@ console.log(this.bookForm.errors);
       console.error('Form is not valid');
     }
   }
-  
+
+  onTypeChange(event: any): void {
+    this.isLookingFor = event.target.value === 'buy';
+}
   
   async  proceedWithRegistration() {
 
@@ -188,6 +192,7 @@ console.log(this.bookForm.errors);
       Language: '',
       AddedDate: new Date().toISOString(), // or any other default value
     });
+    this.isLookingFor = false;
     this.bookForm.patchValue({
       UserId: userId,
       HistoryId: historyId,

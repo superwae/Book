@@ -34,8 +34,8 @@
 }
 
 .middle .box {
-  width: 120px;
-  height: 30px;
+  width: 100px;
+  height: 35px;
   line-height: 40px;
   background-color: #fff;
   transition: all 250ms ease;
