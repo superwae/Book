@@ -247,7 +247,10 @@ namespace Lafatkotob.Services.AppUserService
             return new LoginResultModel
             {
                 Success = true,
-                Token = token
+                Token = token,
+                UserId = user.Id,
+                UserName = user.UserName,
+                ProfilePicture = ConvertToFullUrl(user.ProfilePicture),
             };
         }
 

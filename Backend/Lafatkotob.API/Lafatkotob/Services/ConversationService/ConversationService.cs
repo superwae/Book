@@ -30,7 +30,9 @@ namespace Lafatkotob.Services.ConversationService
                     {
                         var conversation = new Conversation
                         {
-                            LastMessageDate = model.LastMessageDate
+                            LastMessageDate = model.LastMessageDate,
+                            LastMessage = model.LastMessage
+
                         };
 
                         _context.Conversations.Add(conversation);
@@ -60,7 +62,8 @@ namespace Lafatkotob.Services.ConversationService
             return new ConversationModel
             {
                 Id = conversation.Id,
-                LastMessageDate = conversation.LastMessageDate
+                LastMessageDate = conversation.LastMessageDate,
+                LastMessage = conversation.LastMessage
             };
         }
 
@@ -71,7 +74,9 @@ namespace Lafatkotob.Services.ConversationService
                 .Select(c => new ConversationModel
                 {
                     Id = c.Id,
-                    LastMessageDate = c.LastMessageDate
+                    LastMessageDate = c.LastMessageDate,
+                    LastMessage = c.LastMessage
+
                 })
                 .ToListAsync();
         }
@@ -101,6 +106,7 @@ namespace Lafatkotob.Services.ConversationService
                     {
                        
                         Conversation.LastMessageDate = model.LastMessageDate;
+                        Conversation.LastMessage = model.LastMessage;
                        
                         _context.Conversations.Update(Conversation);
                         await _context.SaveChangesAsync();
@@ -148,7 +154,8 @@ namespace Lafatkotob.Services.ConversationService
                         response.Data = new ConversationModel
                         {
                             Id = Conversation.Id,
-                            LastMessageDate = Conversation.LastMessageDate
+                            LastMessageDate = Conversation.LastMessageDate,
+                            LastMessage = Conversation.LastMessage  
                         };
                     }
                     catch (Exception ex)

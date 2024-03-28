@@ -23,7 +23,7 @@ export class EventComponent implements OnInit {
 
   ngOnInit(): void {
     const eventId = this.route.snapshot.params['id'];
-    const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+    const userId = localStorage.getItem('userId');
     
     if (eventId && userId) {
       this.eventService.getEventById(eventId).subscribe({
@@ -38,12 +38,5 @@ export class EventComponent implements OnInit {
   }
 
 
-  getUserInfoFromToken(): MyTokenPayload | undefined {
-    const token = localStorage.getItem('token');
-    if (token) {
-      return jwtDecode<MyTokenPayload>(token);
-    }
-    return undefined;
-  }
 
 }

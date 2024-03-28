@@ -52,7 +52,7 @@ namespace Lafatkotob.Controllers
                 return Unauthorized(loginResult.ErrorMessage);
             }
 
-            return Ok(new { Token = loginResult.Token });
+            return Ok(loginResult);
         }
 
 

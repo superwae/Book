@@ -27,6 +27,7 @@ export class ModalComponent implements OnInit {
   registrationData: any;
   showModalGenre: boolean = false;
   isLookingFor:boolean = false;
+  userid: string | null = localStorage.getItem('userId');
   private readonly NAME_IDENTIFIER_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier';
 
   constructor(
@@ -38,9 +39,8 @@ export class ModalComponent implements OnInit {
      ) {}
 
   ngOnInit() {
-    const userInfo = this.getUserInfoFromToken();
-    if (userInfo && userInfo[this.NAME_IDENTIFIER_CLAIM]) {
-      this.userService.getUserById(userInfo[this.NAME_IDENTIFIER_CLAIM]).subscribe({
+    if (localStorage.getItem('token')&&this.userid) {
+      this.userService.getUserById(this.userid).subscribe({
                 next: (user: AppUserModel) => {
           this.initializeForm(user.historyId);
         },
@@ -59,7 +59,7 @@ export class ModalComponent implements OnInit {
       Author: ['', Validators.required],
       Description: [''],
       CoverImage: [null],
-      UserId: [this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM], Validators.required],
+      UserId: [localStorage.getItem('userId')],
       HistoryId: [historyId], 
       PublicationDate: [],
       ISBN: ['', [Validators.required, Validators.pattern(/^\d{13}$/)]],
@@ -67,20 +67,13 @@ export class ModalComponent implements OnInit {
       Condition: ['', Validators.required],
       Status: ['Available', Validators.required],
       Type: ['', Validators.required],
-      PartnerUserId: [this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM]],
+      PartnerUserId: [this.userid],
       Language: ['', Validators.required],
       AddedDate: [new Date().toISOString()]
     });
   }
 
-  getUserInfoFromToken(): MyTokenPayload | undefined {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken: MyTokenPayload = jwtDecode<MyTokenPayload>(token);
-      return decodedToken;
-    }
-    return undefined;
-  }
+
 
   async register() {
     console.log(this.bookForm.value);
@@ -90,12 +83,11 @@ console.log(this.bookForm.errors);
      
       if (this.bookForm.value.HistoryId == null) {
   
-        this.historyService.postHistory(this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM]!).subscribe({
+        this.historyService.postHistory(this.userid!).subscribe({
           next: (history) => {
-            const userId = this.getUserInfoFromToken()?.[this.NAME_IDENTIFIER_CLAIM];
-            if (userId && history.historyId ) {
+            if (this.userid && history.historyId ) {
               const data: SetUserHistoryModel = {
-                UserId: userId,
+                UserId: this.userid,
                 HistoryId: history.historyId
             }; 
               this.userService.updateUserHistoryId(data).subscribe({

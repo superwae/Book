@@ -4,7 +4,6 @@ import { BehaviorSubject, Observable, map, pipe } from 'rxjs';
 import { login } from '../../Models/LoginModel';
 import { ResetPasswordModel } from '../../Models/ResetPasswordModel';
 import { AppUserModel } from '../../Models/AppUserModel';
-import { registerModel } from '../../Models/registerModel';
 import { LoginResponse } from '../../Models/Loginresponse';
 import { SetUserHistoryModel } from '../../Models/SetUserHistoryModel';
 import { Route, Router } from '@angular/router';
@@ -25,7 +24,13 @@ export class AppUsereService {
    loginUser(loginData: login): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.baseUrl}/Login`, loginData)
       .pipe(map(response => {
+        console.log("respose bbb "+response);
         localStorage.setItem('token', response.token);
+        localStorage.setItem('userId', response.userId);
+        localStorage.setItem('userName', response.userName);
+        localStorage.setItem('profilePicture', response.profilePicture);
+
+
         this.isAuthenticatedSubject.next(true);
         window.location.href = '/home';
         return response;
@@ -92,18 +97,7 @@ export class AppUsereService {
     return payload.exp < currentTime;
   }
 
-  private getUserFromLocalStorage(): AppUserModel | null {
-    const user = localStorage.getItem('currentUser');
-    return user ? JSON.parse(user) : null;
-  }
-    getUserInfoFromToken(): MyTokenPayload | null {
-    const token = localStorage.getItem('token');
-    if (!token || this.isTokenExpired(this.decodeToken(token))) {
-        return null;
-    }
-    return this.decodeToken(token); 
-}
- 
+
 
 }
 

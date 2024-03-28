@@ -41,7 +41,7 @@ export class BooksComponent implements OnInit,OnDestroy {
 
 
   checkBooksLikeStatus(books: Book[]): void {
-    const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+    const userId = localStorage.getItem('userId');
     if (userId && books.length > 0) {
       const bookIds = books.map(book => book.id);
       this.bookService.checkBulkLikes(userId, bookIds).subscribe(isLikedMap => {
@@ -56,13 +56,6 @@ export class BooksComponent implements OnInit,OnDestroy {
     return this.bookService.books$;
   }
 
-  getUserInfoFromToken(): MyTokenPayload | undefined {
-    const token = localStorage.getItem('token');
-    if (token) {
-      return jwtDecode<MyTokenPayload>(token);
-    }
-    return undefined;
-  }
 
   trackByBook(index: number, book: Book): number {
     return book.id; 

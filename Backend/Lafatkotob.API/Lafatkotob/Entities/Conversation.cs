@@ -8,10 +8,13 @@ namespace Lafatkotob.Entities
     {
         [Key]
         public int Id { get; set; }
+        public string LastMessage { get; set; }
+
         public DateTime LastMessageDate { get; set; }
 
         public virtual ICollection<Message> Messages { get; set; }
         public virtual ICollection<ConversationsUser> ConversationsUsers { get; set; }
+
 
         public Conversation()
         {

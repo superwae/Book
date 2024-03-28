@@ -29,7 +29,7 @@ export class BookComponent implements OnInit{
 
   ngOnInit(): void {
     const bookId = this.route.snapshot.params['id'];
-    const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];    
+    const userId = localStorage.getItem('userId');    
     if (bookId) {
       this.bookService.getBookById(bookId).subscribe({
           next: (data) => {
@@ -51,7 +51,7 @@ export class BookComponent implements OnInit{
   }
   onLikeBook(bookId: number, event: MouseEvent): void {
     event.stopPropagation();
-    const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+    const userId = localStorage.getItem('userId');
     if (!userId) {
       console.error('User must be logged in to like a book');
       return;
@@ -100,12 +100,4 @@ export class BookComponent implements OnInit{
     console.log('Opening chat with user ID:', userId);
   }
 
-  getUserInfoFromToken(): MyTokenPayload | undefined {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken: MyTokenPayload = jwtDecode<MyTokenPayload>(token);
-      return decodedToken;
-    }
-    return undefined;
-  }
 }

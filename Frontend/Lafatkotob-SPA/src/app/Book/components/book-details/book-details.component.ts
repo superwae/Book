@@ -31,8 +31,7 @@ export class BookDetailsComponent implements OnInit {
 
    ngOnInit(): void {
     const bookId = this.route.snapshot.params['id'];
-    const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];    
-    if (bookId) {
+    const userId = localStorage.getItem('userId');
       this.bookService.getBookById(bookId).subscribe({
           next: (data) => {
               this.book = data; // Make sure this line successfully assigns data to this.book
@@ -48,9 +47,9 @@ export class BookDetailsComponent implements OnInit {
           }
       });
   }
-}
+
   checkBookLikeStatus(): void {
-    const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+    const userId = localStorage.getItem('userId');
     if (userId && this.book && this.book.id !== undefined) {
       this.bookService.checkBulkLikes(userId, [this.book.id]).subscribe(isLikedMap => {
         if (this.book) {
@@ -60,17 +59,11 @@ export class BookDetailsComponent implements OnInit {
     }
   }
   
-  getUserInfoFromToken(): any { 
-    const token = localStorage.getItem('token');
-    if (token) {
-      return jwtDecode(token);
-    }
-    return null;
-  }
+
 
   onLikeBook(bookId: number, event: MouseEvent): void {
     event.stopPropagation();
-    const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+    const userId = localStorage.getItem('userId');
   
     if (!userId) {
       console.error('User must be logged in to like a book');

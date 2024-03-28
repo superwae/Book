@@ -75,12 +75,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
       }
     }));
 
-    // Correctly subscribe to authentication state changes
     this.authSubscription = this.appUserService.isAuthenticated.subscribe(isAuthenticated => {
       this.isLoggedIn = isAuthenticated;
       if (isAuthenticated) {
         // Fetch user info only if authenticated
-        const userId = this.getUserInfoFromToken()?.['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+        const userId = localStorage.getItem('userId');
         if (userId) {
           this.fetchUserInfo(userId);
         }
@@ -173,14 +172,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   testClick() {
     console.log('Link clicked!');
   }
-  getUserInfoFromToken(): MyTokenPayload | undefined {
-    const token = localStorage.getItem('token');
-    if (token) {
-      const decodedToken: MyTokenPayload = jwtDecode<MyTokenPayload>(token);
-      return decodedToken;
-    }
-    return undefined;
-  }
+
 
   toggleDropdown() {
     console.log("Toggle dropdown called");
